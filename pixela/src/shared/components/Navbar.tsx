@@ -245,14 +245,22 @@ export const Navbar = () => {
           <button 
             className={STYLES.mobileMenuButton} 
             onClick={toggleMobileMenu}
-            aria-label="Abrir menú"
+            aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <RxHamburgerMenu className="w-6 h-6" />
           </button>
         </div>
       </nav>
       
-      <div className={`${STYLES.mobileMenu} ${mobileMenuOpen ? STYLES.mobileMenuVisible : STYLES.mobileMenuHidden}`}>
+      <div
+        id="mobile-menu"
+        className={`${STYLES.mobileMenu} ${mobileMenuOpen ? STYLES.mobileMenuVisible : STYLES.mobileMenuHidden}`}
+        aria-hidden={!mobileMenuOpen ? true : undefined}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        {...(!mobileMenuOpen ? { inert: true as any } : {})}
+      >
         <button 
           className={STYLES.mobileCloseButton} 
           onClick={closeMobileMenu}

@@ -165,6 +165,15 @@ body {
   animation: slide-out-right 0.3s ease-in;
 }
 
+/* Estilos base de Embla Carousel (migrados desde trending.css) */
+.embla__container {
+  display: flex;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -khtml-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Animación de pulso para los botones de embla carrusel */
 @keyframes embla-pulse {
   0% {
