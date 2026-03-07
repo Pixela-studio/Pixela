@@ -19,7 +19,7 @@ const STYLES = {
 
   // Título principal del hero
   heroTitle: {
-    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tight leading-[1.1] drop-shadow-sm",
+    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase md:tracking-tight md:uppercase leading-[1.0] drop-shadow-sm",
     accent: "text-pixela-accent",
   },
 

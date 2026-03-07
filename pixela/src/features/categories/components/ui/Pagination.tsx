@@ -3,23 +3,23 @@ import { PaginationProps } from '@/features/categories/types/pagination';
 
 const STYLES = {
     // Contenedor principal
-    container: 'flex justify-center items-center gap-1 md:gap-2 transition-all duration-300',
+    container: 'flex justify-center items-center gap-2 md:gap-3 transition-all duration-300 flex-wrap',
 
     // Botones de página
-    button: 'flex items-center justify-center rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
-    pageButton: 'w-8 h-8 md:w-10 md:h-10 text-sm md:text-base relative',
-    activeButton: 'bg-pixela-accent text-white shadow-lg shadow-pixela-accent/20 scale-105',
+    button: 'flex items-center justify-center rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium',
+    pageButton: 'w-10 h-10 md:w-12 md:h-12 text-base md:text-lg relative',
+    activeButton: 'bg-pixela-accent text-white shadow-xl shadow-pixela-accent/20 scale-105',
     inactiveButton: 'bg-pixela-dark/30 text-pixela-light/80 border border-pixela-accent/20 hover:bg-pixela-accent/10 hover:border-pixela-accent/40 hover:scale-105',
 
     // Estados de loading
-    loadingButton: 'bg-pixela-accent/50 text-white shadow-lg shadow-pixela-accent/10 cursor-wait',
-    loadingOverlay: 'absolute inset-0 flex items-center justify-center bg-pixela-accent/90 rounded-lg',
-    loadingSpinner: 'w-3 h-3 md:w-4 md:h-4 animate-spin',
+    loadingButton: 'bg-pixela-accent/50 text-white shadow-xl shadow-pixela-accent/10 cursor-wait',
+    loadingOverlay: 'absolute inset-0 flex items-center justify-center bg-pixela-accent/90 rounded-xl',
+    loadingSpinner: 'w-4 h-4 md:w-5 md:h-5 animate-spin',
 
     // Elementos de navegación
-    ellipsis: 'flex items-center justify-center w-8 h-8 md:w-10 md:h-10 text-pixela-light/60',
-    navButton: 'w-8 h-8 md:w-10 md:h-10 text-pixela-light/60 hover:text-pixela-accent hover:scale-110 transition-all duration-200',
-    chevronIcon: 'w-5 h-5 transition-transform duration-200',
+    ellipsis: 'flex items-center justify-center w-10 h-10 md:w-12 md:h-12 text-pixela-light/60 text-base md:text-lg tracking-widest',
+    navButton: 'w-10 h-10 md:w-12 md:h-12 text-pixela-light/60 hover:text-pixela-accent hover:scale-110 transition-all duration-200',
+    chevronIcon: 'w-6 h-6 transition-transform duration-200',
     
     // Disabled state improvements
     disabledContainer: 'opacity-60 pointer-events-none'

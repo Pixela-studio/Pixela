@@ -24,7 +24,7 @@ export const TextInput = ({ icon, className = '', type = 'text', ...props }: Tex
       
       <input 
         type={inputType}
-        className={`w-full border border-transparent bg-[#181818] hover:border-gray-500 focus:border-gray-500 hover:border-opacity-70 focus:border-opacity-90 rounded-[49px] transition-all duration-200 ease-out outline-none focus:outline-none focus:ring-0 px-6 placeholder-gray-500/50 placeholder-shown:text-[16px] focus:placeholder-gray-500/30 ${icon ? 'pl-10' : ''} ${className}`}
+        className={`w-full h-[48px] py-3 text-white border border-transparent bg-[#181818] hover:border-gray-500 focus:border-gray-500 hover:border-opacity-70 focus:border-opacity-90 rounded-[49px] transition-all duration-200 ease-out outline-none focus:outline-none focus:ring-0 px-6 placeholder-gray-500/50 placeholder-shown:text-[16px] focus:placeholder-gray-500/30 ${icon ? 'pl-10' : ''} ${className}`}
         {...props}
       />
       

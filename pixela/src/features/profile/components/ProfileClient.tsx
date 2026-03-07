@@ -39,10 +39,10 @@ const STYLES = {
 
   // Tabs (Premium Style)
   tabsContainer:
-    "flex flex-wrap justify-center md:justify-start gap-2 mb-10 border-b border-white/10 pb-1",
+    "grid grid-cols-2 sm:flex sm:flex-wrap justify-center md:justify-start gap-2 mb-10 border-b border-white/10",
   tabButton: (isActive: boolean) =>
     clsx(
-      "px-6 py-3 text-sm font-medium transition-all duration-300 relative",
+      "px-2 sm:px-6 py-4 sm:py-3 text-[13px] sm:text-sm font-medium transition-all duration-300 relative flex flex-col sm:flex-row items-center justify-center gap-2",
       isActive ? "text-white" : "text-gray-400 hover:text-white",
     ),
   tabIndicator: (isActive: boolean) =>
@@ -50,7 +50,7 @@ const STYLES = {
       "absolute bottom-0 left-0 w-full h-0.5 bg-pixela-accent shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-300",
       isActive ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0",
     ),
-  tabIcon: "inline-block mr-2 text-lg relative top-[-1px]",
+  tabIcon: "text-2xl sm:text-lg relative",
 
   // Content Layout
   contentWrapper: "min-h-[400px] animate-fade-in",

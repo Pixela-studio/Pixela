@@ -9,13 +9,14 @@ interface ProfileStatsBarProps {
 
 const STYLES = {
   statsContainer: "max-w-7xl mx-auto px-4 md:px-8 mt-20 mb-12",
-  statsGrid: "grid grid-cols-2 md:grid-cols-4 gap-4",
-  statCard: (clickable: boolean) =>
+  statsGrid: "grid grid-cols-2 md:flex md:justify-center md:flex-wrap lg:grid lg:grid-cols-3 gap-4",
+  statCard: (clickable: boolean, isLastOdd: boolean) =>
     clsx(
-      "bg-white/5 backdrop-blur-sm border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center transition-all duration-300 group relative overflow-hidden",
+      "bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-300 group relative overflow-hidden",
       clickable
         ? "hover:bg-white/10 cursor-pointer hover:border-white/20 active:scale-95"
         : "cursor-default",
+      isLastOdd ? "col-span-2 lg:col-span-1" : "col-span-1"
     ),
   statValue:
     "text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform font-outfit relative z-10",
@@ -40,10 +41,12 @@ export const ProfileStatsBar = ({
       <div className={STYLES.statsGrid}>
         {stats.map((stat, idx) => {
           const targetTab = getTabForStat(stat.label);
+          const isLastOdd = stats.length % 2 !== 0 && idx === stats.length - 1;
+          
           return (
             <div
               key={idx}
-              className={STYLES.statCard(!!targetTab)}
+              className={STYLES.statCard(!!targetTab, isLastOdd)}
               onClick={() => targetTab && onTabChange(targetTab)}
             >
               <stat.icon className={STYLES.statIcon} />
