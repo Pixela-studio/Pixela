@@ -106,7 +106,7 @@ export const DiscoverContent = () => {
    */
   const descriptionContent = (
     <div
-      className={`${STYLES.description} mb-8 2k:mb-6 mx-0 lg:max-w-xl py-8 lg:py-0`}
+      className={`${STYLES.description} mb-8 2k:mb-6 mx-0 lg:max-w-xl p-6 lg:p-0 bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none rounded-2xl lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mt-6 lg:mt-0`}
     >
       <p>
         Explora un catálogo seleccionado para{" "}
@@ -123,7 +123,7 @@ export const DiscoverContent = () => {
 
   return (
     <div
-      className={`${STYLES.container} flex-col items-stretch gap-8 px-4 py-12 lg:min-h-[85vh] lg:mt-16 lg:flex-row lg:items-center lg:justify-center lg:px-0 lg:py-0`}
+      className={`${STYLES.container} flex-col items-stretch gap-8 px-4 py-16 lg:min-h-[85vh] lg:mt-16 lg:flex-row lg:items-center lg:justify-center lg:px-0 lg:py-0`}
     >
       {/* --- Fondo para ESCRITORIO y MÓVIL (Visible Always) --- */}
       <div className={`${STYLES.gradientContainer}`}>

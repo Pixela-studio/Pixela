@@ -85,13 +85,13 @@ const STYLES = {
   randomContainer: "container px-4 mx-auto",
   randomGrid:
     "grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[70vh]",
-  textContainer: "max-w-2xl space-y-8 ml-8 lg:ml-12",
+  textContainer: "max-w-2xl space-y-8 lg:ml-12",
   textContent: "space-y-6",
   mainTitle:
-    "text-4xl font-black leading-tight md:text-5xl lg:text-6xl text-pixela-light",
+    "text-4xl sm:text-5xl lg:text-6xl font-black font-outfit leading-[1.1] sm:leading-tight tracking-tight text-pixela-light",
   accentText: "text-pixela-accent",
   descriptionContainer:
-    "space-y-6 text-lg leading-relaxed md:text-xl text-pixela-light/90",
+    "space-y-4 text-base leading-relaxed md:space-y-6 md:text-lg lg:text-xl text-pixela-light/80",
   descriptionText: "text-balance",
   highlightText: "font-semibold text-pixela-accent",
   highlightTextWhite: "font-semibold text-white",
@@ -711,7 +711,7 @@ const RandomRecommendations = memo(
           <div className={STYLES.textContainer}>
             <div className={STYLES.textContent}>
               <h2 className={STYLES.mainTitle}>
-                ¿No sabes qué ver{" "}
+                ¿No sabes qué ver<br className="sm:hidden" />{" "}
                 <span className={STYLES.accentText}>ahora mismo?</span>
               </h2>
 

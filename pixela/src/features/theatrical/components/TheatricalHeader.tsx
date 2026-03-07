@@ -14,8 +14,8 @@ import {
 // Estilos adaptados de TrendingHeader
 const STYLES = {
   ...HEADER_LAYOUT_STYLES,
-  title: `${HEADER_TYPOGRAPHY_STYLES.titleBase} text-right ml-auto`,
-  titleMobile: `${HEADER_TYPOGRAPHY_STYLES.titleMobileBase} text-right pr-4`,
+  title: `${HEADER_TYPOGRAPHY_STYLES.titleBase} text-left sm:text-right sm:ml-auto`,
+  titleMobile: `${HEADER_TYPOGRAPHY_STYLES.titleMobileBase} text-left pl-4`,
   titleDesktop: `${HEADER_TYPOGRAPHY_STYLES.titleDesktopBase} text-right sm:pr-0`,
 } as const;
 
@@ -57,7 +57,7 @@ export const TheatricalHeader = ({
           {/* Espaciador flexible para empujar título a la derecha si es necesario */}
           <div className="flex-grow hidden lg:block" />
 
-          <div ref={titleRef} className="ml-auto">
+          <div ref={titleRef} className="w-full sm:w-auto sm:ml-auto">
             <h2 className={STYLES.title}>
               <span className={STYLES.titleMobile}>
                 TOP
