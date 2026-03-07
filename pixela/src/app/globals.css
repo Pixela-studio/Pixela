@@ -29,7 +29,11 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 /* Clase para añadir efecto de ruido de película */
@@ -67,96 +71,122 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 .animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
 /* Delays para efectos escalonados */
 .delay-200 {
-    animation-delay: 0.2s;
+  animation-delay: 0.2s;
 }
 
 .delay-400 {
-    animation-delay: 0.4s;
+  animation-delay: 0.4s;
 }
 
 .delay-600 {
-    animation-delay: 0.6s;
+  animation-delay: 0.6s;
 }
 
 .delay-800 {
-    animation-delay: 0.8s;
+  animation-delay: 0.8s;
 }
 
 /* Clases de delay para animaciones float */
 .animation-delay-200 {
-    animation-delay: 200ms;
+  animation-delay: 200ms;
 }
 
 .animation-delay-400 {
-    animation-delay: 400ms;
+  animation-delay: 400ms;
 }
 
 .animation-delay-600 {
-    animation-delay: 600ms;
+  animation-delay: 600ms;
 }
 
 .animation-delay-800 {
-    animation-delay: 800ms;
+  animation-delay: 800ms;
 }
 
 /* Toast Animations */
 @keyframes slide-in-right {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-out-right {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 .animate-slide-in-right {
-    animation: slide-in-right 0.3s ease-out;
+  animation: slide-in-right 0.3s ease-out;
 }
 
 .animate-slide-out-right {
-    animation: slide-out-right 0.3s ease-in;
+  animation: slide-out-right 0.3s ease-in;
+}
+
+/* Estilos base de Embla Carousel (migrados desde trending.css) */
+.embla__container {
+  display: flex;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -khtml-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Animación de pulso para los botones de embla carrusel */
+@keyframes embla-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(236, 27, 105, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(236, 27, 105, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(236, 27, 105, 0);
+  }
+}
+
+.embla-btn-pulse {
+  animation: embla-pulse 2s infinite;
 }

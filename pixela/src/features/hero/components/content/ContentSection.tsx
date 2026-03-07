@@ -14,12 +14,12 @@ const STYLES = {
   // Línea decorativa de acento
   accentLine: {
     base: "w-16 md:w-24 lg:w-24 h-1 bg-pixela-accent",
-    withMargin: "mb-4 md:mb-6 lg:mb-8",
+    withMargin: "mb-4 md:mb-6 lg:mb-8 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
   },
 
   // Título principal del hero
   heroTitle: {
-    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase md:tracking-tight md:uppercase leading-[1.0] drop-shadow-sm",
+    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase md:tracking-tight md:uppercase leading-[1.0] drop-shadow-sm [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
     accent: "text-pixela-accent",
   },
 
@@ -34,9 +34,9 @@ const STYLES = {
   contentSection: {
     base: "absolute inset-x-0 bottom-0 z-10 px-4 sm:px-5 md:px-6 lg:px-0 2k:px-8",
     container:
-      "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24",
+      "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24 [@media(max-height:500px)_and_(orientation:landscape)]:pb-8",
     description:
-      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/80 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg 2k:max-w-2xl mb-6 md:mb-8 lg:mb-12 2k:mb-8 drop-shadow-sm backdrop-blur-[2px] sm:backdrop-blur-0",
+      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/80 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg 2k:max-w-2xl mb-6 md:mb-8 lg:mb-12 2k:mb-8 drop-shadow-sm backdrop-blur-[2px] sm:backdrop-blur-0 [@media(max-height:500px)_and_(orientation:landscape)]:mb-3",
     buttonsContainer:
       "flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-8 2k:gap-6 ipad:flex-col ipad:items-start ipad:gap-6",
     buttonWrapper: "ipad:w-full",

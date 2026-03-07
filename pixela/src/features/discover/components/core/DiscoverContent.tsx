@@ -106,7 +106,7 @@ export const DiscoverContent = () => {
    */
   const descriptionContent = (
     <div
-      className={`${STYLES.description} mb-8 2k:mb-6 mx-0 lg:max-w-xl p-6 lg:p-0 bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none rounded-2xl lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mt-6 lg:mt-0`}
+      className={`${STYLES.description} mb-8 2k:mb-6 mx-0 lg:max-w-xl p-6 bg-pixela-dark/60 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl mt-6 lg:mt-0`}
     >
       <p>
         Explora un catálogo seleccionado para{" "}
@@ -123,7 +123,7 @@ export const DiscoverContent = () => {
 
   return (
     <div
-      className={`${STYLES.container} flex-col items-stretch gap-8 px-4 py-16 lg:min-h-[85vh] lg:mt-16 lg:flex-row lg:items-center lg:justify-center lg:px-0 lg:py-0`}
+      className={`${STYLES.container} flex-col items-stretch gap-8 px-4 py-16 lg:min-h-[85vh] lg:mt-16 lg:flex-row lg:items-center lg:justify-center lg:px-0 lg:py-0 [@media(max-height:500px)_and_(orientation:landscape)]:py-8 [@media(max-height:500px)_and_(orientation:landscape)]:gap-4`}
     >
       {/* --- Fondo para ESCRITORIO y MÓVIL (Visible Always) --- */}
       <div className={`${STYLES.gradientContainer}`}>
@@ -131,7 +131,7 @@ export const DiscoverContent = () => {
       </div>
 
       {/* --- Contenido para MÓVIL (Visible only on lg and below) --- */}
-      <div className="flex flex-col lg:hidden w-full relative z-10">
+      <div className="flex flex-col lg:hidden w-full relative z-10 [@media(max-height:500px)_and_(orientation:landscape)]:flex-row [@media(max-height:500px)_and_(orientation:landscape)]:items-center [@media(max-height:500px)_and_(orientation:landscape)]:gap-6">
         <h2 className={STYLES.mainHeadingMobile}>
           DES-
           <br />

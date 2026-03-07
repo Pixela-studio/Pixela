@@ -17,7 +17,7 @@ const STYLES = {
   bookmarkIcon: (isFavorited: boolean) =>
     `w-5 h-5 transition-all duration-300 ${isFavorited ? "" : "drop-shadow-[0_0_8px_rgba(255,45,85,0.5)] scale-110"}`,
   reviewButton:
-    "bg-[#1A1A1A] hover:bg-[#252525] text-white px-8 py-3 rounded-lg font-medium transition duration-300 flex items-center gap-2 border border-white/10 relative z-50",
+    "bg-[#1A1A1A] hover:bg-[#252525] text-white px-8 py-3 rounded-lg font-medium transition duration-300 flex items-center gap-2 border border-white/10",
   penIcon: "w-5 h-5",
 };
 

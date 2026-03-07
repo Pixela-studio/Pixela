@@ -8,7 +8,7 @@ import { HeroImage } from "@/features/hero/types/content";
 const STYLES = {
   progress: {
     container:
-      "absolute bottom-6 sm:bottom-14 md:bottom-20 lg:bottom-28 2k:bottom-16 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xl px-4 lg:px-0",
+      "absolute bottom-6 sm:bottom-14 md:bottom-20 lg:bottom-28 2k:bottom-16 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xl px-4 lg:px-0 [@media(max-height:500px)_and_(orientation:landscape)]:bottom-2",
     content: "flex flex-col items-center gap-3 sm:gap-3 md:gap-3 lg:gap-4",
     controls: "flex items-center justify-between w-full",
     counter:

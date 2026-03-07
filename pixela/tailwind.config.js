@@ -13,6 +13,8 @@ module.exports = {
       screens: {
         ipad: { raw: "(width: 768px) and (height: 1024px)" },
         "2k": { raw: "(min-width: 2048px)" },
+        // Landscape horizontal en móviles pequeños (altura reducida)
+        ls: { raw: "(max-height: 500px) and (orientation: landscape)" },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],

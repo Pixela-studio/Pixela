@@ -16,21 +16,21 @@ const STYLES = {
   container: 'w-full max-w-[83.333%] mx-auto flex items-center p-4 max-sm:px-3 max-sm:w-[calc(100%-2rem)] bg-dark-opacity backdrop-blur-sm rounded-[36px]',
   logo: 'mx-10 sm:mx-2 md:mx-6 lg:mx-10',
   logoText: 'text-3xl font-bold font-outfit text-pixela-accent',
-  navLinks: 'hidden md:flex ipad:hidden lg:flex flex-1 justify-center', 
-  navLinksContainer: 'flex space-x-8',
+  navLinks: 'hidden lg:flex flex-1 justify-center', 
+  navLinksContainer: 'flex space-x-8 lg:space-x-6 xl:space-x-8',
   navLink: 'font-pixela-outfit-sm text-pixela-light relative group',
   navLinkUnderline: 'absolute bottom-0 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
-  userSection: 'hidden md:flex ipad:hidden lg:flex mx-10 items-center',
+  userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
   userContainer: 'flex items-center gap-2',
   userName: 'text-pixela-light font-pixela-outfit-sm',
   button: 'text-pixela-light/80 hover:text-pixela-accent transition-colors duration-300 p-2 rounded-full hover:bg-pixela-dark/30',
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
 
   // Estilos para el menú hamburguesa
-  mobileMenuButton: 'md:hidden ipad:block lg:hidden text-pixela-light hover:text-pixela-accent p-2 rounded-full shadow-lg transition-all duration-300 mr-3 ml-auto',
-  mobileMenu: 'fixed inset-0 bg-pixela-dark/95 backdrop-blur-lg z-50 flex flex-col justify-center items-start p-6 sm:p-8 md:p-16 transform transition-transform duration-300',
-  mobileMenuVisible: 'translate-y-0',
-  mobileMenuHidden: 'translate-y-full',
+  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 rounded-full shadow-lg transition-all duration-300 mr-3 ml-auto',
+  mobileMenu: 'fixed inset-0 bg-pixela-dark/95 backdrop-blur-lg z-50 flex flex-col justify-start overflow-y-auto items-start p-6 sm:p-8 md:p-16 pt-24 sm:pt-28 transform transition-all duration-300',
+  mobileMenuVisible: 'translate-y-0 opacity-100 pointer-events-auto',
+  mobileMenuHidden: 'translate-y-full opacity-0 pointer-events-none',
   mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2',
   mobileNavContainer: 'flex flex-col items-start w-full space-y-2 sm:space-y-8 pl-2 sm:pl-6',
   mobileNavLink: 'font-outfit font-black text-5xl sm:text-4xl text-pixela-light hover:text-pixela-accent py-3 pl-4 sm:pl-8 transition-colors duration-300 text-left w-full',
@@ -245,14 +245,22 @@ export const Navbar = () => {
           <button 
             className={STYLES.mobileMenuButton} 
             onClick={toggleMobileMenu}
-            aria-label="Abrir menú"
+            aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <RxHamburgerMenu className="w-6 h-6" />
           </button>
         </div>
       </nav>
       
-      <div className={`${STYLES.mobileMenu} ${mobileMenuOpen ? STYLES.mobileMenuVisible : STYLES.mobileMenuHidden}`}>
+      <div
+        id="mobile-menu"
+        className={`${STYLES.mobileMenu} ${mobileMenuOpen ? STYLES.mobileMenuVisible : STYLES.mobileMenuHidden}`}
+        aria-hidden={!mobileMenuOpen ? true : undefined}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        {...(!mobileMenuOpen ? { inert: true as any } : {})}
+      >
         <button 
           className={STYLES.mobileCloseButton} 
           onClick={closeMobileMenu}
