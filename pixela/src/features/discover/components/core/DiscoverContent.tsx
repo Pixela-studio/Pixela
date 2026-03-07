@@ -106,7 +106,7 @@ export const DiscoverContent = () => {
    */
   const descriptionContent = (
     <div
-      className={`${STYLES.description} mb-8 2k:mb-6 mx-0 lg:max-w-xl p-6 lg:p-0 bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none rounded-2xl lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mt-6 lg:mt-0`}
+      className={`${STYLES.description} mb-8 2k:mb-6 mx-0 lg:max-w-xl p-6 bg-pixela-dark/60 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl mt-6 lg:mt-0`}
     >
       <p>
         Explora un catálogo seleccionado para{" "}

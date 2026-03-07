@@ -102,8 +102,8 @@ export function CastSection({ actors }: CastSectionProps) {
       {useGrid ? (
         // Cuadrícula solo en desktop cuando hay pocos actores
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {actors.map((actor) => (
-            <ActorCard key={actor.nombre} actor={actor} />
+          {actors.map((actor, index) => (
+            <ActorCard key={`${actor.nombre}-${actor.personaje ?? ''}-${index}`} actor={actor} />
           ))}
         </div>
       ) : (
@@ -116,9 +116,9 @@ export function CastSection({ actors }: CastSectionProps) {
             ref={emblaRef}
           >
             <div className="flex -mx-2 will-change-transform transform-gpu">
-              {actors.map((actor) => (
+              {actors.map((actor, index) => (
                 <ActorCard
-                  key={actor.nombre}
+                  key={`${actor.nombre}-${actor.personaje ?? ''}-${index}`}
                   actor={actor}
                   className="flex-none w-[120px] sm:w-[140px] md:w-[160px] lg:w-[180px] mx-2"
                 />
