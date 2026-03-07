@@ -16,11 +16,11 @@ import { useScrollAnimation, useInteractiveBorder } from '@/hooks';
 const STYLES = {
   
   // Seccion general
-  section: "relative z-0 py-36 2k:py-24 px-4 max-sm:px-2 bg-pixela-dark",
+  section: "relative z-0 py-36 2k:py-24 px-4 max-sm:px-2 bg-pixela-dark [@media(max-height:500px)_and_(orientation:landscape)]:py-8",
   container: "max-w-7xl 2k:max-w-6xl mx-auto max-sm:w-5/6 ipad:w-[90%] 2k:w-[70%]",
 
   // Titulos
-  title: "text-6xl max-sm:text-4xl font-black mb-8 text-pixela-accent font-outfit relative inline-block max-sm:text-[64px] max-sm:leading-[0.95] max-sm:break-words",
+  title: "text-6xl max-sm:text-4xl font-black mb-8 text-pixela-accent font-outfit relative inline-block max-sm:text-[64px] max-sm:leading-[0.95] max-sm:break-words [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px] [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
   titleUnderline: "absolute -bottom-2 left-0 w-0 h-1 bg-pixela-accent group-hover:w-full transition-all duration-500",
   titleMobile: "block sm:hidden text-left",
   titleDesktop: "hidden sm:block",
@@ -31,14 +31,14 @@ const STYLES = {
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   cardContent: "relative z-10 h-full rounded-[15px] p-8 max-sm:p-4 ipad:p-6 flex flex-col bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5",
   cardIcon: "text-4xl text-pixela-accent ipad:text-3xl",
-  cardIconContainer: "mb-6",
-  cardTitle: "text-2xl font-semibold text-white mb-4 group-hover:text-pixela-accent transition-colors duration-300 flex items-center ipad:text-xl ipad:mb-3 mt-1",
+  cardIconContainer: "mb-6 [@media(max-height:500px)_and_(orientation:landscape)]:mb-3",
+  cardTitle: "text-2xl font-semibold text-white mb-4 group-hover:text-pixela-accent transition-colors duration-300 flex items-center ipad:text-xl ipad:mb-3 mt-1 [@media(max-height:500px)_and_(orientation:landscape)]:text-xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
   cardTitleContainer: "flex items-center gap-3 mb-4 ipad:flex-col ipad:items-start ipad:gap-2",
   cardDescription: "text-white/70 leading-relaxed flex-grow ipad:text-sm ipad:leading-relaxed",
   comingSoon: "px-2 py-1 text-xs font-bold uppercase tracking-wider bg-pixela-accent/20 text-pixela-accent rounded-full border border-pixela-accent/30 ipad:px-1.5 ipad:py-0.5 ipad:text-[10px] ipad:self-start ",
   
   // Seccion de equipo
-  teamSection: "py-20 2k:py-16 ipad:py-12",
+  teamSection: "py-20 2k:py-16 ipad:py-12 [@media(max-height:500px)_and_(orientation:landscape)]:py-8",
   teamHeader: "text-left ipad:text-left lg:text-center xl:text-center mb-16 2k:mb-12",
   teamHeaderText: "space-y-4 2k:space-y-3 max-w-3xl max-sm:mx-0 ipad:mx-0 lg:mx-auto xl:mx-auto",
   teamGrid: "flex flex-col md:flex-row justify-between gap-8 md:gap-16 2k:gap-12 ipad:flex-col ipad:gap-8",

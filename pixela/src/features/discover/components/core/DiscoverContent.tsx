@@ -123,7 +123,7 @@ export const DiscoverContent = () => {
 
   return (
     <div
-      className={`${STYLES.container} flex-col items-stretch gap-8 px-4 py-16 lg:min-h-[85vh] lg:mt-16 lg:flex-row lg:items-center lg:justify-center lg:px-0 lg:py-0`}
+      className={`${STYLES.container} flex-col items-stretch gap-8 px-4 py-16 lg:min-h-[85vh] lg:mt-16 lg:flex-row lg:items-center lg:justify-center lg:px-0 lg:py-0 [@media(max-height:500px)_and_(orientation:landscape)]:py-8 [@media(max-height:500px)_and_(orientation:landscape)]:gap-4`}
     >
       {/* --- Fondo para ESCRITORIO y MÓVIL (Visible Always) --- */}
       <div className={`${STYLES.gradientContainer}`}>
@@ -131,7 +131,7 @@ export const DiscoverContent = () => {
       </div>
 
       {/* --- Contenido para MÓVIL (Visible only on lg and below) --- */}
-      <div className="flex flex-col lg:hidden w-full relative z-10">
+      <div className="flex flex-col lg:hidden w-full relative z-10 [@media(max-height:500px)_and_(orientation:landscape)]:flex-row [@media(max-height:500px)_and_(orientation:landscape)]:items-center [@media(max-height:500px)_and_(orientation:landscape)]:gap-6">
         <h2 className={STYLES.mainHeadingMobile}>
           DES-
           <br />

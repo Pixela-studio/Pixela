@@ -13,7 +13,7 @@ import { useProgressBar } from "@/features/hero/hooks/useProgressBar";
 
 const STYLES = {
   hero: {
-    base: "relative w-full min-h-[80vh] sm:min-h-[85vh] md:min-h-screen lg:h-screen 2k:h-[70vh] overflow-hidden px-4 sm:px-6 md:px-8 lg:px-0 2k:px-0",
+    base: "relative w-full min-h-[80vh] sm:min-h-[85vh] md:min-h-[100svh] lg:h-[100svh] 2k:h-[70vh] overflow-hidden px-4 sm:px-6 md:px-8 lg:px-0 2k:px-0",
     ipadFix:
       "sm:[min-height:1180px]:min-h-screen sm:[min-width:820px]:min-h-screen",
   },

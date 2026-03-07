@@ -1,5 +1,4 @@
 "use client";
-import "../trending.css";
 import { useState, memo, useRef, useMemo } from "react";
 import { useTrendingStore } from "@/features/trending/store/trendingStore";
 import { TrendingMediaCarousel } from "../layout/TrendingMediaCarousel";
@@ -18,9 +17,9 @@ const STYLES = {
   titleMobile:
     "block sm:hidden text-[64px] leading-[0.95] text-pixela-accent text-left pl-4",
   titleDesktop:
-    "hidden sm:block text-[64px] md:text-[80px] lg:text-[80px] xl:text-[96px] 2xl:text-[112px] min-[1920px]:text-[128px] 2k:text-[100px] text-pixela-accent text-left pl-4 sm:pl-0 lg:whitespace-nowrap",
+    "hidden sm:block text-[64px] md:text-[80px] lg:text-[80px] xl:text-[96px] 2xl:text-[112px] min-[1920px]:text-[128px] 2k:text-[100px] text-pixela-accent text-left pl-4 sm:pl-0 lg:whitespace-nowrap [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px]",
   container:
-    "relative w-full min-h-screen 2k:min-h-[80vh] bg-pixela-dark flex flex-col py-16 md:py-0 md:pt-20 2k:pt-12",
+    "relative w-full min-h-[100svh] 2k:min-h-[80vh] [@media(max-height:500px)_and_(orientation:landscape)]:min-h-0 bg-pixela-dark flex flex-col py-16 md:py-0 md:pt-20 2k:pt-12 [@media(max-height:500px)_and_(orientation:landscape)]:py-8",
   content:
     "flex-grow flex flex-col justify-center md:justify-start relative z-10 md:pb-0 2k:pb-8",
   contentWrapper: "w-[90%] md:w-[85%] lg:w-[80%] 2k:w-[70%] mx-auto",
