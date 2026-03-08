@@ -9,7 +9,7 @@ const STYLES = {
   navigation: {
     button: {
       container: {
-        base: "absolute top-1/2 transform -translate-y-1/2 z-20",
+        base: "absolute top-[35%] md:top-[40%] lg:top-1/2 transform -translate-y-1/2 z-20",
         left: "left-2 sm:left-3 md:left-4 lg:left-4",
         right: "right-2 sm:right-3 md:right-4 lg:right-4"
       },

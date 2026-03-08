@@ -35,11 +35,13 @@ const STYLES = {
     base: "absolute inset-x-0 bottom-0 z-10 px-4 sm:px-5 md:px-6 lg:px-0 2k:px-8",
     container:
       "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24 [@media(max-height:500px)_and_(orientation:landscape)]:pb-8",
+    textCard:
+      "w-fit bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-0 p-6 sm:p-7 md:p-8 lg:p-0 rounded-[24px] lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mb-6 md:mb-8 lg:mb-12 2k:mb-8",
     description:
-      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/80 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg 2k:max-w-2xl mb-6 md:mb-8 lg:mb-12 2k:mb-8 drop-shadow-sm backdrop-blur-[2px] sm:backdrop-blur-0 [@media(max-height:500px)_and_(orientation:landscape)]:mb-3",
+      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/90 lg:text-pixela-light/80 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg 2k:max-w-2xl drop-shadow-sm mt-4 md:mt-5 lg:mt-6 [@media(max-height:500px)_and_(orientation:landscape)]:mt-2",
     buttonsContainer:
       "flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-8 2k:gap-6 ipad:flex-col ipad:items-start ipad:gap-6",
-    buttonWrapper: "ipad:w-full",
+    buttonWrapper: "mt-6 md:mt-8 lg:mt-0 ipad:w-full",
     progressWrapper: "hidden ipad:block ipad:w-full",
   },
 } as const;
@@ -154,22 +156,26 @@ export const ContentSection = ({
     <div className={STYLES.contentSection.base}>
       <div className={STYLES.contentSection.container}>
         <div key={currentImageIndex} className="animate-fade-in">
-          <AccentLine className={STYLES.accentLine.withMargin} />
+          <div className={STYLES.contentSection.textCard}>
+            <AccentLine className={STYLES.accentLine.withMargin} />
 
-          <HeroTitle
-            title={displayTitle}
-            accentTitle={displayAccentTitle}
-            inline={!!currentImage?.title}
-          />
+            <HeroTitle
+              title={displayTitle}
+              accentTitle={displayAccentTitle}
+              inline={!!currentImage?.title}
+            />
 
-          <p className={STYLES.contentSection.description}>
-            {displayDescription}
-          </p>
+            <p className={STYLES.contentSection.description}>
+              {displayDescription}
+            </p>
 
-          <div className={STYLES.contentSection.buttonsContainer}>
+            {/* En móvil, el botón forma parte de la tarjeta para agrupar las llamadas a la acción */}
             <div className={STYLES.contentSection.buttonWrapper}>
               <SecondaryButton text={buttonText} href={buttonHref} />
             </div>
+          </div>
+
+          <div className={STYLES.contentSection.buttonsContainer}>
             <div className={STYLES.contentSection.progressWrapper}>
               <ProgressIndicator images={images} />
             </div>

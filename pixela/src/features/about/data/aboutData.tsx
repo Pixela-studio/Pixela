@@ -9,7 +9,7 @@ import { TeamMember, FeatureCard } from '@/features/about/types/components';
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Envyx10",
-    role: "Desarrollador Frontend",
+    role: "Desarrollador Full Stack",
     image: "/about/img/aboutus-envyx10.jpg",
     linkedin: "https://www.linkedin.com/in/envyx10/",
     github: "https://github.com/envyx10",
@@ -19,7 +19,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: "Ruyi",
-    role: "Desarrolladora Backend",
+    role: "Desarrolladora Full Stack",
     image: "/about/img/aboutus-ruyi.jpg",
     linkedin: "https://www.linkedin.com/in/ruyi-xia-ye-b19853189/",
     github: "https://github.com/rxy94",

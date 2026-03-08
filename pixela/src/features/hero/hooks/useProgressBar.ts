@@ -12,9 +12,14 @@ export const useProgressBar = () => {
     if (isPlaying) {
       resetProgress();
       
+      const startTime = Date.now();
+      const duration = 5000; // 5 segundos
+      
       const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 0.5, 100));
-      }, 25);
+        const elapsed = Date.now() - startTime;
+        const newProgress = Math.min((elapsed / duration) * 100, 100);
+        setProgress(newProgress);
+      }, 30); // ~33fps
       
       return () => clearInterval(progressInterval);
     }

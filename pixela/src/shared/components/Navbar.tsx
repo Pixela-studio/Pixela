@@ -27,21 +27,22 @@ const STYLES = {
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
 
   // Estilos para el menú hamburguesa
-  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 rounded-full shadow-lg transition-all duration-300 mr-3 ml-auto',
-  mobileMenu: 'fixed inset-0 bg-pixela-dark/95 backdrop-blur-lg z-50 flex flex-col justify-start overflow-y-auto items-start p-6 sm:p-8 md:p-16 pt-24 sm:pt-28 transform transition-all duration-300',
-  mobileMenuVisible: 'translate-y-0 opacity-100 pointer-events-auto',
-  mobileMenuHidden: 'translate-y-full opacity-0 pointer-events-none',
-  mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2',
-  mobileNavContainer: 'flex flex-col items-start w-full space-y-2 sm:space-y-8 pl-2 sm:pl-6',
-  mobileNavLink: 'font-outfit font-black text-5xl sm:text-4xl text-pixela-light hover:text-pixela-accent py-3 pl-4 sm:pl-8 transition-colors duration-300 text-left w-full',
-  mobileWelcomeText: 'text-sm sm:text-base font-outfit text-pixela-light/60 pl-4 sm:pl-8 mb-1',
-  mobileUserGreeting: 'flex flex-col items-start pl-4 sm:pl-8 mb-4',
-  mobileHelloText: 'text-sm sm:text-base font-outfit text-pixela-light/70 mb-1',
-  mobileUserName: 'text-2xl sm:text-3xl font-outfit font-bold text-pixela-accent bg-gradient-to-r from-pixela-accent to-pink-400 bg-clip-text text-transparent',
-  mobileUserSection: 'mt-8 sm:mt-12 flex flex-col items-start w-full space-y-4 sm:space-y-6',
-  mobileUserContainer: 'flex flex-col items-start gap-4 sm:gap-5 w-full pl-2 sm:pl-6',
-  mobileActionButton: 'flex items-center justify-start gap-3 text-pixela-light hover:text-pixela-accent transition-colors duration-300 py-2 sm:py-3 pl-4 sm:pl-8 rounded-lg hover:bg-pixela-accent/5 w-full border border-pixela-accent/10 hover:border-pixela-accent/30',
-  mobileActionText: 'text-lg sm:text-xl font-outfit',
+  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 transition-all duration-300 mr-1 ml-auto',
+  mobileMenu: 'fixed inset-0 bg-pixela-dark z-[100] flex flex-col justify-start overflow-y-auto p-6 sm:p-12 pt-24 pb-8 transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+  mobileMenuVisible: 'translate-y-0',
+  mobileMenuHidden: '-translate-y-full',
+  mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2 transition-transform hover:rotate-90 duration-300',
+  mobileNavContainer: 'flex flex-col flex-1 w-full mt-4 sm:mt-8',
+  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-pixela-light/10 flex items-center justify-between w-full overflow-hidden transition-all duration-500 ease-out',
+  mobileNavLinkText: 'relative z-10 transition-transform duration-300 group-hover:translate-x-4',
+  mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0',
+  mobileNavLinkHoverBg: 'absolute inset-0 bg-pixela-accent/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out',
+  mobileUserSection: 'mt-auto pt-8 w-full',
+  mobileUserContainer: 'flex flex-col gap-4 w-full',
+  mobileActionButton: 'group relative flex w-full items-center justify-between px-6 py-5 border-2 border-pixela-light/20 hover:border-pixela-accent bg-transparent transition-all duration-300 overflow-hidden',
+  mobileActionText: 'font-outfit font-bold text-xl text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
+  mobileActionIcon: 'w-6 h-6 text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
+  mobileActionHoverBg: 'absolute inset-0 bg-pixela-accent translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out',
 } as const;
 
 /**
@@ -62,18 +63,11 @@ const MobileActionButton = ({
     onClick={onClick} 
     className={STYLES.mobileActionButton}
   >
-    {userName ? (
-      <>
-        <span className={STYLES.mobileActionText}>{userName}</span>
-        <span className="text-pixela-light/40">|</span>
-        <Icon className="w-6 h-6" />
-      </>
-    ) : (
-      <>
-        <Icon className="w-6 h-6" />
-        <span className={STYLES.mobileActionText}>{label}</span>
-      </>
-    )}
+    <div className={STYLES.mobileActionHoverBg} />
+    <span className={STYLES.mobileActionText}>
+      {userName ? userName : label}
+    </span>
+    <Icon className={STYLES.mobileActionIcon} />
   </button>
 );
 
@@ -246,7 +240,7 @@ export const Navbar = () => {
             className={STYLES.mobileMenuButton} 
             onClick={toggleMobileMenu}
             aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={mobileMenuOpen}
+            aria-expanded={mobileMenuOpen ? "true" : "false"}
             aria-controls="mobile-menu"
           >
             <RxHamburgerMenu className="w-6 h-6" />
@@ -257,7 +251,7 @@ export const Navbar = () => {
       <div
         id="mobile-menu"
         className={`${STYLES.mobileMenu} ${mobileMenuOpen ? STYLES.mobileMenuVisible : STYLES.mobileMenuHidden}`}
-        aria-hidden={!mobileMenuOpen ? true : undefined}
+        aria-hidden={!mobileMenuOpen ? "true" : "false"}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...(!mobileMenuOpen ? { inert: true as any } : {})}
       >
@@ -266,36 +260,39 @@ export const Navbar = () => {
           onClick={closeMobileMenu}
           aria-label="Cerrar menú"
         >
-          <FiX className="w-8 h-8" />
+          <FiX className="w-10 h-10" />
         </button>
 
         {/* Enlaces de navegación para móvil */}
         <div className={STYLES.mobileNavContainer}>
-          {mainNavLinks.map((link) => (
+          {mainNavLinks.map((link, index) => (
             <Link 
               key={link.href} 
               href={link.href} 
-              className={STYLES.mobileNavLink}
+              className={`${STYLES.mobileNavLink} ${mobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}
+              style={{ transitionDelay: mobileMenuOpen ? `${100 + index * 100}ms` : '0ms' }}
               onClick={(e) => handleNavClick(e, link.href)}
-              prefetch={true} // Prefetch también en móvil
+              prefetch={true}
             >
-              {link.label}
+              <div className={STYLES.mobileNavLinkHoverBg} />
+              <span className={STYLES.mobileNavLinkText}>{link.label}</span>
+              <span className={STYLES.mobileNavLinkArrow}>→</span>
             </Link>
           ))}
         </div>
 
         {/* Sección de usuario para móvil */}
-        <div className={STYLES.mobileUserSection}>
+        <div 
+          className={`${STYLES.mobileUserSection} transition-all duration-700 delay-500 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        >
           <div className={STYLES.mobileUserContainer}>
             {isAuthenticated && user && (
-              <>
-                <MobileActionButton
-                  onClick={handleProfile}
-                  icon={FiUser}
-                  label="Perfil"
-                  userName={userDisplayName}
-                />
-              </>
+              <MobileActionButton
+                onClick={handleProfile}
+                icon={FiUser}
+                label="Perfil"
+                userName={userDisplayName}
+              />
             )}
             {!isAuthenticated && (
               <MobileActionButton
