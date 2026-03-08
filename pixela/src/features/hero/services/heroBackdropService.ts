@@ -49,6 +49,13 @@ async function fetchAndMapImages(
           "law & order",
           "ley y orden",
           "hermandad",
+          "turno de noche",
+          "night shift",
+          "joven sherlock",
+          "young sherlock",
+          "hoppers",
+          "dinosaur",
+          "dinosaurio",
         ];
         const isBanned = bannedTerms.some((term) => title.includes(term));
 
@@ -96,18 +103,9 @@ async function fetchAndMapImages(
 export async function getFeaturedImages(): Promise<HeroImage[]> {
   try {
     // Paralelizar todas las peticiones para minimizar el tiempo de espera (Waterfall elimination)
-    const [
-      martySupremeData,
-      trendingDay,
-      trendingWeek,
-      popularMovies,
-      popularTv,
-    ] = await Promise.all([
+    const [martySupremeData, trendingDay] = await Promise.all([
       fetchFromTmdb<TmdbResult>("movie/1317288").catch(() => null), // Marty Supreme (Prioridad 1)
-      fetchAndMapImages("trending/all/day", 3), // 3 Tendencias del DÍA
-      fetchAndMapImages("trending/all/week", 4), // 4 Tendencias SEMANALES
-      fetchAndMapImages("movie/popular", 2, "movie"), // 2 Películas populares globales
-      fetchAndMapImages("tv/popular", 2, "serie"), // 2 Series populares globales
+      fetchAndMapImages("trending/all/day", 10), // Pedimos hasta 10 para garantizar llenar el cupo tras filtrar la blacklist
     ]);
 
     // Mapear Marty Supreme si existe
@@ -133,16 +131,10 @@ export async function getFeaturedImages(): Promise<HeroImage[]> {
 
     // Combinar resultados:
     // 1. Marty Supreme SIEMPRE PRIMERO
-    // 2. El TOP del día va segundo
-    // 3. Luego lo mejor de la semana
-    // 4. Finalmente los clásicos populares
-    const images = [
-      martySupreme,
-      ...trendingDay,
-      ...trendingWeek,
-      ...popularMovies,
-      ...popularTv,
-    ].filter((img): img is HeroImage => img !== null); // Filtrar nulls
+    // 2. El TOP actual va después
+    const images = [martySupreme, ...trendingDay].filter(
+      (img): img is HeroImage => img !== null,
+    ); // Filtrar nulls
 
     // Deduplicar por si acaso el mismo item aparece en varias categorías (usando backdrop como clave única)
     const uniqueImages = Array.from(
@@ -150,7 +142,8 @@ export async function getFeaturedImages(): Promise<HeroImage[]> {
     );
 
     // Si por alguna razón fallan todas, devolver array vacío para que la UI lo maneje
-    return uniqueImages;
+    // Asegurarnos de que bajo ninguna circunstancia devolveremos más de 4 opciones.
+    return uniqueImages.slice(0, 4);
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
       console.error("Error crítico al obtener imágenes del hero:", error);

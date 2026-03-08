@@ -7,7 +7,7 @@ import { useHeroStore } from "@/features/hero/store/heroStore";
  * @returns {Function} Función para avanzar a la siguiente imagen
  */
 export const useCarouselAutoPlay = (imagesLength: number) => {
-  const { isPlaying, nextImage } = useHeroStore();
+  const { isPlaying, nextImage, currentImageIndex } = useHeroStore();
 
   const handleNextImage = useCallback(() => {
     nextImage(imagesLength);
@@ -21,7 +21,7 @@ export const useCarouselAutoPlay = (imagesLength: number) => {
     }
     
     return () => clearInterval(interval);
-  }, [isPlaying, handleNextImage, imagesLength]);
+  }, [isPlaying, handleNextImage, imagesLength, currentImageIndex]);
 
   return handleNextImage;
 }; 
