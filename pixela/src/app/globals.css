@@ -156,31 +156,6 @@ body {
   animation: slide-out-right 0.3s ease-in;
 }
 
-/* Hero backdrop: subtle continuous Ken Burns zoom.
-   Amplitude tuned low (2% → 6%) so browser scaling doesn't soften the
-   image visibly. Alternate so it never snaps back. */
-@keyframes hero-kenburns {
-  0% {
-    transform: scale(1.02) translate3d(0, 0, 0);
-  }
-  100% {
-    transform: scale(1.06) translate3d(-0.6%, -0.6%, 0);
-  }
-}
-
-.animate-hero-kenburns {
-  animation: hero-kenburns 28s ease-in-out infinite alternate;
-  will-change: transform;
-  transform-origin: center center;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-hero-kenburns {
-    animation: none;
-    transform: scale(1.02);
-  }
-}
-
 /* Estilos base de Embla Carousel (migrados desde trending.css) */
 .embla__container {
   display: flex;

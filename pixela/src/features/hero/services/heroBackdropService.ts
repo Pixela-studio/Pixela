@@ -17,145 +17,136 @@ interface TmdbResponse {
 }
 
 /**
- * Editorial pool — TMDB movie IDs hand-picked because their backdrops read
- * as cinematic frames (good framing, contrast, no burned-in text). One of
- * these lands in slot 0 every request, so the first hero impression is
- * always controlled while still varying between page loads.
- *
- * To add a new pick: open the movie on TMDB, copy the numeric ID from the
- * URL, drop it here. Any ID that 404s is silently skipped.
+ * Función helper para obtener y mapear imágenes de una categoría
+ * Usa URLs de alta calidad para el backdrop (original) y poster (w780)
  */
-const EDITORIAL_MOVIE_IDS: readonly number[] = [
-  1317288, // Marty Supreme
-];
-
-/**
- * Blacklist de títulos que suelen aparecer en trending con backdrops pobres
- * (procedurals, infantiles con arte muy plano, promos con texto quemado).
- */
-const BANNED_TITLE_TERMS: readonly string[] = [
-  "primal",
-  "monster high",
-  "barbie",
-  "primate",
-  "apes",
-  "simios",
-  "law & order",
-  "ley y orden",
-  "hermandad",
-  "turno de noche",
-  "night shift",
-  "joven sherlock",
-  "young sherlock",
-  "hoppers",
-  "dinosaur",
-  "dinosaurio",
-];
-
-const HERO_SLOT_COUNT = 4;
-
-function mapTmdbToHeroImage(
-  item: TmdbResult,
-  fallbackType?: "movie" | "serie",
-): HeroImage | null {
-  if (!item.backdrop_path || !item.poster_path) return null;
-  const rawType = item.media_type === "tv" ? "serie" : item.media_type;
-  return {
-    id: item.id,
-    backdrop: tmdbImageHelpers.backdrop(
-      item.backdrop_path,
-      TMDB_IMAGE_CONFIG.SIZES.BACKDROP.ORIGINAL,
-    ),
-    poster: tmdbImageHelpers.poster(
-      item.poster_path,
-      TMDB_IMAGE_CONFIG.SIZES.POSTER.W780,
-    ),
-    title: item.title || item.name,
-    description: item.overview,
-    type: rawType || fallbackType || "movie",
-  };
-}
-
-function passesQualityFilter(item: TmdbResult): boolean {
-  const title = (item.title || item.name || "").toLowerCase();
-  if (!title) return false;
-  if (!item.overview) return false;
-  return !BANNED_TITLE_TERMS.some((term) => title.includes(term));
-}
-
-async function fetchAndMapFromEndpoint(
+async function fetchAndMapImages(
   endpoint: string,
+  limit: number,
   fallbackType?: "movie" | "serie",
 ): Promise<HeroImage[]> {
   try {
     const data = await fetchFromTmdb<TmdbResponse>(endpoint);
+
     return data.results
-      .filter(passesQualityFilter)
-      .map((item) => mapTmdbToHeroImage(item, fallbackType))
-      .filter((img): img is HeroImage => img !== null);
+      .filter((item) => item.backdrop_path && item.poster_path)
+      .filter((item) => {
+        const title = (item.title || item.name || "").toLowerCase();
+        const overview = item.overview || "";
+        // Filtro de calidad y contenido
+        // 1. Excluir títulos vacíos
+        if (!title) return false;
+        // 2. Excluir items sin descripción
+        if (!overview) return false;
+        // 3. Excluir títulos específicos no deseados (blacklist)
+        const bannedTerms = [
+          "primal",
+          "monster high",
+          "barbie",
+          "primate",
+          "apes",
+          "simios",
+          "law & order",
+          "ley y orden",
+          "hermandad",
+          "turno de noche",
+          "night shift",
+          "joven sherlock",
+          "young sherlock",
+          "hoppers",
+          "dinosaur",
+          "dinosaurio",
+        ];
+        const isBanned = bannedTerms.some((term) => title.includes(term));
+
+        if (isBanned && process.env.NODE_ENV === "development") {
+          console.log(`[Hero Filter] Excluded: ${title}`);
+        }
+
+        return !isBanned;
+      })
+      .slice(0, limit)
+      .map((item) => ({
+        id: item.id,
+        backdrop: tmdbImageHelpers.backdrop(
+          item.backdrop_path,
+          TMDB_IMAGE_CONFIG.SIZES.BACKDROP.ORIGINAL,
+        ),
+        poster: tmdbImageHelpers.poster(
+          item.poster_path,
+          TMDB_IMAGE_CONFIG.SIZES.POSTER.W780,
+        ),
+        title: item.title || item.name,
+        description: item.overview,
+        type:
+          (item.media_type === "tv" ? "serie" : item.media_type) ||
+          fallbackType ||
+          "movie",
+      }));
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
-      console.warn(`[Hero] Failed to fetch ${endpoint}:`, error);
+      console.warn(`Error fetching images from ${endpoint}:`, error);
     }
     return [];
   }
 }
 
 /**
- * Elige 1 pick editorial al azar. Si el pool está vacío o la petición falla,
- * devuelve null y el hero cae a trending.
- */
-async function fetchOneEditorialPick(): Promise<HeroImage | null> {
-  if (EDITORIAL_MOVIE_IDS.length === 0) return null;
-  const id =
-    EDITORIAL_MOVIE_IDS[Math.floor(Math.random() * EDITORIAL_MOVIE_IDS.length)];
-  try {
-    const item = await fetchFromTmdb<TmdbResult>(`movie/${id}`);
-    return mapTmdbToHeroImage(item, "movie");
-  } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn(`[Hero] Editorial pick ${id} failed:`, error);
-    }
-    return null;
-  }
-}
-
-/**
- * Devuelve las imágenes destacadas del hero.
+ * Obtiene las imágenes destacadas para el Hero section combinando:
+ * - Tendencias (Trending)
+ * - Más populares (Popular)
+ * - Mejor valoradas (Top Rated)
  *
- * Estrategia:
- * 1. Slot 0: pick editorial (garantiza primer frame controlado).
- * 2. Slots 1..N: top-rated (backdrops consistentemente buenos) fusionado
- *    con trending del día (contenido fresco).
- * 3. Deduplicado por backdrop y capado a HERO_SLOT_COUNT.
- * 4. Si todo falla, se devuelve array vacío y la UI lo maneja.
+ * Prioriza velocidad de carga y calidad de imagen.
+ * @returns {Promise<HeroImage[]>} Array de objetos de imágenes
  */
 export async function getFeaturedImages(): Promise<HeroImage[]> {
   try {
-    const [editorial, topRated, trending] = await Promise.all([
-      fetchOneEditorialPick(),
-      fetchAndMapFromEndpoint("movie/top_rated", "movie"),
-      fetchAndMapFromEndpoint("trending/all/day"),
+    // Paralelizar todas las peticiones para minimizar el tiempo de espera (Waterfall elimination)
+    const [martySupremeData, trendingDay] = await Promise.all([
+      fetchFromTmdb<TmdbResult>("movie/1317288").catch(() => null), // Marty Supreme (Prioridad 1)
+      fetchAndMapImages("trending/all/day", 10), // Pedimos hasta 10 para garantizar llenar el cupo tras filtrar la blacklist
     ]);
 
-    // Mezcla top-rated + trending manteniendo variedad en las primeras posiciones.
-    const rest: HeroImage[] = [];
-    const maxLen = Math.max(topRated.length, trending.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (trending[i]) rest.push(trending[i]);
-      if (topRated[i]) rest.push(topRated[i]);
-    }
+    // Mapear Marty Supreme si existe
+    const martySupreme: HeroImage | null =
+      martySupremeData &&
+      martySupremeData.backdrop_path &&
+      martySupremeData.poster_path
+        ? {
+            id: martySupremeData.id,
+            backdrop: tmdbImageHelpers.backdrop(
+              martySupremeData.backdrop_path,
+              TMDB_IMAGE_CONFIG.SIZES.BACKDROP.ORIGINAL,
+            ),
+            poster: tmdbImageHelpers.poster(
+              martySupremeData.poster_path,
+              TMDB_IMAGE_CONFIG.SIZES.POSTER.W780,
+            ),
+            title: martySupremeData.title || martySupremeData.name,
+            description: martySupremeData.overview,
+            type: "movie",
+          }
+        : null;
 
-    const combined = editorial ? [editorial, ...rest] : rest;
+    // Combinar resultados:
+    // 1. Marty Supreme SIEMPRE PRIMERO
+    // 2. El TOP actual va después
+    const images = [martySupreme, ...trendingDay].filter(
+      (img): img is HeroImage => img !== null,
+    ); // Filtrar nulls
 
-    const unique = Array.from(
-      new Map(combined.map((img) => [img.backdrop, img])).values(),
+    // Deduplicar por si acaso el mismo item aparece en varias categorías (usando backdrop como clave única)
+    const uniqueImages = Array.from(
+      new Map(images.map((img) => [img.backdrop, img])).values(),
     );
 
-    return unique.slice(0, HERO_SLOT_COUNT);
+    // Si por alguna razón fallan todas, devolver array vacío para que la UI lo maneje
+    // Asegurarnos de que bajo ninguna circunstancia devolveremos más de 4 opciones.
+    return uniqueImages.slice(0, 4);
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
-      console.error("[Hero] Fatal error fetching hero images:", error);
+      console.error("Error crítico al obtener imágenes del hero:", error);
     }
     return [];
   }
