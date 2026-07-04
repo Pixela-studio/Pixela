@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { memo, useState } from 'react';
 import clsx from 'clsx';
 import { FiUser } from 'react-icons/fi';
+import Link from 'next/link';
 
 /**
  * Componente que muestra una tarjeta de actor con su imagen y detalles
@@ -16,9 +17,10 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
   const hasValidImage = actor.foto && !imageError;
 
   return (
-    <div 
+    <Link 
+      href={`/actor/${actor.id}`}
       className={clsx(
-        "bg-[#1A1A1A] rounded-xl overflow-hidden group hover:bg-[#252525] transition duration-300 shadow-lg shadow-black/10",
+        "block bg-[#1A1A1A] rounded-xl overflow-hidden group hover:bg-[#252525] hover:scale-105 transition duration-300 shadow-lg shadow-black/10 cursor-pointer",
         className
       )}
     >
@@ -51,7 +53,7 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 });
 

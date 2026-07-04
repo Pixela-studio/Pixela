@@ -1,14 +1,6 @@
-/**
- * Tipo que representa un actor en el sistema
- * @property {string} nombre - Nombre del actor
- * @property {string} personaje - Personaje que interpreta
- * @property {string} [foto] - URL opcional de la foto del actor
- */
-export type Actor = {
-  nombre: string;
-  personaje?: string;
-  foto?: string;
-};
+import { Actor } from './people';
+
+export type { Actor };
 
 /**
  * Props para el componente ActorCard

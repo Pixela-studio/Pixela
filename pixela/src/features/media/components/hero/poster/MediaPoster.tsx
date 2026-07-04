@@ -23,16 +23,16 @@ interface MediaPosterProps {
   title: string;
   onClick: () => void;
   className?: string;
-  type?: 'movie' | 'series';
+  type?: 'movie' | 'series' | 'person';
 }
 
 /**
  * Componente placeholder cuando no hay imagen disponible
  */
-const PlaceholderPoster = memo(({ title, type = 'movie' }: { title: string, type?: 'movie' | 'series' }) => (
+const PlaceholderPoster = memo(({ title, type = 'movie' }: { title: string, type?: 'movie' | 'series' | 'person' }) => (
   <div className={STYLES.placeholderContainer}>
     <div className={STYLES.placeholderEmoji}>
-      {type === 'movie' ? '🎬' : '📺'}
+      {type === 'movie' ? '🎬' : type === 'series' ? '📺' : '👤'}
     </div>
     <h3 className={STYLES.placeholderTitle}>
       {title}
