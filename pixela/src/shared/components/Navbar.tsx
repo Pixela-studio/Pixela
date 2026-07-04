@@ -1,7 +1,7 @@
 'use client';
 // Imports
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { MdLogout } from 'react-icons/md';
 import { FiUser, FiX } from 'react-icons/fi';
 import { RxHamburgerMenu } from 'react-icons/rx';
@@ -11,6 +11,20 @@ import { mainNavLinks } from '@/links/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useSectionNavigation } from '@/hooks/useSectionNavigation';
 
+/**
+ * Returns whether the current pathname matches this nav link.
+ *
+ * Hash links (Tendencias / Descubre / Sobre Nosotros) all live on the
+ * homepage, so they only ever count as active when we're actually on `/`.
+ * Marking the specific anchor as "current" would need a scroll observer —
+ * scoped out of this pass.
+ */
+const isNavLinkActive = (href: string, pathname: string): boolean => {
+  if (href === "/") return pathname === "/";
+  if (href.startsWith("/#")) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
+
 const STYLES = {
   nav: 'w-full fixed top-0 left-0 z-50 mt-5 px-4',
   container: 'w-full max-w-[83.333%] mx-auto flex items-center p-4 max-sm:px-3 max-sm:w-[calc(100%-2rem)] bg-dark-opacity backdrop-blur-sm rounded-[36px]',
@@ -18,8 +32,10 @@ const STYLES = {
   logoText: 'text-3xl font-bold font-outfit text-pixela-accent',
   navLinks: 'hidden lg:flex flex-1 justify-center', 
   navLinksContainer: 'flex space-x-8 lg:space-x-6 xl:space-x-8',
-  navLink: 'font-pixela-outfit-sm text-pixela-light relative group',
+  navLink: 'font-pixela-outfit-sm text-pixela-light relative group transition-colors duration-300',
+  navLinkActive: 'text-pixela-accent',
   navLinkUnderline: 'absolute bottom-0 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
+  navLinkUnderlineActive: 'w-full',
   userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
   userContainer: 'flex items-center gap-2',
   userName: 'text-pixela-light font-pixela-outfit-sm',
@@ -77,6 +93,7 @@ const MobileActionButton = ({
  */
 export const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status } = useSession();
   const { user, isAuthenticated, isLoading } = useAuthStore();
   const { logout, syncWithSession } = useAuthStore();
@@ -188,19 +205,25 @@ export const Navbar = () => {
           
           <div className={STYLES.navLinks}>
             <div className={STYLES.navLinksContainer}>
-              {mainNavLinks.map((link) => (
-                <Link 
-                  key={link.href} 
-                  href={link.href} 
-                  className={STYLES.navLink}
-                  aria-label={link.label}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  prefetch={true} // Prefetch para todos los links
-                >
-                  {link.label}
-                  <span className={STYLES.navLinkUnderline} />
-                </Link>
-              ))}
+              {mainNavLinks.map((link) => {
+                const active = isNavLinkActive(link.href, pathname);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`${STYLES.navLink} ${active ? STYLES.navLinkActive : ""}`}
+                    aria-label={link.label}
+                    aria-current={active ? "page" : undefined}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    prefetch={true}
+                  >
+                    {link.label}
+                    <span
+                      className={`${STYLES.navLinkUnderline} ${active ? STYLES.navLinkUnderlineActive : ""}`}
+                    />
+                  </Link>
+                );
+              })}
             </div>
           </div>
           
@@ -265,20 +288,24 @@ export const Navbar = () => {
 
         {/* Enlaces de navegación para móvil */}
         <div className={STYLES.mobileNavContainer}>
-          {mainNavLinks.map((link, index) => (
-            <Link 
-              key={link.href} 
-              href={link.href} 
-              className={`${STYLES.mobileNavLink} ${mobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}
-              style={{ transitionDelay: mobileMenuOpen ? `${100 + index * 100}ms` : '0ms' }}
-              onClick={(e) => handleNavClick(e, link.href)}
-              prefetch={true}
-            >
-              <div className={STYLES.mobileNavLinkHoverBg} />
-              <span className={STYLES.mobileNavLinkText}>{link.label}</span>
-              <span className={STYLES.mobileNavLinkArrow}>→</span>
-            </Link>
-          ))}
+          {mainNavLinks.map((link, index) => {
+            const active = isNavLinkActive(link.href, pathname);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`${STYLES.mobileNavLink} ${active ? "text-pixela-accent" : ""} ${mobileMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
+                style={{ transitionDelay: mobileMenuOpen ? `${100 + index * 100}ms` : "0ms" }}
+                onClick={(e) => handleNavClick(e, link.href)}
+                aria-current={active ? "page" : undefined}
+                prefetch={true}
+              >
+                <div className={STYLES.mobileNavLinkHoverBg} />
+                <span className={STYLES.mobileNavLinkText}>{link.label}</span>
+                <span className={STYLES.mobileNavLinkArrow}>→</span>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Sección de usuario para móvil */}
