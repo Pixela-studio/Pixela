@@ -20,14 +20,12 @@ const STYLES = {
   container: "max-w-7xl 2k:max-w-6xl mx-auto max-sm:w-5/6 ipad:w-[90%] 2k:w-[70%]",
 
   // Titulos
-  title: "text-6xl max-sm:text-4xl font-black mb-8 text-pixela-accent font-outfit relative inline-block max-sm:text-[64px] max-sm:leading-[0.95] max-sm:break-words [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px] [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
+  title: "text-6xl max-sm:text-[clamp(2.5rem,10vw,3rem)] font-black mb-8 text-pixela-accent font-outfit relative inline-block [text-wrap:balance] max-sm:leading-[0.95] [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px] [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
   titleUnderline: "absolute -bottom-2 left-0 w-0 h-1 bg-pixela-accent group-hover:w-full transition-all duration-500",
-  titleMobile: "block sm:hidden text-left",
-  titleDesktop: "hidden sm:block",
   subtitle: "text-xl max-sm:text-base text-white/80 text-left ipad:text-left lg:text-center xl:text-center",
 
   // Tarjeta de característica
-  card: "group relative rounded-2xl p-px cursor-pointer animate-float overflow-hidden",
+  card: "group relative rounded-2xl p-px cursor-pointer overflow-hidden transition-transform duration-300 hover:-translate-y-1",
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   cardContent: "relative z-10 h-full rounded-[15px] p-8 max-sm:p-4 ipad:p-6 flex flex-col bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5",
   cardIcon: "text-4xl text-pixela-accent ipad:text-3xl",
@@ -47,11 +45,9 @@ const STYLES = {
   teamTextContainer: "max-sm:mt-2 ipad:mt-6",
   teamDescription: "text-xl max-sm:text-base text-white/90 leading-relaxed mb-4 ipad:text-lg ipad:mb-3",
   teamCardsGrid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6 mb-20 [&>*:nth-child(3)]:md:col-span-2 [&>*:nth-child(3)]:lg:col-span-1",
-  teamTitleMobileEquipo: "block sm:hidden",
-  teamTitleDesktopEquipo: "hidden sm:block",
 
   // Tarjeta de miembro del equipo
-  teamCard: "w-full group relative rounded-2xl p-px cursor-pointer animate-float-smooth overflow-hidden",
+  teamCard: "w-full group relative rounded-2xl p-px cursor-pointer overflow-hidden transition-transform duration-300 hover:-translate-y-1",
   teamCardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(200px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   teamCardContentContainer: "relative z-10 h-full rounded-[15px] p-6 max-sm:p-4 ipad:p-5 bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5",
   teamImage: "relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-pixela-accent/30 group-hover:border-pixela-accent/50 transition-colors duration-300 ipad:w-28 ipad:h-28",
@@ -210,8 +206,7 @@ const AboutSection = () => {
         {/* Título y Subtítulo */}
         <div className={STYLES.teamHeader}>
           <h1 className={STYLES.title} ref={titleRef}>
-            <span className={STYLES.titleMobile}>QUIÉ-<br/>NES SOMOS</span>
-            <span className={STYLES.titleDesktop}>Quiénes Somos</span>
+            Quiénes Somos
             <span className={STYLES.titleUnderline}></span>
           </h1>
           <div className={STYLES.teamHeaderText}>
@@ -234,17 +229,12 @@ const AboutSection = () => {
             {/* Columna de texto */}
             <div className={STYLES.teamTextColumn}>
               <h2 className={STYLES.title} ref={teamTitleRef}>
-                <span className={STYLES.teamTitleMobileEquipo}>NUES-<br/>TRO EQUIPO</span>
-                <span className={STYLES.teamTitleDesktopEquipo}>Nuestro Equipo</span>
+                Nuestro Equipo
                 <span className={STYLES.titleUnderline}></span>
               </h2>
               <div className={STYLES.teamTextContainer} ref={teamTextRef}>
                 <p className={STYLES.teamDescription}>
-                  En Pixela, unimos talento y pasión por el cine. Somos desarrolladores, diseñadores y cinéfilos comprometidos con una misión: crear una plataforma donde descubrir historias sea tan emocionante como vivirlas.
-                  Cada día trabajamos para mejorar y ofrecer la mejor experiencia posible a nuestra comunidad.
-                </p>
-                <p className={STYLES.teamDescription}>
-                  Nuestra dedicación y amor por el cine nos impulsa a mejorar constantemente y ofrecer lo mejor a nuestros usuarios.
+                  Somos desarrolladores, diseñadores y cinéfilos con una misión clara: hacer que descubrir historias sea tan emocionante como vivirlas.
                 </p>
               </div>
             </div>

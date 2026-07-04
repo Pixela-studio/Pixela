@@ -100,24 +100,6 @@ body {
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
-/* Delays para efectos escalonados */
-.delay-200 {
-  animation-delay: 0.2s;
-}
-
-.delay-400 {
-  animation-delay: 0.4s;
-}
-
-.delay-600 {
-  animation-delay: 0.6s;
-}
-
-.delay-800 {
-  animation-delay: 0.8s;
-}
-
-/* Clases de delay para animaciones float */
 .animation-delay-200 {
   animation-delay: 200ms;
 }
