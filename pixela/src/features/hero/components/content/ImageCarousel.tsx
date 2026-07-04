@@ -41,8 +41,13 @@ const STYLES = {
   },
 
   // Grano de peli sobre la imagen. Reutiliza .noise-effect (opacity 0.04)
-  // ya definida en globals.css. Sube el z para quedar por debajo del texto.
-  grain: "noise-effect",
+  // ya definida en globals.css, con una máscara que lo desvanece en el
+  // borde superior (bajo la barra de nav) y en el inferior (donde el hero
+  // se une a Tendencias). Sin la máscara el grano llega hasta el último
+  // píxel del hero mientras la sección siguiente arranca limpia, y esa
+  // diferencia se lee como una línea horizontal en la unión.
+  grain:
+    "noise-effect [mask-image:linear-gradient(to_bottom,transparent_0%,black_12%,black_82%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_12%,black_82%,transparent_100%)]",
 } as const;
 
 /**
