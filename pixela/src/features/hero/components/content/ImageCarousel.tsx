@@ -19,7 +19,9 @@ const STYLES = {
   // Capas de superposición y efectos visuales
   overlays: {
     base: "absolute inset-0",
-    darkOverlay: "bg-pixela-dark/300",
+    // Antes había un darkOverlay con `bg-pixela-dark/300` — /300 no existe en
+    // la escala de opacidad de Tailwind, así que esa capa nunca aplicaba.
+    // Eliminada.
     gradientOverlay:
       "bg-gradient-to-t from-pixela-dark/90 via-pixela-dark/50 to-pixela-dark/80",
     topGradient:
@@ -43,11 +45,9 @@ const STYLES = {
  */
 const VisualOverlays = () => (
   <>
-    <div className={clsx(STYLES.overlays.base, STYLES.overlays.darkOverlay)} />
     <div
       className={clsx(STYLES.overlays.base, STYLES.overlays.gradientOverlay)}
     />
-    <div className={STYLES.overlays.topGradient} />
     <div className={STYLES.overlays.topGradient} />
     <div className={STYLES.overlays.bottomGradient} />
   </>
