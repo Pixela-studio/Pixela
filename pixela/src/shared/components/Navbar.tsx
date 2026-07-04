@@ -33,17 +33,21 @@ const STYLES = {
 
   // Contenedor visible: en floating es una "píldora" flotante centrada;
   // en docked ocupa 100% de ancho, rectangular y con más opacidad.
+  // max-w-full (100%) en docked en vez de max-w-none — max-width: none no
+  // interpola en CSS, así que la píldora crecía a saltos.
   containerBase: 'w-full mx-auto flex items-center backdrop-blur-md transition-[max-width,padding,border-radius,background-color,box-shadow] duration-300 ease-out',
   containerFloating: 'max-w-[83.333%] p-4 max-sm:px-3 max-sm:w-[calc(100%-2rem)] rounded-[36px] bg-dark-opacity',
-  containerDocked: 'max-w-none p-3 max-sm:px-3 rounded-none bg-pixela-dark/90 border-b border-white/10 shadow-lg shadow-black/30',
+  containerDocked: 'max-w-full py-3 px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 rounded-none bg-pixela-dark/90 border-b border-white/10 shadow-lg shadow-black/30',
 
-  logo: 'mx-10 sm:mx-2 md:mx-6 lg:mx-10',
+  logo: 'mx-10 sm:mx-2 md:mx-6 lg:mx-10 transition-transform duration-300 hover:scale-[1.02] active:scale-100',
   logoText: 'text-3xl font-bold font-outfit text-pixela-accent',
-  navLinks: 'hidden lg:flex flex-1 justify-center', 
+  navLinks: 'hidden lg:flex flex-1 justify-center',
   navLinksContainer: 'flex space-x-8 lg:space-x-6 xl:space-x-8',
-  navLink: 'font-pixela-outfit-sm text-pixela-light relative group transition-colors duration-300',
-  navLinkActive: 'text-pixela-accent',
-  navLinkUnderline: 'absolute bottom-0 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
+  // Inactivo atenuado a 65% para que el activo (magenta) destaque; hover
+  // devuelve al 100% mientras el underline crece.
+  navLink: 'font-pixela-outfit-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
+  navLinkActive: 'text-pixela-accent hover:text-pixela-accent',
+  navLinkUnderline: 'absolute -bottom-1 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
   navLinkUnderlineActive: 'w-full',
   userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
   userContainer: 'flex items-center gap-2',
@@ -58,7 +62,7 @@ const STYLES = {
   mobileMenuHidden: '-translate-y-full',
   mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2 transition-transform hover:rotate-90 duration-300',
   mobileNavContainer: 'flex flex-col flex-1 w-full mt-4 sm:mt-8',
-  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-pixela-light/10 flex items-center justify-between w-full overflow-hidden transition-all duration-500 ease-out',
+  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-white/10 flex items-center justify-between w-full overflow-hidden transition-all duration-500 ease-out',
   mobileNavLinkText: 'relative z-10 transition-transform duration-300 group-hover:translate-x-4',
   mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0',
   mobileNavLinkHoverBg: 'absolute inset-0 bg-pixela-accent/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out',
@@ -104,8 +108,13 @@ const MobileActionButton = ({
 // flotando y pasa a docked cuando el usuario baja ~el 85% del viewport.
 // En cualquier otra ruta el navbar arranca ya en docked porque no hay
 // hero por debajo que justifique la píldora flotante.
+//
+// Hysteresis: dockea a 82% pero solo undockea si vuelve por debajo del
+// 78%. Sin el gap el estado parpadea cuando el usuario se para justo
+// en el umbral.
 const isLandingPath = (pathname: string): boolean => pathname === "/";
-const DOCK_TRIGGER_VH = 0.85;
+const DOCK_ON_VH = 0.82;
+const DOCK_OFF_VH = 0.78;
 
 export const Navbar = () => {
   const router = useRouter();
@@ -133,8 +142,8 @@ export const Navbar = () => {
 
   // Sincroniza el estado docked con la ruta / scroll:
   // - Fuera del landing: siempre docked.
-  // - En landing: docked una vez el scroll supera ~85% del viewport,
-  //   momento en el que el hero ya está fuera de vista.
+  // - En landing: docked una vez el scroll supera 82% del viewport,
+  //   undockea al volver por debajo del 78% (gap para evitar parpadeo).
   useEffect(() => {
     if (!isLandingPath(pathname)) {
       setIsDocked(true);
@@ -142,7 +151,13 @@ export const Navbar = () => {
     }
 
     const evaluate = () => {
-      setIsDocked(window.scrollY >= window.innerHeight * DOCK_TRIGGER_VH);
+      const y = window.scrollY;
+      const h = window.innerHeight;
+      setIsDocked((prev) => {
+        if (!prev && y >= h * DOCK_ON_VH) return true;
+        if (prev && y < h * DOCK_OFF_VH) return false;
+        return prev;
+      });
     };
 
     evaluate();
