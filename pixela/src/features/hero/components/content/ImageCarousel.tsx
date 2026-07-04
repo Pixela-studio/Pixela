@@ -33,10 +33,16 @@ const STYLES = {
   // Estilos de la imagen
   image: {
     container: "relative w-full h-full lg:pt-16",
-    base: "w-full h-full object-cover grayscale",
+    // Concepto B&W preservado. Ligero boost de contraste para que la escala
+    // de grises no se lea plana sobre el gradiente oscuro.
+    base: "w-full h-full object-cover grayscale contrast-[1.08]",
     mobile: "block md:hidden", // Visible solo en móvil
     desktop: "hidden md:block", // Visible solo en escritorio
   },
+
+  // Grano de peli sobre la imagen. Reutiliza .noise-effect (opacity 0.04)
+  // ya definida en globals.css. Sube el z para quedar por debajo del texto.
+  grain: "noise-effect",
 } as const;
 
 /**
@@ -50,6 +56,7 @@ const VisualOverlays = () => (
     />
     <div className={STYLES.overlays.topGradient} />
     <div className={STYLES.overlays.bottomGradient} />
+    <div className={STYLES.grain} />
   </>
 );
 

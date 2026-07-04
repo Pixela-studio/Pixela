@@ -14,20 +14,23 @@ const STYLES = {
   // Línea decorativa de acento
   accentLine: {
     base: "w-16 md:w-24 lg:w-24 h-1 bg-pixela-accent",
-    withMargin: "mb-4 md:mb-6 lg:mb-8 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
+    withMargin: "mb-5 md:mb-7 lg:mb-9 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
   },
 
-  // Título principal del hero
+  // Título principal del hero — mismo concepto, refinado:
+  // font-black en vez de bold, leading más cerrado, tracking coherente
+  // entre breakpoints, drop-shadow más presente para legibilidad,
+  // text-wrap: balance para que títulos largos rompan naturales.
   heroTitle: {
-    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase md:tracking-tight md:uppercase leading-[1.0] drop-shadow-sm [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
+    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-black font-outfit text-pixela-light mb-5 md:mb-6 lg:mb-8 2k:mb-6 tracking-tight uppercase leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] [text-wrap:balance] [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
     accent: "text-pixela-accent",
   },
 
   // Botón secundario con animación
   secondaryButton: {
-    base: "group flex items-center transition-all duration-300",
-    text: "font-medium text-pixela-light group-hover:text-white transition-all duration-300 mr-2 text-sm sm:text-base lg:text-base",
-    icon: "h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-pixela-light group-hover:text-pixela-accent opacity-80 group-hover:opacity-100 transition-colors duration-300",
+    base: "group inline-flex items-center transition-all duration-300",
+    text: "font-medium text-pixela-light group-hover:text-white transition-all duration-300 mr-2 text-sm sm:text-base lg:text-base tracking-wide",
+    icon: "h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-pixela-light group-hover:text-pixela-accent opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1",
   },
 
   // Sección de contenido principal
@@ -36,12 +39,12 @@ const STYLES = {
     container:
       "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24 [@media(max-height:500px)_and_(orientation:landscape)]:pb-8",
     textCard:
-      "w-fit bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-0 p-6 sm:p-7 md:p-8 lg:p-0 rounded-[24px] lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mb-6 md:mb-8 lg:mb-12 2k:mb-8",
+      "w-fit max-w-full bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-0 p-6 sm:p-7 md:p-8 lg:p-0 rounded-[24px] lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mb-6 md:mb-8 lg:mb-12 2k:mb-8",
     description:
-      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/90 lg:text-pixela-light/80 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg 2k:max-w-2xl drop-shadow-sm mt-4 md:mt-5 lg:mt-6 [@media(max-height:500px)_and_(orientation:landscape)]:mt-2",
+      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/85 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-xl 2k:max-w-2xl drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] leading-relaxed [text-wrap:pretty] line-clamp-3 mt-5 md:mt-6 lg:mt-7 mb-8 md:mb-10 lg:mb-12 [@media(max-height:500px)_and_(orientation:landscape)]:mt-2 [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
     buttonsContainer:
       "flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-8 2k:gap-6 ipad:flex-col ipad:items-start ipad:gap-6",
-    buttonWrapper: "mt-6 md:mt-8 lg:mt-0 ipad:w-full",
+    buttonWrapper: "ipad:w-full",
     progressWrapper: "hidden ipad:block ipad:w-full",
   },
 } as const;
@@ -65,7 +68,7 @@ const HeroTitle = ({
   accentTitle,
   inline = false,
 }: HeroTitleProps & { inline?: boolean }) => (
-  <h1 className={clsx(STYLES.heroTitle.base, "line-clamp-3 text-ellipsis")}>
+  <h1 className={clsx(STYLES.heroTitle.base, "line-clamp-3")}>
     {title}
     {accentTitle && (
       <>
@@ -106,46 +109,19 @@ export const ContentSection = ({
 }: HeroContent & { images: HeroImage[] }) => {
   const currentImage = images[currentImageIndex];
 
-  // Lógica para separar el título en dos partes para el acento
-  const splitTitle = (
-    fullTitle: string | undefined,
-  ): { main: string; accent: string } => {
-    if (!fullTitle) return { main: "", accent: "" };
+  // Título dinámico: se muestra el título de la película/serie entero, sin
+  // partirlo por la mitad. El accent color queda para el título estático
+  // ("cinematográfico") que sí tiene un punto de corte natural.
+  const isDynamic = !!currentImage?.title;
+  const displayTitle = currentImage?.title ?? title;
+  const displayAccentTitle = isDynamic ? undefined : accentTitle;
 
-    const words = fullTitle.split(" ");
-    if (words.length <= 1) return { main: fullTitle, accent: "" };
+  // Descripción: line-clamp en CSS en vez de recortar por longitud a mano,
+  // así el corte respeta el ancho real del contenedor.
+  const displayDescription = currentImage?.description || description;
 
-    // Punto de corte: aproximadamente a la mitad, favoreciendo la segunda parte para el acento
-    const splitIndex = Math.ceil(words.length / 2);
-
-    const main = words.slice(0, splitIndex).join(" ");
-    const accent = words.slice(splitIndex).join(" ");
-
-    return { main, accent };
-  };
-
-  const { main: dynamicMainTitle, accent: dynamicAccentTitle } = splitTitle(
-    currentImage?.title,
-  );
-
-  // Lógica para mostrar contenido dinámico o estático
-  // Si tenemos título dinámico, usamos la versión partida. Si no, usamos el prop 'title' completo
-  const displayTitle = currentImage?.title ? dynamicMainTitle : title;
-
-  // Si hay título dinámico, el acccent viene de la función split.
-  // Si es estático, usamos el prop 'accentTitle'
-  const displayAccentTitle = currentImage?.title
-    ? dynamicAccentTitle
-    : accentTitle;
-
-  const displayDescription = currentImage?.description
-    ? currentImage.description.length > 200
-      ? `${currentImage.description.substring(0, 200)}...`
-      : currentImage.description
-    : description;
-
-  // URL del botón: si es contenido dinámico, ir a los detalles (placeholder por ahora)
-  // Si es estático, ir a tendencias
+  // URL del botón: si es contenido dinámico, ir a los detalles.
+  // Si es estático, ir a tendencias.
   const buttonHref = currentImage?.id
     ? `/${currentImage.type === "serie" ? "series" : "movies"}/${currentImage.id}`
     : "#tendencias";
@@ -162,7 +138,7 @@ export const ContentSection = ({
             <HeroTitle
               title={displayTitle}
               accentTitle={displayAccentTitle}
-              inline={!!currentImage?.title}
+              inline={false}
             />
 
             <p className={STYLES.contentSection.description}>

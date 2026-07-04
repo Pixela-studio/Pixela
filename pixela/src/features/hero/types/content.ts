@@ -45,11 +45,13 @@ export interface HeroContent {
  * Interfaz para las propiedades del título del hero
  * @interface HeroTitleProps
  * @property {string} title - Título principal
- * @property {string} accentTitle - Título con acento
+ * @property {string} [accentTitle] - Título con acento (opcional: cuando la
+ *   diapositiva es dinámica se usa el título de la película entero, sin
+ *   trocearlo en dos, así que no hay accent)
  */
 export interface HeroTitleProps {
   title: string;
-  accentTitle: string;
+  accentTitle?: string;
 }
 
 /**
