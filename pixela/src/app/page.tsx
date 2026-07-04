@@ -16,6 +16,7 @@ import {
   getWeekendSeries,
 } from "@/features/weekend/services/weekendService";
 import { getRandomQuote } from "@/features/quotes/service";
+import { headings as discoverHeadings } from "@/features/discover/content/headings";
 import { ConditionalSuspenseWrapper } from "@/app/components/ConditionalSuspenseWrapper";
 
 // Dynamic imports for below-the-fold content to improve initial bundle size
@@ -89,10 +90,12 @@ async function RestOfPageLoader() {
   const [weekendSeries, weekendMovies] = weekendData;
   const [discoveredSeries, discoveredMovies] = discoveredData;
 
-  // Generamos múltiples citas aleatorias para cada sección
+  // Generamos citas y heading aleatorios en el servidor para evitar flash de hidratación
   const trendingQuote = getRandomQuote();
   const theatricalQuote = getRandomQuote();
   const weekendQuote = getRandomQuote();
+  const discoverHeading =
+    discoverHeadings[Math.floor(Math.random() * discoverHeadings.length)];
 
   return (
     <>
@@ -117,7 +120,11 @@ async function RestOfPageLoader() {
       </div>
 
       <div id="discover" className={CONFIG.STYLES.section}>
-        <DiscoverSection series={discoveredSeries} movies={discoveredMovies} />
+        <DiscoverSection
+          series={discoveredSeries}
+          movies={discoveredMovies}
+          heading={discoverHeading}
+        />
       </div>
 
       <div id="about" className={CONFIG.STYLES.section}>

@@ -8,22 +8,25 @@ import { DiscoverContent } from "@/features/discover/components/core/DiscoverCon
 interface DiscoverSectionProps {
   series: TrendingSerie[];
   movies: TrendingMovie[];
+  heading: string[];
 }
 
 /**
- * Componente principal de la sección de descubrimiento
- * Maneja el estado global de series y películas
+ * Componente principal de la sección de descubrimiento.
+ * Inicializa el store con los datos del servidor y pasa el heading (elegido
+ * server-side para evitar flash de hidratación) al contenido.
  */
-export const DiscoverSection = ({ series, movies }: DiscoverSectionProps) => {
+export const DiscoverSection = ({
+  series,
+  movies,
+  heading,
+}: DiscoverSectionProps) => {
   const { setSeries, setMovies } = useDiscoverStore();
 
   useEffect(() => {
-    const hasValidSeries = series?.length > 0;
-    const hasValidMovies = movies?.length > 0;
-
-    if (hasValidSeries) setSeries(series);
-    if (hasValidMovies) setMovies(movies);
+    if (series?.length) setSeries(series);
+    if (movies?.length) setMovies(movies);
   }, [series, movies, setSeries, setMovies]);
 
-  return <DiscoverContent />;
+  return <DiscoverContent heading={heading} />;
 };
