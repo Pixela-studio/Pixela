@@ -21,11 +21,12 @@ export async function GET(request: Request) {
     );
   }
 
+  // fetchFromTmdb already appends language=es-ES. Passing it again here made
+  // TMDB return "Invalid parameters" (400), which the catch turned into a 500.
   const tmdbParams: Record<string, string> = {
     page,
     query,
     include_adult: "false",
-    language: "es-ES",
   };
 
   try {
