@@ -98,7 +98,7 @@ export const ItemCounter = memo(({
                     
                     {isSearching && searchQuery && (
                         <div className={STYLES.secondaryText}>
-                            para "{searchQuery}"
+                            para &ldquo;{searchQuery}&rdquo;
                         </div>
                     )}
                 </div>

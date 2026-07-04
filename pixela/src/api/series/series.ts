@@ -2,10 +2,20 @@ import { Serie } from '@/features/media/types/content';
 import { API_ENDPOINTS } from '@/api/shared/apiEndpoints';
 import { fetchWithErrorHandling } from '@/api/shared/apiHelpers';
 import { mapSerieFromApi } from './mapper/mapSerie';
-import type { 
+import type {
   Video, Provider, ApiSerie, ApiActor,
-  ApiResponse, ApiCastResponse, ApiVideosResponse, ApiProvidersResponse 
+  ApiResponse, ApiCastResponse, ApiVideosResponse, ApiProvidersResponse
 } from './types';
+
+interface SerieImage {
+  file_path: string;
+  width?: number;
+  height?: number;
+  aspect_ratio?: number;
+  vote_average?: number;
+  vote_count?: number;
+  iso_639_1?: string | null;
+}
 
 interface ExtendedSerieResponse extends ApiSerie {
   credits?: {
@@ -24,8 +34,8 @@ interface ExtendedSerieResponse extends ApiSerie {
     };
   };
   images?: {
-    backdrops: any[];
-    posters: any[];
+    backdrops: SerieImage[];
+    posters: SerieImage[];
   };
 }
 
