@@ -61,7 +61,7 @@ const STYLES = {
 
   // Notificaciones
   notification:
-    "fixed top-24 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-in backdrop-blur-md border border-white/10",
+    "fixed top-24 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-in-right backdrop-blur-md border border-white/10",
   notificationSuccess: "bg-green-500/10 border-green-500/20 text-green-400",
   notificationError: "bg-red-500/10 border-red-500/20 text-red-400",
 

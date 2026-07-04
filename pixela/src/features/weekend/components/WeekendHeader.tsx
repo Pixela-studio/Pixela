@@ -71,7 +71,7 @@ export const WeekendHeader = ({
   if (!movies || !series) return null;
 
   return (
-    <div id="finde-en-casa" className={STYLES.container} ref={containerRef}>
+    <div className={STYLES.container} ref={containerRef}>
       <div className={STYLES.content}>
         {/* Header con Título a la izquierda y Toggle a la derecha */}
         <div className={STYLES.headerWrapper}>

@@ -290,11 +290,7 @@ const MediaCard = memo(
     const isInitiallyVisible = index < INITIAL_VISIBLE_ITEMS;
 
     const handleFollowClick = () => {
-      console.log(
-        "Seguir",
-        type === "series" ? "serie" : "película",
-        type === "movies" ? (media as Pelicula).title : (media as Serie).name,
-      );
+      // TODO: wire this up to the favorites API.
     };
 
     /**
@@ -571,11 +567,7 @@ const RecommendationCard = memo(
       (recommendation.vote_average ?? 0) >= HIGH_RATING_THRESHOLD;
 
     const handleFollowClick = () => {
-      console.log(
-        "Seguir",
-        recommendation.mediaType === "series" ? "serie" : "película",
-        recommendation.title,
-      );
+      // TODO: wire this up to the favorites API.
     };
 
     /**

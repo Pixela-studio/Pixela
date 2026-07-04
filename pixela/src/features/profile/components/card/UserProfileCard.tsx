@@ -34,8 +34,8 @@ export const UserProfileCard = ({ user }: UserProfileCardProps) => {
     setIsEditing(false);
   };
 
-  const handleSubmitProfile = (data: UpdateProfileData) => {
-    console.log('Datos actualizados:', data);
+  const handleSubmitProfile = (_data: UpdateProfileData) => {
+    // TODO: persist updates via the users API once wired up.
     setIsEditing(false);
   };
 

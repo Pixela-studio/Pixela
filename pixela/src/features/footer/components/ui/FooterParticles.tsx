@@ -3,7 +3,7 @@ import { Particle, ParticleOptions } from "@/features/footer/types/components";
 
 const STYLES = {
   container: "absolute inset-0 w-full h-full overflow-hidden pointer-events-none",
-  particle: "absolute rounded-full bg-[#ff007f] animate-float"
+  particle: "absolute rounded-full bg-[#EC1B69] animate-float"
 } as const;
 
 

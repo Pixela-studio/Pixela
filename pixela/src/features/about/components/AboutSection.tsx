@@ -181,7 +181,6 @@ const AboutSection = () => {
   const teamTextRef = useRef<HTMLDivElement>(null);
   const teamCardsRef = useRef<HTMLDivElement>(null);
 
-  // DEBUG: Configuración simple sin stagger
   useScrollAnimation({
     trigger: sectionRef,
     elements: [

@@ -22,10 +22,10 @@ const STYLES = {
   // Información de contacto
   contactContainer: "flex flex-wrap gap-x-6 md:gap-x-8 gap-y-3 md:gap-y-4 mt-2 md:mt-3 ipad:gap-x-4 ipad:gap-y-2",
   contactGroup: "flex flex-col group",
-  contactLabel: "text-white/50 text-xs uppercase tracking-widest group-hover:text-[#ff007f]/80 transition-colors duration-300",
-  contactLink: "text-white hover:text-[#ff007f] transition flex items-center group",
+  contactLabel: "text-white/50 text-xs uppercase tracking-widest group-hover:text-[#EC1B69]/80 transition-colors duration-300",
+  contactLink: "text-white hover:text-[#EC1B69] transition flex items-center group",
   contactArrow: "ml-1 transform translate-x-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300",
-  contactText: "text-white group-hover:text-[#ff007f]/90 transition-colors duration-300",
+  contactText: "text-white group-hover:text-[#EC1B69]/90 transition-colors duration-300",
 
   // Navegación y enlaces
   mobileSeparator: "h-px w-full bg-white/5 md:hidden my-4",
@@ -33,11 +33,11 @@ const STYLES = {
   explorerColumn: "md:col-span-3 text-left ipad:col-span-1",
   companyColumn: "md:col-span-3 text-left ipad:col-span-1",
   sectionTitle: "text-white font-bold text-base md:text-lg mb-4 md:mb-6 relative inline-block ipad:text-base ipad:mb-4",
-  titleUnderline: "absolute -bottom-1 left-0 w-8 h-0.5 bg-[#ff007f]/50 rounded-full",
+  titleUnderline: "absolute -bottom-1 left-0 w-8 h-0.5 bg-[#EC1B69]/50 rounded-full",
   linksList: "space-y-4 ipad:space-y-3",
   linkItem: "transform hover:translate-x-1 transition-transform duration-300",
-  linkAnchor: "text-white/70 hover:text-[#ff007f] transition flex items-center justify-start group ipad:text-sm",
-  linkIndicator: "w-0 h-0.5 bg-[#ff007f] mr-0 opacity-0 group-hover:w-2 group-hover:mr-2 group-hover:opacity-100 transition-all duration-300",
+  linkAnchor: "text-white/70 hover:text-[#EC1B69] transition flex items-center justify-start group ipad:text-sm",
+  linkIndicator: "w-0 h-0.5 bg-[#EC1B69] mr-0 opacity-0 group-hover:w-2 group-hover:mr-2 group-hover:opacity-100 transition-all duration-300",
 
   // Redes sociales
   socialColumn: "flex flex-col space-y-6 md:space-y-8 md:col-span-2 mt-6 md:mt-0 ipad:space-y-5 ipad:mt-0 ipad:col-span-1",
@@ -47,7 +47,7 @@ const STYLES = {
   copyrightContainer: "flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 ipad:flex-col ipad:gap-3",
   copyrightText: "text-white/60 text-xs md:text-sm text-center sm:text-left ipad:text-xs ipad:text-center",
   copyrightLinks: "flex flex-wrap justify-center sm:justify-end gap-x-4 gap-y-2 ipad:justify-center",
-  copyrightLink: "text-white/60 hover:text-[#ff007f] text-xs md:text-sm transition-colors ipad:text-xs",
+  copyrightLink: "text-white/60 hover:text-[#EC1B69] text-xs md:text-sm transition-colors ipad:text-xs",
   copyrightSeparator: "text-white/20 hidden sm:inline ipad:hidden",
 } as const;
 
@@ -86,7 +86,7 @@ export const FooterContent = () => {
                   fontWeight: 900,
                   letterSpacing: "-0.03em",
                   lineHeight: 1,
-                  background: "linear-gradient(to right, #ff007f, #ff00ff)",
+                  background: "linear-gradient(to right, #EC1B69, #EC1B69)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}

@@ -50,7 +50,7 @@ export const TheatricalHeader = ({
   if (!movies || movies.length === 0) return null;
 
   return (
-    <div id="cartelera" className={STYLES.container} ref={containerRef}>
+    <div className={STYLES.container} ref={containerRef}>
       <div className={STYLES.content}>
         {/* Header con estructura idéntica a Tendencias para respetar espacios */}
         <div className={STYLES.headerWrapper}>

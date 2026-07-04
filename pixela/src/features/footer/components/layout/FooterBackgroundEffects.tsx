@@ -6,19 +6,19 @@ const STYLES = {
   container: "absolute top-0 left-0 w-full h-full opacity-0 transition-opacity duration-1000",
   
   // Gradientes animados
-  gradientContainer: "absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-[#ff007f]/10 filter blur-[80px] animate-pulse-slow",
+  gradientContainer: "absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-[#EC1B69]/10 filter blur-[80px] animate-pulse-slow",
   gradientContainer2: "absolute bottom-[20%] right-[10%] w-80 h-80 rounded-full bg-purple-500/10 filter blur-[100px] animate-pulse-slow animation-delay-1000",
   
   // Elementos de fondo
   pixelGrid: "absolute inset-0 w-full h-full",
   flowLinesContainer: "absolute inset-0 w-full h-full overflow-hidden",
-  flowLine: "absolute bg-gradient-to-r from-[#ff007f]/5 to-transparent",
+  flowLine: "absolute bg-gradient-to-r from-[#EC1B69]/5 to-transparent",
   
   // Elementos decorativos
-  bubble: "absolute bottom-0 rounded-full bg-[#ff007f]/20 backdrop-blur-md",
+  bubble: "absolute bottom-0 rounded-full bg-[#EC1B69]/20 backdrop-blur-md",
   digitalElementsContainer: "absolute inset-0 overflow-hidden pointer-events-none",
   triangle: "absolute opacity-20",
-  pixel: "absolute bg-[#ff007f]",
+  pixel: "absolute bg-[#EC1B69]",
   
   // Texto de fondo
   backgroundText: "pointer-events-none select-none absolute inset-0 w-full h-full hidden md:flex items-center justify-center font-black uppercase tracking-tighter z-0 leading-none text-transparent transition-opacity duration-1000"
@@ -93,7 +93,7 @@ export const FooterBackgroundEffects: React.FC<BackgroundEffectProps> = ({ isAni
       <div 
         className={STYLES.pixelGrid}
         style={{
-          backgroundImage: "radial-gradient(circle, #ff007f 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, #EC1B69 1px, transparent 1px)",
           backgroundSize: "30px 30px",
           opacity: 0.08,
           animation: "pixelPulse 8s infinite alternate"

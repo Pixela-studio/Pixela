@@ -47,7 +47,6 @@ const MOVIE_ONLY_CATEGORY_IDS = [
  */
 export async function getAllCategories(): Promise<Category[]> {
     const apiUrl = API_ENDPOINTS.CATEGORIES.LIST;
-    console.log(`[DEBUG] getAllCategories - Intentando obtener categorías`);
 
     try {
         const data = await fetchFromAPI<CategoriesApiResponse>(apiUrl);

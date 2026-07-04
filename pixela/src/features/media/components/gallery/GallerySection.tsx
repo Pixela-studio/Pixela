@@ -28,7 +28,7 @@ const STYLES = {
   // Contenedor de la cuadrícula y botones
   gridContainer: "mt-6",
   buttonContainer: "flex justify-start mt-4",
-  button: "px-5 py-2 rounded-lg font-semibold bg-pixela-accent hover:bg-pixela-accent-dark text-white shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pixela-accent-dark focus:ring-offset-2",
+  button: "px-5 py-2 rounded-lg font-semibold bg-pixela-accent hover:bg-pixela-accent/80 text-white shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pixela-accent/80 focus:ring-offset-2",
 
   // Estilos del modal de vista previa
   modal: {
