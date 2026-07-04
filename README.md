@@ -17,14 +17,26 @@ Este proyecto ha evolucionado desde sus inicios académicos hasta convertirse en
 
 Pixela unifica frontend y backend en una arquitectura eficiente y escalable:
 
-*   **Core:** [Next.js 15](https://nextjs.org/) (App Router & API Routes).
+*   **Core:** [Next.js 16](https://nextjs.org/) (App Router & API Routes) + [React 19](https://react.dev/).
 *   **Lenguaje:** [TypeScript](https://www.typescriptlang.org/).
 *   **Base de Datos:** [PostgreSQL](https://www.postgresql.org/) en [Supabase](https://supabase.com/).
 *   **ORM:** [Prisma](https://www.prisma.io/).
 *   **Autenticación:** [Auth.js (NextAuth v5)](https://authjs.dev/).
 *   **Estilos:** [Tailwind CSS](https://tailwindcss.com/) (Diseño "Glassmorphism").
 *   **Datos:** API de [TMDB](https://www.themoviedb.org/).
+*   **Package manager & runtime:** [Bun](https://bun.sh/).
 *   **Despliegue:** [Vercel](https://vercel.com/).
+
+### Requisitos y arranque local
+
+```bash
+cd pixela
+bun install
+bunx prisma generate
+bun run dev
+```
+
+Necesitas [Bun ≥ 1.3](https://bun.sh/docs/installation). El proyecto usa `bun.lock` — no reintroduzcas `package-lock.json`.
 
 **¿Cómo funciona?**
 Toda la aplicación opera sobre Next.js. El frontend consume una API interna (`/api/...`) que actúa como proxy seguro hacia TMDB y gestiona la lógica de negocio (usuarios, favoritos) directamente contra la base de datos PostgreSQL, eliminando la necesidad de servidores backend externos complejos.
