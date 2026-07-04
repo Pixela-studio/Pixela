@@ -1,7 +1,8 @@
 'use client';
 
 import { create } from 'zustand';
-import { useSession, signOut } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import { UserResponse } from '@/api/auth/types';
 
 const CLEANUP_DELAY_MS = 2000;
@@ -15,7 +16,7 @@ interface AuthState {
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: UserResponse) => void;
-  syncWithSession: (session: any) => void;
+  syncWithSession: (session: Session | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -28,21 +29,23 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user, isAuthenticated: true });
   },
 
-  syncWithSession: (session: any) => {
+  syncWithSession: (session: Session | null) => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(FORCE_LOGOUT_KEY);
     }
 
     if (session?.user) {
+      const sessionUser = session.user as Session['user'] & { id?: string; isAdmin?: boolean };
+      const now = new Date().toISOString();
       const user: UserResponse = {
-        user_id: parseInt(session.user.id),
-        name: session.user.name || '',
-        email: session.user.email || '',
-        is_admin: session.user.isAdmin || false,
-        photo_url: session.user.image || undefined,
-        password: '', // Session doesn't have password
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        user_id: parseInt(sessionUser.id ?? '0'),
+        name: sessionUser.name || '',
+        email: sessionUser.email || '',
+        is_admin: sessionUser.isAdmin ?? false,
+        photo_url: sessionUser.image || undefined,
+        password: '',
+        created_at: now,
+        updated_at: now,
       };
       
       set({ 

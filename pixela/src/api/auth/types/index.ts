@@ -34,7 +34,7 @@ export interface UserResponse {
   user_id: number;
   name: string;
   email: string;
-  photo_url: string;
+  photo_url?: string;
   cover_url?: string;
   is_admin: boolean;
   password: string;

@@ -178,9 +178,19 @@ export interface ApiSerie {
   };
   results?: ApiTrailer[];
   imagenes?: {
-    backdrops: any[];
-    posters: any[];
+    backdrops: ApiImageEntry[];
+    posters: ApiImageEntry[];
   };
+}
+
+export interface ApiImageEntry {
+  file_path: string;
+  width?: number;
+  height?: number;
+  aspect_ratio?: number;
+  vote_average?: number;
+  vote_count?: number;
+  iso_639_1?: string | null;
 } 
 
 /** 

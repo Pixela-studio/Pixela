@@ -2,7 +2,7 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import Error403 from '@/app/error-403';
+import Error403 from '@/app/errors/error-403';
 
 interface ProtectedRouteProps {
   children: ReactNode;
