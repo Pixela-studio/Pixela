@@ -17,9 +17,9 @@ const STYLES = {
     withMargin: "mb-4 md:mb-6 lg:mb-8 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
   },
 
-  // Título principal del hero
+  // Título principal del hero — escala editorial mayor, peso black y leading apretado
   heroTitle: {
-    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase md:tracking-tight md:uppercase leading-[1.0] drop-shadow-sm [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
+    base: "text-5xl sm:text-6xl md:text-7xl lg:text-8xl 2k:text-[10rem] font-black font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase leading-[0.9] drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] [text-wrap:balance] [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
     accent: "text-pixela-accent",
   },
 
