@@ -20,7 +20,7 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
     <Link 
       href={`/actor/${actor.id}`}
       className={clsx(
-        "block bg-[#1A1A1A] rounded-xl overflow-hidden group hover:bg-[#252525] hover:scale-105 transition duration-300 shadow-lg shadow-black/10 cursor-pointer",
+        "block rounded-2xl overflow-hidden group bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 border border-white/5 shadow-2xl shadow-pixela-accent/5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer",
         className
       )}
     >

@@ -24,7 +24,7 @@ export function PlatformCard({ provider }: PlatformCardProps) {
   return (
     <div
       onClick={handleClick}
-      className="bg-[#1A1A1A] p-3 rounded-xl flex items-center gap-3 hover:bg-[#252525] transition duration-300 shadow-lg shadow-black/10 cursor-pointer select-none"
+      className="p-3 rounded-2xl flex items-center gap-3 bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 border border-white/5 shadow-2xl shadow-pixela-accent/5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer select-none"
       role="button"
       tabIndex={0}
     >
