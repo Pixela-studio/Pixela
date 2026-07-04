@@ -26,8 +26,17 @@ const isNavLinkActive = (href: string, pathname: string): boolean => {
 };
 
 const STYLES = {
-  nav: 'w-full fixed top-0 left-0 z-50 mt-5 px-4',
-  container: 'w-full max-w-[83.333%] mx-auto flex items-center p-4 max-sm:px-3 max-sm:w-[calc(100%-2rem)] bg-dark-opacity backdrop-blur-sm rounded-[36px]',
+  // Nav wrapper: cambia márgenes/padding cuando pasa a docked.
+  navBase: 'w-full fixed top-0 left-0 z-50 transition-[margin,padding] duration-300 ease-out',
+  navFloating: 'mt-5 px-4',
+  navDocked: 'mt-0 px-0',
+
+  // Contenedor visible: en floating es una "píldora" flotante centrada;
+  // en docked ocupa 100% de ancho, rectangular y con más opacidad.
+  containerBase: 'w-full mx-auto flex items-center backdrop-blur-md transition-[max-width,padding,border-radius,background-color,box-shadow] duration-300 ease-out',
+  containerFloating: 'max-w-[83.333%] p-4 max-sm:px-3 max-sm:w-[calc(100%-2rem)] rounded-[36px] bg-dark-opacity',
+  containerDocked: 'max-w-none p-3 max-sm:px-3 rounded-none bg-pixela-dark/90 border-b border-white/10 shadow-lg shadow-black/30',
+
   logo: 'mx-10 sm:mx-2 md:mx-6 lg:mx-10',
   logoText: 'text-3xl font-bold font-outfit text-pixela-accent',
   navLinks: 'hidden lg:flex flex-1 justify-center', 
@@ -91,6 +100,13 @@ const MobileActionButton = ({
  * Componente de barra de navegación principal
  * @returns {JSX.Element} Componente de barra de navegación
  */
+// En landing (donde vive el hero de altura viewport) el navbar arranca
+// flotando y pasa a docked cuando el usuario baja ~el 85% del viewport.
+// En cualquier otra ruta el navbar arranca ya en docked porque no hay
+// hero por debajo que justifique la píldora flotante.
+const isLandingPath = (pathname: string): boolean => pathname === "/";
+const DOCK_TRIGGER_VH = 0.85;
+
 export const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -98,6 +114,7 @@ export const Navbar = () => {
   const { user, isAuthenticated, isLoading } = useAuthStore();
   const { logout, syncWithSession } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDocked, setIsDocked] = useState(() => !isLandingPath(pathname));
   const { navigateToSection, navigateToTop } = useSectionNavigation();
 
   // Sincronizar sesión de NextAuth con el store
@@ -113,6 +130,30 @@ export const Navbar = () => {
     router.prefetch('/profile');
     router.prefetch('/categories');
   }, [router]);
+
+  // Sincroniza el estado docked con la ruta / scroll:
+  // - Fuera del landing: siempre docked.
+  // - En landing: docked una vez el scroll supera ~85% del viewport,
+  //   momento en el que el hero ya está fuera de vista.
+  useEffect(() => {
+    if (!isLandingPath(pathname)) {
+      setIsDocked(true);
+      return;
+    }
+
+    const evaluate = () => {
+      setIsDocked(window.scrollY >= window.innerHeight * DOCK_TRIGGER_VH);
+    };
+
+    evaluate();
+    window.addEventListener("scroll", evaluate, { passive: true });
+    window.addEventListener("resize", evaluate);
+
+    return () => {
+      window.removeEventListener("scroll", evaluate);
+      window.removeEventListener("resize", evaluate);
+    };
+  }, [pathname]);
 
   // Manejar overflow del body cuando el menú móvil está abierto
   useEffect(() => {
@@ -196,8 +237,13 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className={STYLES.nav} role="navigation">
-        <div className={STYLES.container}>
+      <nav
+        className={`${STYLES.navBase} ${isDocked ? STYLES.navDocked : STYLES.navFloating}`}
+        role="navigation"
+      >
+        <div
+          className={`${STYLES.containerBase} ${isDocked ? STYLES.containerDocked : STYLES.containerFloating}`}
+        >
           {/* Prefetch en el logo para navegación al inicio */}
           <Link href="/" className={STYLES.logo} prefetch={true}>
             <h1 className={STYLES.logoText}>Pixela</h1>
