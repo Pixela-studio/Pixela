@@ -32,9 +32,12 @@ const STYLES = {
     // Bleed the navbar area to solid dark so the fixed nav sits on a clean base.
     topFade:
       "absolute top-0 left-0 w-full h-40 sm:h-56 md:h-64 lg:h-72 bg-gradient-to-b from-pixela-dark via-pixela-dark/70 to-transparent pointer-events-none",
-    // Bottom stripe so the CTA row and progress dots have contrast.
+    // Bottom fade — cubre casi la mitad inferior del hero para que la unión
+    // con la siguiente sección (bg-pixela-dark) sea invisible. Stops
+    // explícitos para controlar dónde el gradiente pierde/gana opacidad
+    // en vez de dejarlo a interpolación lineal.
     bottomFade:
-      "absolute bottom-0 left-0 w-full h-56 md:h-72 lg:h-96 bg-gradient-to-t from-pixela-dark via-pixela-dark/60 to-transparent pointer-events-none",
+      "absolute inset-0 pointer-events-none [background:linear-gradient(to_top,rgba(24,24,24,1)_0%,rgba(24,24,24,0.85)_18%,rgba(24,24,24,0.35)_42%,transparent_70%)]",
     // Film grain, uses the existing .noise-effect from globals.css.
     grain: "noise-effect",
   },
@@ -74,7 +77,7 @@ const OptimizedHeroImage = ({
           width={1000}
           height={1500}
           priority={index === 0}
-          quality={95}
+          quality={100}
           sizes="(max-width: 768px) 100vw, 1px"
           loading={index === 0 ? "eager" : "lazy"}
         />
@@ -90,7 +93,7 @@ const OptimizedHeroImage = ({
           width={3000}
           height={2000}
           priority={index === 0}
-          quality={95}
+          quality={100}
           sizes="(min-width: 769px) 100vw, 1px"
           loading={index === 0 ? "eager" : "lazy"}
         />
