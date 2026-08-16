@@ -28,12 +28,13 @@ pixela/
 │   │       ├── hooks/
 │   │       ├── store/
 │   │       └── types/
-│   ├── shared/             # Cross-feature UI (Navbar, MediaCarousel, buttons)
+│   ├── shared/             # Cross-feature UI (Navbar, MediaCarousel, EmptyState)
 │   ├── hooks/              # Cross-feature hooks
 │   ├── lib/                # prisma client, low-level helpers
+│   │   └── api/            # Route-handler layer: guards, responses, schemas, TMDB proxy
 │   ├── api/                # HTTP client wrappers per resource
 │   ├── stores/             # Cross-feature Zustand stores (auth)
-│   ├── types/              # Global TS types
+│   ├── middleware.ts       # Security headers (CSP) + redirect for protected routes
 │   └── auth.ts             # NextAuth config
 ├── prisma/                 # schema + migrations + seeds
 └── public/
@@ -67,11 +68,24 @@ Do NOT reintroduce `package-lock.json` or `.npmrc legacy-peer-deps`. Bun handles
 - Migrations: `bunx prisma migrate dev`.
 - Client is a singleton in `src/lib/prisma.ts` (avoid connection storms during dev HMR).
 
+## API layer (`src/lib/api/`)
+
+Every route handler goes through these. Don't hand-roll auth or validation in a route.
+
+- **`guards.ts`** — `requireUser()` / `requireAdmin()`. Return `{ ok, user }` or `{ ok: false, response }`; bail early with `if (!guard.ok) return guard.response`. They parse and validate `session.user.id` so it never reaches Prisma as `NaN`.
+- **`responses.ts`** — `apiError`, `validationError`, `parseJsonBody`, `handleRouteError`. **Never return `error.message` to the client**: Prisma leaks index and column names in it. `handleRouteError` logs the real error and answers generically.
+- **`schemas.ts`** — shared Zod schemas (`tmdbIdSchema`, `itemTypeSchema`, `watchStatusSchema`, …) plus `pickDiscoverParams`, the allowlist for what may be forwarded to TMDB.
+- **`tmdbProxy.ts`** — the actual TMDB proxying. Route files under `/api/{movies,series}/*` are one-line wrappers. `parseTmdbId` must gate any id before it reaches a TMDB path: Next decodes route params, so an encoded `..` would otherwise walk to arbitrary TMDB endpoints with our API key.
+- **`rateLimit.ts`** — fixed-window limiter in memory. Per-process, so a multi-instance deploy multiplies the effective limit; swap the `Map` for Redis if that stops being acceptable, keeping the signature.
+- **`mediaEnrichment.ts`** — `enrichWithTmdb` resolves TMDB metadata for a list of own rows, deduplicating by `(itemType, tmdbId)`.
+
+`src/middleware.ts` adds the CSP and security headers, and redirects to `/login` when the session cookie is missing. That redirect is UX only — real authorization lives in the handlers.
+
 ## Known tech debt
 
 **Storage / data**
-- Profile photos stored as base64 in `users.photo_url` (TEXT). Should move to object storage (S3/Cloudinary).
-- `session.user` cache is bypassed in `/api/user` GET by re-querying Prisma — trade consistency for extra DB round-trip.
+- Profile photos stored as base64 in `users.photo_url` (TEXT), capped at 512 KB by the Zod schema. Should move to object storage (S3/Cloudinary).
+- No password recovery. The "forgot password" link is rendered disabled on purpose; wire it up once there's email delivery.
 
 **Pending major upgrades** (skipped in the Bun migration to keep the diff safe)
 - **Prisma 5 → 7**: two majors. Follow https://pris.ly/d/major-version-upgrade. Regenerate client, review query call sites, run migrations against a snapshot first.
@@ -81,25 +95,17 @@ Do NOT reintroduce `package-lock.json` or `.npmrc legacy-peer-deps`. Bun handles
 
 **Code smells** (non-blocking, worth a focused refactor pass)
 - `src/features/categories/components/core/CategoriesContent.tsx` (~1000 lines): God component. Split by concern (filters, grid, pagination, search state).
-- `src/features/categories/hooks/useContentLoader.ts` (~549 lines): same shape, split by responsibility.
-- 5+ files >300 lines in `features/profile/**` — refactor candidates.
-- New React 19 lint rules (`react-hooks/set-state-in-effect`, `react-hooks/purity`, `react-hooks/error-boundaries`) are set to `warn` in `eslint.config.mjs`. Address progressively — the warnings point at real anti-patterns, they were just too many to tackle in the migration commit.
+- `src/features/categories/hooks/useContentLoader.ts` (~485 lines): same shape, split by responsibility. It also drops user interactions — `if (isLoadingRef.current) return` silently discards a page change requested while another load is in flight. Replace the boolean with a request-id counter (see `useAsyncResource`) so newer requests supersede older ones instead of being ignored.
+- `src/features/hero/services/heroBackdropService.ts` pins a hardcoded TMDB id as the first hero slide and keeps a manual title blacklist. Both will rot; move them to configuration.
+- The remaining lint warnings (22, all `warn`) are mostly `react-hooks/set-state-in-effect` coming from fetch-in-effect, which is inherent to `useAsyncResource`. The two `react-hooks/purity` hits are `Math.random()` inside Server Components in `app/page.tsx`, which is safe there because the page is `force-dynamic`.
 
-**Orphan modules** (audited, safe to delete once you confirm no external tooling references them)
-- Barrels never imported: `src/features/{about,discover,trending}/index.ts`, `src/features/{discover,trending,media}/components/index.ts`, `src/links/index.ts`, `src/metadata/index.ts` (and its `pages/*.ts`).
-- Types never used: `src/types/media.ts`; `interface CategoriesState` and `OverlayContentProps` (already deleted where duplicated).
-- Profile components exported only via barrel, never consumed: `FormInput`, `UserProfileCard`, `ProfileLoader`, `ProfileTabs`, `TabNavigationButton`.
-- Hook `src/hooks/useMediaQuery.ts` — every call site is commented out in `DiscoverGrid.tsx` / `DiscoverContent.tsx`. Either uncomment the sites or delete the hook.
-
-**`'use client'` on pure render-only components** (would gain from becoming Server Components)
-`src/features/{theatrical,weekend}/components/*Section.tsx`, `src/features/media/components/{platforms/StreamingProviders,hero/title/MediaTitle,hero/backdrop/BackdropImage,hero/genres/GenresList,hero/metadata/MediaMetadata,hero/creators/CreatorInfo,hero/modal/PosterImage,review/StarDisplay}.tsx`.
-
-**Duplicated logic** (DRY)
-- `src/app/errors/error-403.tsx` and `not-found.tsx` share identical `STYLES` — extract to `src/app/errors/_styles.ts`.
-- `src/shared/components/ActionButtons.tsx` and `src/features/media/components/hero/actions/ActionButtons.tsx` reimplement the same favorite lookup.
-- `useEffect(() => { setLoading(true); api.list().then(setState).catch(setError).finally(setLoading(false)); }, [])` copied verbatim in ≥5 files under `features/profile/**` and `features/categories/hooks/**`. Wrap in a `useAsyncList<T>` hook.
-
-**Remaining `any` to clean up** (see also `src/api/{peliculas,series}/mapper/*.ts`, `src/app/(auth)/register/page.tsx:62`, `src/app/api/reviews/media/[tmdbId]/[itemType]/route.ts:10`, `src/app/api/library/details/route.ts:27`).
+**Shared building blocks** — reach for these before writing a new one:
+- `src/hooks/useAsyncResource.ts` — load a resource with loading/error state, cancel on unmount and discard out-of-order responses.
+- `src/hooks/useFavoriteToggle.ts` — favorite state and toggling for a title.
+- `src/shared/components/EmptyState.tsx` — empty list with headline, context and an exit.
+- `src/lib/date.ts` — `formatYear` / `formatRuntime`. Use `formatYear`, never `new Date(x).getFullYear()`: TMDB returns an empty string for unreleased titles and that renders as `NaN`.
+- `src/lib/deterministicRandom.ts` — seeded values for decorative elements. Do not call `Math.random()` during render.
+- `src/lib/constants/reviews.ts` — review limits shared by the form and the API schema.
 
 ## Skills available for this repo
 
