@@ -1,5 +1,3 @@
-"use client";
-
 import { TheatricalHeader } from "./TheatricalHeader";
 import type { TheatricalMovie } from "../types";
 

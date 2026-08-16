@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast as toastManager, Toast, ToastType } from '@/lib/toast';
 import { FiX } from 'react-icons/fi';
 
@@ -49,21 +49,36 @@ interface ToastItemProps {
   onDismiss: (id: string) => void;
 }
 
+/** Duración de la animación de salida antes de retirar el aviso del DOM. */
+const EXIT_ANIMATION_MS = 300;
+
 const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
   const [isExiting, setIsExiting] = useState(false);
   const variant = TOAST_VARIANTS[toastData.type];
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleDismiss = () => {
+  // `handleDismiss` se recreaba en cada render y se usaba dentro del efecto sin
+  // declararla como dependencia, de modo que el temporizador de auto-cierre
+  // conservaba un `onDismiss` obsoleto.
+  const handleDismiss = useCallback(() => {
     setIsExiting(true);
-    setTimeout(() => onDismiss(toastData.id), 300);
-  };
+    exitTimer.current = setTimeout(
+      () => onDismiss(toastData.id),
+      EXIT_ANIMATION_MS,
+    );
+  }, [onDismiss, toastData.id]);
+
+  // El temporizador de salida no se cancelaba al desmontar.
+  useEffect(() => () => {
+    if (exitTimer.current) clearTimeout(exitTimer.current);
+  }, []);
 
   useEffect(() => {
     if (toastData.duration > 0 && ['success', 'info'].includes(toastData.type)) {
       const timer = setTimeout(handleDismiss, toastData.duration);
       return () => clearTimeout(timer);
     }
-  }, [toastData.duration, toastData.type]);
+  }, [toastData.duration, toastData.type, handleDismiss]);
 
   return (
     <div
