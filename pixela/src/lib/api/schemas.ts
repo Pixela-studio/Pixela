@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { REVIEW_MAX_LENGTH } from "@/lib/constants/reviews";
 
 /**
  * Esquemas compartidos por las route handlers.
@@ -36,12 +37,11 @@ export const resourceIdSchema = z.coerce
   .int("Identificador inválido")
   .positive("Identificador inválido");
 
-/**
- * Longitud máxima de una reseña. Sin este límite el campo `TEXT` aceptaba
- * payloads de megabytes, lo que es un vector de agotamiento de almacenamiento.
+/*
+ * La longitud máxima vive en `@/lib/constants/reviews` para que el formulario
+ * del cliente valide exactamente el mismo límite que aplica el servidor. Sin
+ * este tope el campo `TEXT` aceptaba payloads de megabytes.
  */
-export const REVIEW_MAX_LENGTH = 2000;
-
 export const createReviewSchema = z.object({
   tmdb_id: tmdbIdSchema,
   item_type: itemTypeSchema,

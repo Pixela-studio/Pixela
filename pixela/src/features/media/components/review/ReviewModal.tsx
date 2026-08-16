@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { FiX, FiStar } from 'react-icons/fi';
 import { reviewsAPI } from '@/api/reviews/reviews';
 import { CreateReview } from '@/api/reviews/types';
 import { ReviewModalProps } from '@/features/media/types/reviews';
+import { parseApiErrorMessage } from '@/api/shared/apiHelpers';
+import { REVIEW_MAX_LENGTH } from '@/lib/constants/reviews';
 
 const STYLES = {
   // Estilos del modal y overlay
@@ -93,17 +95,39 @@ export const ReviewModal = ({ isOpen, onClose, tmdbId, itemType, title, refreshR
 
   const [apiError, setApiError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const titleId = useId();
 
   useEffect(() => {
-    if (!isOpen) {
-      // Retrasar el reseteo para que no se vea el cambio antes de que se cierre el modal
-      setTimeout(() => {
-        reset({ rating: 6, review: '' });
-        setApiError(null);
-        setSuccess(null);
-      }, 300);
-    }
+    if (isOpen) return;
+
+    // Retrasar el reseteo para que no se vea el cambio antes de que se cierre el modal
+    const timer = setTimeout(() => {
+      reset({ rating: 6, review: '' });
+      setApiError(null);
+      setSuccess(null);
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [isOpen, reset]);
+
+  // Escape para cerrar y bloqueo del scroll de fondo: el diálogo solo se podía
+  // cerrar con el ratón y la página seguía desplazándose por detrás.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   /**
    * Función que cierra el modal
@@ -130,19 +154,25 @@ export const ReviewModal = ({ isOpen, onClose, tmdbId, itemType, title, refreshR
       };
       await reviewsAPI.add(reviewData);
       
-      setSuccess('¡Reseña creada correctamente!');
-      
+      // La API hace upsert: la misma acción crea o actualiza, así que el
+      // mensaje ya no puede afirmar que se ha creado.
+      setSuccess('¡Reseña guardada correctamente!');
+
       setTimeout(() => {
         handleClose();
         if (refreshReviews) refreshReviews();
       }, 1500);
 
     } catch (error: unknown) {
-      if (error instanceof Error && error.message.includes('Review already exists')) {
-        setApiError('Ya tienes una reseña para esta ficha.');
-      } else {
-        setApiError('No se pudo guardar la reseña. Por favor, inténtalo de nuevo.');
-      }
+      // Se comparaba con 'Review already exists', una cadena que la API nunca
+      // devuelve: `ApiError.message` es siempre "Request failed with status N".
+      // El motivo real viaja en el cuerpo de la respuesta.
+      setApiError(
+        parseApiErrorMessage(
+          error,
+          'No se pudo guardar la reseña. Por favor, inténtalo de nuevo.',
+        ),
+      );
     }
   };
 
@@ -157,17 +187,21 @@ export const ReviewModal = ({ isOpen, onClose, tmdbId, itemType, title, refreshR
     >
       <div 
         className={STYLES.modal.container}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className={STYLES.header.container}>
-          <h2 className={STYLES.header.title}>Escribir Reseña</h2>
+          <h2 id={titleId} className={STYLES.header.title}>Escribir Reseña</h2>
           <button
             onClick={handleClose}
             className={STYLES.header.closeButton}
             type="button"
+            aria-label="Cerrar"
           >
-            <FiX className="w-6 h-6" />
+            <FiX className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
 
@@ -233,8 +267,12 @@ export const ReviewModal = ({ isOpen, onClose, tmdbId, itemType, title, refreshR
               </label>
               <textarea
                 {...register('review', {
-                  maxLength: { value: 5000, message: 'La reseña no puede exceder los 5000 caracteres' }
+                  maxLength: {
+                    value: REVIEW_MAX_LENGTH,
+                    message: `La reseña no puede exceder los ${REVIEW_MAX_LENGTH} caracteres`,
+                  },
                 })}
+                maxLength={REVIEW_MAX_LENGTH}
                 className={STYLES.content.review.textarea}
                 placeholder="Escribe tu opinión sobre esta película o serie..."
               />
