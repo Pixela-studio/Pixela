@@ -1,81 +1,22 @@
 import { API_ENDPOINTS } from "../shared/apiEndpoints";
 import { fetchFromAPI } from "../shared/apiHelpers";
-import { AuthResponse, UserResponse } from "./types";
-
-const AUTH_STORAGE_KEYS = {
-  TOKEN: 'token',
-  FORCE_LOGOUT: 'forceLogout',
-} as const;
-
-const COOKIE_NAMES = {
-  XSRF_TOKEN: 'XSRF-TOKEN',
-  SESSION: 'pixela_session',
-} as const;
-
-const clearAuthCookies = (): void => {
-  if (typeof document === 'undefined') return;
-  
-  const expireDate = 'Thu, 01 Jan 1970 00:00:00 UTC';
-  const domain = typeof window !== 'undefined' ? window.location.hostname : '';
-  
-  Object.values(COOKIE_NAMES).forEach(cookieName => {
-    document.cookie = `${cookieName}=; expires=${expireDate}; path=/;`;
-    document.cookie = `${cookieName}=; expires=${expireDate}; path=/; domain=${domain}`;
-  });
-};
+import { UserResponse } from "./types";
 
 /**
- * API para autenticación
- * @namespace authAPI
- * @description API para autenticación
+ * API de autenticación.
+ *
+ * El login, el registro y el logout los gestiona Auth.js (`signIn` / `signOut`
+ * de `next-auth/react`); aquí solo queda la lectura del perfil.
+ *
+ * Se han eliminado los métodos heredados del backend Laravel: `login()` apuntaba
+ * a `/api/auth/login`, una ruta que no existe; `register()` enviaba un payload
+ * con `surname` y `password_confirmation` que el handler actual ignora, y
+ * `logout()` borraba las cookies `XSRF-TOKEN` y `pixela_session` —ninguna de las
+ * cuales usa Auth.js—, así que daba por cerrada una sesión que seguía viva.
+ * Los tres guardaban además un token en `localStorage` que nadie leía.
  */
 export const authAPI = {
-    async login(email: string, password: string): Promise<AuthResponse> {
-        const response = await fetchFromAPI<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-        });
-
-        if (response.token && typeof window !== 'undefined') {
-            localStorage.removeItem(AUTH_STORAGE_KEYS.FORCE_LOGOUT);
-        }
-
-        return response;
-    },
-
-    async register(userData: {
-        name: string;
-        surname: string;
-        email: string;
-        password: string;
-        password_confirmation: string;
-    }): Promise<AuthResponse> {
-        const response = await fetchFromAPI<AuthResponse>(API_ENDPOINTS.AUTH.REGISTER, {
-            method: 'POST',
-            body: JSON.stringify(userData),
-        });
-
-        if (response.token && typeof window !== 'undefined') {
-            localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, response.token);
-        }
-
-        return response;
-    },
-
-    async logout(): Promise<void> {
-        await fetchFromAPI(API_ENDPOINTS.AUTH.LOGOUT, {
-            method: 'POST',
-        });
-
-        clearAuthCookies();
-    },
-
-    async getUser(): Promise<UserResponse> {
-        if (typeof window !== 'undefined' && localStorage.getItem(AUTH_STORAGE_KEYS.FORCE_LOGOUT)) {
-            localStorage.removeItem(AUTH_STORAGE_KEYS.FORCE_LOGOUT);
-            throw new Error('Session closed');
-        }
-        
-        return fetchFromAPI<UserResponse>(API_ENDPOINTS.AUTH.USER);
-    }
+  async getUser(): Promise<UserResponse> {
+    return fetchFromAPI<UserResponse>(API_ENDPOINTS.AUTH.USER);
+  },
 };

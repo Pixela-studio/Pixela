@@ -1,93 +1,63 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import { auth } from "@/auth";
-import { fetchFromTmdb } from "@/lib/tmdb";
-
-interface TmdbMediaDetails {
-  title?: string;
-  name?: string;
-  poster_path: string | null;
-  overview: string;
-  release_date?: string;
-  first_air_date?: string;
-  vote_average: number;
-}
+import { requireUser } from "@/lib/api/guards";
+import { apiError, handleRouteError } from "@/lib/api/responses";
+import { watchStatusSchema } from "@/lib/api/schemas";
+import {
+  FALLBACK_SUMMARY,
+  enrichWithTmdb,
+  mediaKey,
+} from "@/lib/api/mediaEnrichment";
 
 export async function GET(request: Request) {
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
+  const { searchParams } = new URL(request.url);
+  const statusParam = searchParams.get("status");
+
+  /*
+   * `whereClause` era `any` y el `status` de la query se inyectaba sin validar:
+   * cualquier valor fuera del enum `WatchStatus` hacía que Prisma lanzara y la
+   * ruta respondiera 500 en vez de 400.
+   */
+  const where: Prisma.LibraryItemWhereInput = { userId: guard.user.id };
+
+  if (statusParam) {
+    const parsedStatus = watchStatusSchema.safeParse(statusParam);
+    if (!parsedStatus.success) {
+      return apiError("Estado de biblioteca inválido", 400);
+    }
+    where.status = parsedStatus.data;
+  }
+
   try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const statusFilter = searchParams.get("status");
-
-    const userId = parseInt(session.user.id);
-    const whereClause: any = { userId };
-
-    if (statusFilter) {
-      whereClause.status = statusFilter;
-    }
-
     const libraryItems = await prisma.libraryItem.findMany({
-      where: whereClause,
+      where,
       orderBy: { updatedAt: "desc" },
     });
 
-    // Obtener detalles de TMDB para cada item
-    const itemsWithDetails = await Promise.all(
-      libraryItems.map(async (item) => {
-        try {
-          const tmdbType = item.itemType === "movie" ? "movie" : "tv";
-          const data = await fetchFromTmdb<TmdbMediaDetails>(
-            `${tmdbType}/${item.tmdbId}`,
-          );
-
-          return {
-            id: item.id,
-            user_id: item.userId,
-            tmdb_id: Number(item.tmdbId),
-            item_type: item.itemType,
-            status: item.status,
-            title: data.title || data.name || "Sin título",
-            poster_path: data.poster_path,
-            overview: data.overview,
-            release_date: data.release_date || data.first_air_date,
-            vote_average: data.vote_average,
-            updated_at: item.updatedAt,
-          };
-        } catch (error) {
-          console.error(
-            `Error fetching TMDB for library item ${item.id}:`,
-            error,
-          );
-          return {
-            id: item.id,
-            user_id: item.userId,
-            tmdb_id: Number(item.tmdbId),
-            item_type: item.itemType,
-            status: item.status,
-            title: "Error al cargar detalles",
-            poster_path: null,
-            overview: "",
-            release_date: "",
-            vote_average: 0,
-            updated_at: item.updatedAt,
-          };
-        }
-      }),
-    );
+    const summaries = await enrichWithTmdb(libraryItems);
 
     return NextResponse.json({
       success: true,
-      data: itemsWithDetails,
+      data: libraryItems.map((item) => {
+        const summary =
+          summaries.get(mediaKey(item.itemType, item.tmdbId)) ?? FALLBACK_SUMMARY;
+
+        return {
+          id: item.id,
+          user_id: item.userId,
+          tmdb_id: Number(item.tmdbId),
+          item_type: item.itemType,
+          status: item.status,
+          updated_at: item.updatedAt,
+          ...summary,
+        };
+      }),
     });
   } catch (error) {
-    console.error("Error listing library:", error);
-    return NextResponse.json(
-      { error: "Error al listar biblioteca" },
-      { status: 500 },
-    );
+    return handleRouteError("Failed to list library", error);
   }
 }

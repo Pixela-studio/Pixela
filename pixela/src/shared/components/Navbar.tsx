@@ -198,30 +198,18 @@ export const Navbar = () => {
     }
   };
 
+  // Se cierra sesión **antes** de navegar. La versión anterior navegaba primero
+  // y lanzaba el logout "en segundo plano" apoyándose en una bandera
+  // `forceLogout` en localStorage: si la petición fallaba, el usuario veía la
+  // interfaz de invitado con la cookie de sesión todavía válida.
   const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    
-    // Marcar inmediatamente que estamos haciendo logout
-    localStorage.setItem('forceLogout', 'true');
     setMobileMenuOpen(false);
-    
-    // Usar router.push optimizado para navegación
+
+    await logout();
+
     router.push('/');
-    
-    // Limpiar forceLogout después de la navegación
-    setTimeout(() => {
-      localStorage.removeItem('forceLogout');
-    }, 1000);
-    
-    // Hacer logout en background
-    try {
-      await logout();
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error durante el logout:', error);
-      }
-      // No importa si falla, ya redirigimos
-    }
+    router.refresh();
   };
 
   const toggleMobileMenu = () => {

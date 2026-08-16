@@ -1,14 +1,14 @@
 "use client";
 
 import { FaBookmark, FaPen } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { favoritesAPI } from "@/api/favorites/favorites";
 import { ReviewModal } from "@/features/media/components/review/ReviewModal";
 import { ActionButtonsProps } from "@/features/media/types/actions";
 import { toast } from "@/lib/toast";
 import { LibraryButton } from "@/features/media/components/actions/LibraryButton";
+import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
 
 const STYLES = {
   container: "flex gap-4",
@@ -22,13 +22,10 @@ const STYLES = {
 };
 
 /**
- * Componente que muestra los botones de acción para una película o serie
- * @param {ActionButtonsProps} props - Propiedades del componente
- * @param {number} props.tmdbId - ID de la película o serie
- * @param {'movie' | 'series'} props.itemType - Tipo de película o serie
- * @param {string} props.title - Título de la película o serie
- * @param {() => void} [props.refreshReviews] - Función para refrescar las reseñas
- * @returns {JSX.Element} Componente de botones de acción
+ * Botones de acción de la ficha de una película o serie.
+ *
+ * El estado de favorito lo gestiona `useFavoriteToggle`, compartido con las
+ * tarjetas de los carruseles.
  */
 export const ActionButtons = ({
   tmdbId,
@@ -36,91 +33,15 @@ export const ActionButtons = ({
   title,
   refreshReviews,
 }: ActionButtonsProps) => {
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [favoriteId, setFavoriteId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const { isAuthenticated, checkAuth } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = useRouter();
 
-  /**
-   * Efecto para verificar el estado de favoritos
-   * @returns {void}
-   */
-  useEffect(() => {
-    const checkFavoriteStatus = async () => {
-      if (!isAuthenticated) return;
+  const { isFavorited, isLoading, toggleFavorite } = useFavoriteToggle({
+    tmdbId,
+    itemType,
+  });
 
-      try {
-        const favorites = await favoritesAPI.listWithDetails();
-        const fav = favorites.find(
-          (fav) => fav.tmdb_id === tmdbId && fav.item_type === itemType,
-        );
-        setIsFavorited(!!fav);
-        setFavoriteId(fav ? fav.id : null);
-      } catch (error) {
-        if (process.env.NODE_ENV === "development") {
-          console.error("Error checking favorite status:", error);
-        }
-      }
-    };
-
-    checkFavoriteStatus();
-  }, [isAuthenticated, tmdbId, itemType]);
-
-  /**
-   * Maneja el evento de agregar o eliminar un favorito
-   * @returns {Promise<void>}
-   */
-  const handleFavorite = async () => {
-    if (!isAuthenticated) {
-      toast.info("Inicia sesión para agregar a favoritos", {
-        title: "Autenticación requerida",
-        duration: 3000,
-      });
-      router.push("/login");
-      return;
-    }
-
-    /**
-     * Establece el estado de carga y maneja el evento de agregar o eliminar un favorito
-     * @returns {Promise<void>}
-     */
-    setIsLoading(true);
-    try {
-      if (isFavorited && favoriteId) {
-        await favoritesAPI.deleteFavorite(favoriteId);
-      } else {
-        await favoritesAPI.addFavorite({
-          tmdb_id: tmdbId,
-          item_type: itemType,
-        });
-      }
-
-      // Refresca el estado real desde la API
-      const favorites = await favoritesAPI.listWithDetails();
-      const fav = favorites.find(
-        (fav) => fav.tmdb_id === tmdbId && fav.item_type === itemType,
-      );
-      setIsFavorited(!!fav);
-      setFavoriteId(fav ? fav.id : null);
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("Error toggling favorite:", error);
-      }
-      if (error instanceof Error && error.message.includes("401")) {
-        await checkAuth();
-        router.push("/login");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * Maneja el evento de hacer una reseña
-   * @returns {void}
-   */
   const handleReview = () => {
     if (!isAuthenticated) {
       toast.info("Inicia sesión para escribir una reseña", {
@@ -133,26 +54,33 @@ export const ActionButtons = ({
     setShowReviewModal(true);
   };
 
+  const favoriteLabel = isFavorited
+    ? "Quitar de favoritos"
+    : "Agregar a favoritos";
+
   return (
     <>
       <div className={STYLES.container}>
         <button
-          onClick={handleFavorite}
+          type="button"
+          onClick={() => void toggleFavorite()}
           disabled={isLoading}
-          className={STYLES.favoriteButton(isFavorited, isLoading)}
-          aria-label={
-            isFavorited ? "Quitar de favoritos" : "Agregar a favoritos"
-          }
-          title={isFavorited ? "Quitar de favoritos" : "Agregar a favoritos"}
+          className={STYLES.favoriteButton(Boolean(isFavorited), isLoading)}
+          aria-label={favoriteLabel}
+          aria-pressed={Boolean(isFavorited)}
+          title={favoriteLabel}
         >
-          <FaBookmark className={STYLES.bookmarkIcon(isFavorited)} />
+          <FaBookmark
+            aria-hidden="true"
+            className={STYLES.bookmarkIcon(Boolean(isFavorited))}
+          />
         </button>
         <button
           onClick={handleReview}
           className={STYLES.reviewButton}
           type="button"
         >
-          <FaPen className={STYLES.penIcon} />
+          <FaPen aria-hidden="true" className={STYLES.penIcon} />
           Hacer Reseña
         </button>
         <LibraryButton tmdbId={tmdbId} itemType={itemType} title={title} />

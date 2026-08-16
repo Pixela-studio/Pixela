@@ -12,6 +12,26 @@ export class ApiError extends Error {
 }
 
 /**
+ * Extrae el mensaje legible que devuelve la API en `{ success: false, error }`.
+ *
+ * `ApiError.message` es siempre "Request failed with status NNN", que no dice
+ * nada al usuario. El detalle útil viaja en el cuerpo de la respuesta.
+ */
+export function parseApiErrorMessage(
+  error: unknown,
+  fallback = 'Ha ocurrido un error inesperado',
+): string {
+  if (!(error instanceof ApiError) || !error.response) return fallback;
+
+  try {
+    const parsed = JSON.parse(error.response) as { error?: string; message?: string };
+    return parsed.error || parsed.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Opciones por defecto para las peticiones fetch
  * @type {RequestInit}
  */

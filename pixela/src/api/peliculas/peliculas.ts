@@ -3,9 +3,7 @@ import { API_ENDPOINTS } from '@/api/shared/apiEndpoints';
 import { fetchWithErrorHandling } from '@/api/shared/apiHelpers';
 import { mapPeliculaFromApi } from './mapper/mapPelicula'; 
 import type {
-  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor,
-  ApiResponse, ApiCastResponse, ApiVideosResponse, ApiProvidersResponse, 
-  ApiImagesResponse, ApiCreatorResponse
+  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor, ApiResponse
 } from './types';
 
 interface CrewMember {
@@ -112,74 +110,4 @@ export async function getPeliculaById(id: string): Promise<Pelicula> {
     imagenes,
     creador
   });
-}
-
-/**
- * Obtiene los actores de una película
- * @param id ID de la película
- * @returns Array de actores
- */
-export async function getPeliculaActores(id: string): Promise<ApiActor[]> {
-  const data = await fetchWithErrorHandling<ApiCastResponse>(
-    API_ENDPOINTS.PELICULAS.GET_CAST(id)
-  );
-  return data?.success ? (data.data?.cast || []) : [];
-}
-
-/**
- * Obtiene los videos/trailers de una película
- * @param id ID de la película
- * @returns Array de videos
- */
-export async function getPeliculaVideos(id: string): Promise<ApiTrailer[]> {
-  const data = await fetchWithErrorHandling<ApiVideosResponse>(
-    API_ENDPOINTS.PELICULAS.GET_VIDEOS(id)
-  );
-  return data?.success ? (data.data?.results || []) : [];
-}
-
-/**
- * Obtiene los proveedores de streaming de una película
- * @param id ID de la película
- * @param region Región para los proveedores (por defecto ES para España)
- * @returns Array de proveedores de streaming
- */
-export async function getPeliculaProveedores(
-  id: string, 
-  region = 'ES'
-): Promise<ApiProvider[]> {
-  const data = await fetchWithErrorHandling<ApiProvidersResponse>(
-    `${API_ENDPOINTS.PELICULAS.GET_WATCH_PROVIDERS(id)}?region=${region}`
-  );
-  
-  if (!data?.success || !data.data?.results?.[region]) {
-    return [];
-  }
-  
-  const providers = data.data.results[region];
-  const allProviders: ApiProvider[] = [
-    ...(providers.flatrate || []),
-    ...(providers.rent || []),
-    ...(providers.buy || [])
-  ];
-  
-  return deduplicateProviders(allProviders);
-}
-
-/**
- * Obtiene las imágenes de una película (backdrops y posters)
- * @param id ID de la película
- * @returns Array de imágenes
- */
-export async function getPeliculaImagenes(id: string): Promise<ApiImage[]> {
-  const data = await fetchWithErrorHandling<ApiImagesResponse>(
-    API_ENDPOINTS.PELICULAS.GET_IMAGES(id)
-  );
-  
-  if (!data?.success) return [];
-  
-  return [
-    ...(data.data?.backdrops || []), 
-    ...(data.data?.posters || [])
-  ];
 }

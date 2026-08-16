@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { signOut } from "next-auth/react";
 import { UserResponse } from "@/api/auth/types";
 import { User } from "@/api/users/types";
 import { ProfileFormData } from "@/features/profile/types/profileTypes";
 import { usersAPI } from "@/api/users/users";
+import { ApiError, parseApiErrorMessage } from "@/api/shared/apiHelpers";
+import { logger } from "@/lib/logger";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileFavorites } from "./layout/ProfileFavorites";
 import { ProfileReviews } from "./layout/ProfileReviews";
@@ -91,19 +94,27 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     }
   }, [successMessage]);
 
-  // Handle redirect
+  // Tras cambiar la contraseña cerramos la sesión y llevamos al login.
+  //
+  // Antes esto hacía `window.location.replace("http://localhost:3000")`: una URL
+  // absoluta de desarrollo que en producción sacaba al usuario de la aplicación.
+  // Además la sesión anterior seguía viva, así que el cambio de contraseña no
+  // invalidaba nada.
   useEffect(() => {
-    if (redirecting) {
-      const timer = setTimeout(() => {
-        window.location.replace("http://localhost:3000");
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
+    if (!redirecting) return;
+
+    const timer = setTimeout(() => {
+      void signOut({ callbackUrl: "/login" });
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, [redirecting]);
 
   const handleSubmitProfile = async (data: ProfileFormData) => {
+    const isChangingPassword = Boolean(data.password?.trim());
+
     try {
-      const payload: Partial<UserResponse> = {
+      const payload: Partial<UserResponse> & { current_password?: string } = {
         user_id: user.user_id,
         name: data.name,
         email: data.email,
@@ -113,14 +124,16 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           data.cover_url !== undefined ? data.cover_url : user.cover_url,
       };
 
-      if (data.password && data.password.trim()) {
+      if (isChangingPassword) {
         payload.password = data.password;
+        // La API exige la contraseña actual para cambiar la propia.
+        payload.current_password = data.current_password;
       }
 
       const updatedUser = await usersAPI.update(payload as UserResponse);
       const userToSet = "user" in updatedUser ? updatedUser.user : updatedUser;
 
-      if (data.password && data.password.trim()) {
+      if (isChangingPassword) {
         setRedirecting(true);
         return;
       }
@@ -130,9 +143,11 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
       setIsEditing(false);
       setSuccessMessage("¡Perfil actualizado correctamente!");
     } catch (error) {
-      console.error("Error actualizando perfil:", error);
+      logger.error("Error updating profile", error);
       setSuccessMessage(
-        error instanceof Error ? error.message : "Error al actualizar",
+        error instanceof ApiError
+          ? `Error: ${parseApiErrorMessage(error)}`
+          : "Error al actualizar el perfil",
       );
     }
   };
@@ -246,6 +261,9 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                   name: user.name,
                   email: user.email,
                   photo_url: user.photo_url,
+                  // Faltaba: el formulario abría siempre sin la portada actual,
+                  // así que la vista previa aparecía vacía aunque hubiera una.
+                  cover_url: user.cover_url,
                 }}
                 onCancel={() => setIsEditing(false)}
                 onSubmit={handleSubmitProfile}
