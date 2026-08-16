@@ -17,6 +17,45 @@ interface TmdbResponse {
 }
 
 /**
+ * Títulos que no queremos destacar en la portada.
+ */
+const BANNED_TITLE_TERMS = [
+  "primal",
+  "monster high",
+  "barbie",
+  "primate",
+  "apes",
+  "simios",
+  "law & order",
+  "ley y orden",
+  "hermandad",
+  "turno de noche",
+  "night shift",
+  "joven sherlock",
+  "young sherlock",
+  "hoppers",
+  "dinosaur",
+  "dinosaurio",
+];
+
+/**
+ * Comprueba si un título está vetado, comparando **palabras completas**.
+ *
+ * La versión anterior hacía `title.includes(term)` sobre subcadenas, así que
+ * el término "apes" descartaba también «Escapes», «Grapes» o «Landscapes», y
+ * "hoppers" se llevaba por delante «Choppers» o «Shoppers»: títulos legítimos
+ * desaparecían de la portada sin que nadie lo notara.
+ */
+const BANNED_TITLE_PATTERNS = BANNED_TITLE_TERMS.map((term) => {
+  // Escapar los metacaracteres del término antes de meterlo en una expresión.
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}([^\\p{L}\\p{N}]|$)`, "iu");
+});
+
+const isBannedTitle = (title: string): boolean =>
+  BANNED_TITLE_PATTERNS.some((pattern) => pattern.test(title));
+
+/**
  * Función helper para obtener y mapear imágenes de una categoría
  * Usa URLs de alta calidad para el backdrop (original) y poster (w780)
  */
@@ -33,37 +72,18 @@ async function fetchAndMapImages(
       .filter((item) => {
         const title = (item.title || item.name || "").toLowerCase();
         const overview = item.overview || "";
-        // Filtro de calidad y contenido
-        // 1. Excluir títulos vacíos
-        if (!title) return false;
-        // 2. Excluir items sin descripción
-        if (!overview) return false;
-        // 3. Excluir títulos específicos no deseados (blacklist)
-        const bannedTerms = [
-          "primal",
-          "monster high",
-          "barbie",
-          "primate",
-          "apes",
-          "simios",
-          "law & order",
-          "ley y orden",
-          "hermandad",
-          "turno de noche",
-          "night shift",
-          "joven sherlock",
-          "young sherlock",
-          "hoppers",
-          "dinosaur",
-          "dinosaurio",
-        ];
-        const isBanned = bannedTerms.some((term) => title.includes(term));
 
-        if (isBanned && process.env.NODE_ENV === "development") {
-          console.log(`[Hero Filter] Excluded: ${title}`);
+        // Excluir títulos vacíos o sin sinopsis: el hero muestra ambos.
+        if (!title || !overview) return false;
+
+        if (isBannedTitle(title)) {
+          if (process.env.NODE_ENV === "development") {
+            console.log(`[Hero Filter] Excluded: ${title}`);
+          }
+          return false;
         }
 
-        return !isBanned;
+        return true;
       })
       .slice(0, limit)
       .map((item) => ({

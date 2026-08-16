@@ -2,7 +2,6 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Category } from "@/api/categories/categories";
 import { Pelicula, Serie } from "@/features/media/types/content";
 import { fetchFromAPI } from "@/api/shared/apiHelpers";
-import { preloadImages } from "../utils/imageUtils";
 
 /**
  * Respuesta estándar de la API para contenido paginado
@@ -26,13 +25,11 @@ interface ApiResponse<T> {
  * @param ITEMS_PER_PAGE - Número de elementos por página
  * @param MAX_TMDB_PAGES - Límite máximo de páginas de TMDB (no acepta más de 500 páginas)
  * @param MIN_PAGE - Página mínima permitida
- * @param INITIAL_LOAD_COUNT - Número de imágenes a precargar inicialmente
  */
 const PAGINATION_CONFIG = {
   ITEMS_PER_PAGE: 20,
   MAX_TMDB_PAGES: 500,
   MIN_PAGE: 1,
-  INITIAL_LOAD_COUNT: 6,
 } as const;
 
 /**
@@ -170,31 +167,6 @@ const processErrorMessage = (error: unknown): string => {
 };
 
 /**
- * Precarga solo las primeras N imágenes para mejorar el rendimiento inicial
- * @param content Array de contenido con imágenes
- * @param count Número de imágenes a precargar
- */
-const preloadInitialImages = async (
-  content: ContentItem[],
-  count: number = PAGINATION_CONFIG.INITIAL_LOAD_COUNT,
-): Promise<void> => {
-  const initialContent = content.slice(0, count);
-  const imagePromises = initialContent.map((item) => {
-    const imageUrl = item.poster_path || item.poster;
-    if (!imageUrl) return Promise.resolve();
-
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = resolve;
-      img.onerror = resolve;
-      img.src = imageUrl;
-    });
-  });
-
-  await Promise.all(imagePromises);
-};
-
-/**
  * Hook personalizado para cargar y manejar contenido de películas y series
  *
  * Este hook proporciona funcionalidad completa para:
@@ -282,26 +254,8 @@ export const useContentLoader = (
       movieResult: ApiResponse<Pelicula[]>,
       seriesResult: ApiResponse<Serie[]>,
     ): Promise<void> => {
-      // Precargar solo las primeras imágenes de cada tipo
-      await Promise.all([
-        preloadInitialImages(movieResult.data),
-        preloadInitialImages(seriesResult.data),
-      ]);
-
       updateContent(movieResult.data, true, movieResult.total_pages);
       updateContent(seriesResult.data, false, seriesResult.total_pages);
-
-      // Precargar el resto de imágenes en segundo plano
-      setTimeout(() => {
-        Promise.all([
-          preloadImages(
-            movieResult.data.slice(PAGINATION_CONFIG.INITIAL_LOAD_COUNT),
-          ),
-          preloadImages(
-            seriesResult.data.slice(PAGINATION_CONFIG.INITIAL_LOAD_COUNT),
-          ),
-        ]);
-      }, 0);
     },
     [updateContent],
   );
@@ -312,17 +266,8 @@ export const useContentLoader = (
    */
   const processMoviesOnly = useCallback(
     async (movieResult: ApiResponse<Pelicula[]>): Promise<void> => {
-      // Precargar solo las primeras imágenes
-      await preloadInitialImages(movieResult.data);
       updateContent(movieResult.data, true, movieResult.total_pages);
       setSeries([]);
-
-      // Precargar el resto de imágenes en segundo plano
-      setTimeout(() => {
-        preloadImages(
-          movieResult.data.slice(PAGINATION_CONFIG.INITIAL_LOAD_COUNT),
-        );
-      }, 0);
     },
     [updateContent],
   );
@@ -333,17 +278,8 @@ export const useContentLoader = (
    */
   const processSeriesOnly = useCallback(
     async (seriesResult: ApiResponse<Serie[]>): Promise<void> => {
-      // Precargar solo las primeras imágenes
-      await preloadInitialImages(seriesResult.data);
       updateContent(seriesResult.data, false, seriesResult.total_pages);
       setMovies([]);
-
-      // Precargar el resto de imágenes en segundo plano
-      setTimeout(() => {
-        preloadImages(
-          seriesResult.data.slice(PAGINATION_CONFIG.INITIAL_LOAD_COUNT),
-        );
-      }, 0);
     },
     [updateContent],
   );
@@ -499,6 +435,10 @@ export const useContentLoader = (
             ),
           ]);
 
+          if (!movieResult.success || !seriesResult.success) {
+            throw new Error("Error al obtener resultados de búsqueda");
+          }
+
           await processAllMediaContent(movieResult, seriesResult);
         } else {
           const endpoint = buildSearchEndpoint({
@@ -511,15 +451,11 @@ export const useContentLoader = (
             await fetchFromAPI<ApiResponse<ContentItem[]>>(endpoint);
           const isMoviesContent = selectedMediaType === "movies";
 
-          await preloadInitialImages(result.data);
-          updateContent(result.data, isMoviesContent, result.total_pages);
+          if (!result.success) {
+            throw new Error("Error al obtener resultados de búsqueda");
+          }
 
-          // Precargar el resto de imágenes en segundo plano
-          setTimeout(() => {
-            preloadImages(
-              result.data.slice(PAGINATION_CONFIG.INITIAL_LOAD_COUNT),
-            );
-          }, 0);
+          updateContent(result.data, isMoviesContent, result.total_pages);
         }
 
         setCurrentPage(page);
