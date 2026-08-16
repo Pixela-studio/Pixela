@@ -1,25 +1,4 @@
-/**
- * Respuesta de autenticación
- * @interface AuthResponse
- * @property {string} token - Token de autenticación
- * @property {Object} user - Usuario autenticado
- * @property {number} user.id - ID del usuario
- * @property {string} user.name - Nombre del usuario
- * @property {string} user.surname - Apellido del usuario
- */
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: number;
-    name: string;
-    surname: string;
-    email: string;
-    photo_url?: string;
-    is_admin: boolean;
-    password: string;
-    created_at: string;
-  };
-}
+
 
 /**
  * Respuesta de usuario

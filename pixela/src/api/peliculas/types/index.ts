@@ -196,7 +196,6 @@ export interface ApiPelicula {
   results?: ApiTrailer[];
 } 
 
-
 /**
  * Interfaz que representa una respuesta de la API
  * @interface ApiResponse
@@ -253,29 +252,3 @@ export interface ApiProvidersResponse {
   };
 }
 
-/**
- * Interfaz que representa una respuesta de la API para las imágenes
- * @interface ApiImagesResponse
- * @property {boolean} success - Si la respuesta fue exitosa
- * @property {Object} data - Datos de la respuesta
- */
-export interface ApiImagesResponse {
-  success: boolean;
-  data: {
-    backdrops: ApiImage[];
-    posters: ApiImage[];
-  };
-}
-
-/**
- * Interfaz que representa una respuesta de la API para el creador
- * @interface ApiCreatorResponse
- * @property {boolean} success - Si la respuesta fue exitosa
- * @property {Object} data - Datos de la respuesta
- */
-export interface ApiCreatorResponse {
-  success: boolean;
-  data: {
-    creator: ApiCreator;
-  };
-}

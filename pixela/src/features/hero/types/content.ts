@@ -132,31 +132,3 @@ export interface NavigationButtonProps {
   direction: "prev" | "next";
   onClick: () => void;
 }
-
-/**
- * Tipo que representa un medio audiovisual (película o serie)
- * @property {string} id - Identificador único del medio
- * @property {'movie' | 'serie'} type - Tipo de medio (película o serie)
- */
-export type MediaItem = {
-  id: string;
-  type: "movie" | "serie";
-};
-
-/**
- * Props para el componente ProgressIndicator
- * @property {HeroImage[]} images - Array de objetos de imágenes para el carrusel
- */
-export interface ProgressIndicatorProps {
-  images: HeroImage[];
-}
-
-/**
- * Tipo que representa la respuesta de la API para un medio
- * @property {string} [backdrop] - URL opcional del fondo del medio
- * @property {string} [poster] - URL opcional del poster del medio
- */
-export type MediaResponse = {
-  backdrop?: string;
-  poster?: string;
-};

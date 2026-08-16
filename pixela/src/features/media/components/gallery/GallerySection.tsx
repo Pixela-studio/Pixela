@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Wallpaper } from '@/features/media/types/gallery';
 import { GallerySectionProps } from '@/features/media/types/gallery';
-import { getMediaImages } from '@/features/media/services/galleryService';
 import { GalleryGrid } from './GalleryGrid';
 import { GalleryTabs } from './GalleryTabs';
 import { useMediaStore } from '@/features/media/store/mediaStore';

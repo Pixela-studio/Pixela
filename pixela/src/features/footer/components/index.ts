@@ -1,1 +1,0 @@
-export { FooterContent } from './core/FooterContent'; 

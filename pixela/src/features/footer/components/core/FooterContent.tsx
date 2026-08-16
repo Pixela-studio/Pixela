@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import FooterSocialLinks from '../content/FooterSocialLinks';
-import { DISCOVER_LINKS, LEGAL_LINKS } from '@/features/footer/constants/links';
+import { DISCOVER_LINKS, ACCOUNT_LINKS } from '@/features/footer/constants/links';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const STYLES = {
@@ -50,6 +50,10 @@ const STYLES = {
   copyrightLink: "text-white/60 hover:text-[#EC1B69] text-xs md:text-sm transition-colors ipad:text-xs",
   copyrightSeparator: "text-white/20 hidden sm:inline ipad:hidden",
 } as const;
+
+/** Se calcula al cargar el módulo, no en cada render: leer la fecha durante el
+ *  render rompe la pureza que exige React 19. */
+const CURRENT_YEAR = new Date().getFullYear();
 
 export const FooterContent = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -138,14 +142,14 @@ export const FooterContent = () => {
               </ul>
             </div>
 
-            {/* Columna 3: Links de compañía */}
+            {/* Columna 3: accesos de cuenta */}
             <div className={STYLES.companyColumn}>
               <h3 className={STYLES.sectionTitle}>
                 <div className={STYLES.titleUnderline}></div>
-                Compañía
+                Tu cuenta
               </h3>
               <ul className={STYLES.linksList}>
-                {LEGAL_LINKS.map((item, index) => (
+                {ACCOUNT_LINKS.map((item, index) => (
                   <li key={index} className={STYLES.linkItem}>
                     <Link 
                       href={item.href}
@@ -173,13 +177,22 @@ export const FooterContent = () => {
         <div className={STYLES.copyrightSection} ref={copyrightRef}>
           <div className={STYLES.copyrightContainer}>
             <p className={STYLES.copyrightText}>
-              © 2025 Pixela.io. Todos los derechos reservados.
+              © {CURRENT_YEAR} Pixela.io. Todos los derechos reservados.
             </p>
-            <div className={STYLES.copyrightLinks}>
-              <Link href="/cookies" className={STYLES.copyrightLink}>Política de cookies</Link>
-              <span className={STYLES.copyrightSeparator}>|</span>
-              <Link href="/accesibilidad" className={STYLES.copyrightLink}>Accesibilidad</Link>
-            </div>
+            {/* Los enlaces a /cookies y /accesibilidad apuntaban a rutas que no
+                existen. Hasta que haya páginas legales reales, mejor no
+                prometer una que devuelve 404. */}
+            <p className={STYLES.copyrightText}>
+              Datos de películas y series por{' '}
+              <a
+                href="https://www.themoviedb.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={STYLES.copyrightLink}
+              >
+                TMDB
+              </a>
+            </p>
           </div>
         </div>
       </div>

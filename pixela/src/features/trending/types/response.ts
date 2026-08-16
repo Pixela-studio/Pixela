@@ -1,5 +1,3 @@
-import type { TrendingSerie, TrendingMovie } from './media';
-
 /**
  * Interfaz genérica para las respuestas de la API de tendencias
  * @template T - Tipo de medio (TrendingSerie o TrendingMovie)
@@ -11,12 +9,4 @@ export interface TrendingResponse<T> {
     data: T[];
 }
 
-/**
- * Tipo para la respuesta de series en tendencia
- */
-export type SeriesResponse = TrendingResponse<TrendingSerie>;
-
-/**
- * Tipo para la respuesta de películas en tendencia
- */
-export type MoviesResponse = TrendingResponse<TrendingMovie>; 
+ 

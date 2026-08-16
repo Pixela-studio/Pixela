@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title: `${actor.name} | Pixela`,
       description: actor.biography?.slice(0, 160) || `Perfil de ${actor.name} en Pixela.`,
     };
-  } catch (error) {
+  } catch {
     return {
       title: 'Actor | Pixela',
     };

@@ -124,31 +124,3 @@ export const HeroSectionSkeleton = () => {
     </div>
   );
 };
-
-/**
- * Skeleton genérico para una sección con título y carrusel de tarjetas.
- * Ideal para Trending y Discover.
- */
-const SectionSkeleton = ({ titleWidth = 'w-64' }: { titleWidth?: string }) => (
-  <div className="px-4 py-8 space-y-6 sm:px-6 md:px-8 lg:px-16 2k:px-24">
-    <div className={`h-8 bg-pixela-light/10 rounded-lg animate-pulse ${titleWidth}`}></div>
-    <div className="flex px-4 pb-4 -mx-4 space-x-6 overflow-x-hidden sm:-mx-6 md:-mx-8 lg:-mx-16 2k:-mx-24 sm:px-6 md:px-8 lg:px-16 2k:px-24">
-      {[...Array(8)].map((_, i) => (
-        <div key={i} className="flex-shrink-0">
-          <div 
-            className="w-40 h-56 rounded-xl bg-gradient-to-br from-pixela-accent/10 to-pink-400/10 animate-pulse sm:w-48 sm:h-64"
-            style={{ animationDelay: `${i * 100}ms` }}
-          />
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-/** Skeleton para la sección de Tendencias */
-export const TrendingSectionSkeleton = () => <SectionSkeleton titleWidth="w-72" />;
-
-/** Skeleton para la sección de Descubrir */
-export const DiscoverSectionSkeleton = () => <SectionSkeleton titleWidth="w-64" />;
-
- 

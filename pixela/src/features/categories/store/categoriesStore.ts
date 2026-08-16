@@ -4,18 +4,9 @@ import { Category } from '@/api/categories/categories';
 import { MediaType } from '../types/media';
 
 /**
- * Interfaz para el estado de las categorías
- * @interface CategoriesState
- * @property {Category[]} categories - Las categorías disponibles
- * @property {boolean} loading - Indica si se está cargando o no las categorías
- * @property {string | null} error - El mensaje de error si ocurre
- * @property {MediaType} selectedMediaType - El tipo de medio seleccionado
- * @property {string | null} selectedCategory - La categoría seleccionada
- * @property {function} fetchCategories - Función para cargar las categorías      
- * @property {function} setSelectedMediaType - Función para establecer el tipo de medio seleccionado
- * @property {function} setSelectedCategory - Función para establecer la categoría seleccionada
+ * Estado de las categorías. Interno al store: no lo consume nadie fuera.
  */
-export interface CategoriesState {
+interface CategoriesState {
     categories: Category[];
     loading: boolean;
     error: string | null;
