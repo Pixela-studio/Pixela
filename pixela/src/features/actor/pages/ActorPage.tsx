@@ -14,24 +14,17 @@ interface ActorPageProps {
 
 const STYLES = {
   container: "relative min-h-[80vh] w-full bg-[#0F0F0F]",
-  contentWrapper: "relative container mx-auto px-4",
-  mobile: {
-    layout: "lg:hidden pt-36 md:pt-44 pb-8",
-    innerContainer: "flex flex-col items-center gap-6",
-    posterWidth: "w-48",
-    content: "w-full",
-    biography: "text-gray-300 text-base leading-relaxed mt-4 mb-6 text-justify"
-  },
-  desktop: {
-    layout: "hidden lg:flex pt-[30vh] items-start pb-20", // Modified from items-end to items-start since biology can be long
-    innerContainer: "flex flex-row gap-8 w-full",
-    content: "flex-grow",
-    biography: "text-gray-300 text-lg max-w-4xl leading-relaxed mb-8"
-  },
-  title: "text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-2",
+  contentWrapper: "relative container mx-auto px-4 pt-36 pb-12 md:pt-44 lg:pt-[30vh] lg:pb-20",
+  layout:
+    "flex flex-col items-center gap-6 text-center lg:flex-row lg:items-start lg:gap-8 lg:text-left",
+  poster: "w-40 sm:w-48 lg:w-64",
+  content: "w-full lg:flex-grow",
+  title: "font-outfit text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 [text-wrap:balance]",
   subtitle: "text-xl text-pixela-accent font-medium mb-6",
-  metadata: "flex flex-wrap gap-4 text-sm text-gray-400 mb-6 font-medium",
+  metadata: "flex flex-wrap justify-center gap-3 text-sm text-gray-400 mb-6 font-medium lg:justify-start",
   metadataItem: "bg-white/5 border border-white/10 px-3 py-1 rounded-full",
+  biography:
+    "max-w-4xl text-base leading-relaxed text-gray-300 lg:text-lg [text-wrap:pretty]",
 } as const;
 
 export const ActorPage = ({ actor }: ActorPageProps) => {
@@ -55,68 +48,43 @@ export const ActorPage = ({ actor }: ActorPageProps) => {
         {/* BackdropImage Reutilizado (Top Hero Movie effect) */}
         {bestWorkBackdrop && <BackdropImage backdropUrl={bestWorkBackdrop} />}
         
+        {/*
+          Había dos árboles JSX completos, uno `lg:hidden` y otro `hidden lg:flex`,
+          con dos <h1> y dos <h2> idénticos en el documento. Ya habían divergido:
+          la variante móvil se quedó sin el campo "Falleció" y con un texto de
+          respaldo distinto para la biografía. Un único layout responsive.
+        */}
         <div className={STYLES.contentWrapper}>
-          {/* MOBILE LAYOUT (Reutilizado de HeroSection) */}
-          <div className={STYLES.mobile.layout}>
-            <div className={STYLES.mobile.innerContainer}>
-              <MediaPoster 
-                posterUrl={actorImage} 
-                title={actor.name} 
-                onClick={() => {}}
-                className={STYLES.mobile.posterWidth}
-                type="person"
-              />
-              
-              <div className={STYLES.mobile.content}>
-                <h1 className={STYLES.title}>{actor.name}</h1>
-                <h2 className={STYLES.subtitle}>{actor.known_for_department || "Actuación"}</h2>
-                
-                <div className={STYLES.metadata}>
-                  {actor.birthday && (
-                    <span className={STYLES.metadataItem}>Nació: {actor.birthday}</span>
-                  )}
-                  {actor.place_of_birth && (
-                    <span className={STYLES.metadataItem}>{actor.place_of_birth}</span>
-                  )}
-                </div>
+          <div className={STYLES.layout}>
+            <MediaPoster
+              posterUrl={actorImage}
+              title={actor.name}
+              className={STYLES.poster}
+              type="person"
+            />
 
-                <p className={STYLES.mobile.biography}>
-                  {actor.biography || `Biografía no disponible para ${actor.name}.`}
-                </p>
+            <div className={STYLES.content}>
+              <h1 className={STYLES.title}>{actor.name}</h1>
+              <h2 className={STYLES.subtitle}>
+                {actor.known_for_department || "Actuación"}
+              </h2>
+
+              <div className={STYLES.metadata}>
+                {actor.birthday && (
+                  <span className={STYLES.metadataItem}>Nació: {actor.birthday}</span>
+                )}
+                {actor.deathday && (
+                  <span className={STYLES.metadataItem}>Falleció: {actor.deathday}</span>
+                )}
+                {actor.place_of_birth && (
+                  <span className={STYLES.metadataItem}>{actor.place_of_birth}</span>
+                )}
               </div>
-            </div>
-          </div>
 
-          {/* DESKTOP LAYOUT (Reutilizado de HeroSection) */}
-          <div className={STYLES.desktop.layout}>
-            <div className={STYLES.desktop.innerContainer}>
-              <MediaPoster 
-                posterUrl={actorImage} 
-                title={actor.name} 
-                onClick={() => {}}
-                type="person"
-              />
-              
-              <div className={STYLES.desktop.content}>
-                <h1 className={STYLES.title}>{actor.name}</h1>
-                <h2 className={STYLES.subtitle}>{actor.known_for_department || "Actuación"}</h2>
-                
-                <div className={STYLES.metadata}>
-                  {actor.birthday && (
-                    <span className={STYLES.metadataItem}>Nació: {actor.birthday}</span>
-                  )}
-                  {actor.place_of_birth && (
-                    <span className={STYLES.metadataItem}>{actor.place_of_birth}</span>
-                  )}
-                  {actor.deathday && (
-                    <span className={STYLES.metadataItem}>Falleció: {actor.deathday}</span>
-                  )}
-                </div>
-
-                <p className={STYLES.desktop.biography}>
-                  {actor.biography || `Biografía no disponible en español para ${actor.name}.`}
-                </p>
-              </div>
+              <p className={STYLES.biography}>
+                {actor.biography ||
+                  `Biografía no disponible en español para ${actor.name}.`}
+              </p>
             </div>
           </div>
         </div>

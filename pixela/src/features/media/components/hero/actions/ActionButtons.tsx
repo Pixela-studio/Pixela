@@ -10,15 +10,30 @@ import { toast } from "@/lib/toast";
 import { LibraryButton } from "@/features/media/components/actions/LibraryButton";
 import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
 
+/*
+ * Jerarquía de la fila de acciones.
+ *
+ * Antes los tres controles tenían el mismo peso visual —tres rectángulos del
+ * mismo tamaño y color— así que nada indicaba cuál es la acción principal. Las
+ * fichas de Netflix y Prime Video resuelven esto con un único botón relleno
+ * seguido de acciones secundarias en icono circular. Aquí la acción principal
+ * es guardar en la biblioteca (`LibraryButton`); favorito y reseña quedan como
+ * secundarias.
+ */
+const SECONDARY_BUTTON =
+  "flex h-12 w-12 items-center justify-center rounded-full border transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F] disabled:cursor-not-allowed disabled:opacity-60";
+
 const STYLES = {
-  container: "flex gap-4",
-  favoriteButton: (isFavorited: boolean, isLoading: boolean) =>
-    `p-3 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-lg ${isFavorited ? "bg-[#FF2D55] text-white border border-white/20 hover:bg-[#FF4A6B]" : "bg-[#FF2D55]/10 text-[#FF2D55] border border-[#FF2D55]/40 hover:bg-[#FF2D55]/20"} ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`,
-  bookmarkIcon: (isFavorited: boolean) =>
-    `w-5 h-5 transition-all duration-300 ${isFavorited ? "" : "drop-shadow-[0_0_8px_rgba(255,45,85,0.5)] scale-110"}`,
-  reviewButton:
-    "bg-[#1A1A1A] hover:bg-[#252525] text-white px-8 py-3 rounded-lg font-medium transition duration-300 flex items-center gap-2 border border-white/10",
-  penIcon: "w-5 h-5",
+  container: "flex flex-wrap items-center justify-center gap-3 lg:justify-start",
+  favoriteButton: (isFavorited: boolean) =>
+    `${SECONDARY_BUTTON} ${
+      isFavorited
+        ? "border-white/20 bg-pixela-accent text-white hover:bg-pixela-accent/90"
+        : "border-white/15 bg-white/10 text-white hover:bg-white/20"
+    }`,
+  bookmarkIcon: "h-5 w-5 transition-all duration-300",
+  reviewButton: `${SECONDARY_BUTTON} border-white/15 bg-white/10 text-white hover:bg-white/20`,
+  penIcon: "h-5 w-5",
 };
 
 /**
@@ -61,29 +76,30 @@ export const ActionButtons = ({
   return (
     <>
       <div className={STYLES.container}>
+        {/* Acción principal: guardar en la biblioteca. */}
+        <LibraryButton tmdbId={tmdbId} itemType={itemType} title={title} />
+
         <button
           type="button"
           onClick={() => void toggleFavorite()}
           disabled={isLoading}
-          className={STYLES.favoriteButton(Boolean(isFavorited), isLoading)}
+          className={STYLES.favoriteButton(Boolean(isFavorited))}
           aria-label={favoriteLabel}
           aria-pressed={Boolean(isFavorited)}
           title={favoriteLabel}
         >
-          <FaBookmark
-            aria-hidden="true"
-            className={STYLES.bookmarkIcon(Boolean(isFavorited))}
-          />
+          <FaBookmark aria-hidden="true" className={STYLES.bookmarkIcon} />
         </button>
+
         <button
           onClick={handleReview}
           className={STYLES.reviewButton}
           type="button"
+          aria-label={`Escribir una reseña de «${title}»`}
+          title="Escribir una reseña"
         >
           <FaPen aria-hidden="true" className={STYLES.penIcon} />
-          Hacer Reseña
         </button>
-        <LibraryButton tmdbId={tmdbId} itemType={itemType} title={title} />
       </div>
 
       <ReviewModal

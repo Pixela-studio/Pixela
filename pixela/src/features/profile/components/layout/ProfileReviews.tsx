@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { StarEditProps } from "@/features/profile/types/layout";
+import { EmptyState } from "@/shared/components/EmptyState";
 
 /**
  * URL base para las imágenes de TMDB
@@ -175,10 +176,12 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
 
   if (reviews.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-gray-400">
-        <FiAlertCircle className="w-12 h-12 mb-4" />
-        <p className="text-lg font-outfit">No hay reseñas.</p>
-      </div>
+      <EmptyState
+        icon={<FiStar />}
+        title="Aún no has escrito ninguna reseña"
+        description="Puntúa una película o serie desde su ficha y cuenta qué te pareció. Tus reseñas aparecerán aquí."
+        action={{ label: "Buscar algo que reseñar", href: "/categories" }}
+      />
     );
   }
 

@@ -17,93 +17,61 @@ interface HeroSectionProps {
 }
 
 const STYLES = {
-  container: "relative min-h-[80vh] w-full",
-  contentWrapper: "relative container mx-auto px-4",
-  mobile: {
-    layout: "lg:hidden pt-36 md:pt-44 pb-8",
-    innerContainer: "flex flex-col items-center gap-6",
-    posterWidth: "w-48",
-    content: "w-full",
-    synopsis: "text-gray-300 text-base leading-relaxed mt-4 mb-6"
-  },
-  desktop: {
-    layout: "hidden lg:flex h-[80vh] items-end pb-20",
-    innerContainer: "flex flex-row gap-8",
-    content: "flex-grow",
-    synopsis: "text-gray-300 text-lg max-w-3xl leading-relaxed mb-8"
-  }
+  container: "relative w-full min-h-[80vh] flex items-end",
+  contentWrapper: "relative container mx-auto px-4 pt-32 pb-12 lg:pt-40 lg:pb-20",
+  layout:
+    "flex flex-col items-center gap-8 text-center lg:flex-row lg:items-end lg:gap-10 lg:text-left",
+  poster: "w-40 flex-shrink-0 sm:w-48 lg:w-64",
+  content: "flex w-full flex-col items-center gap-4 lg:items-start",
+  synopsis:
+    "max-w-3xl text-base leading-relaxed text-gray-300 lg:text-lg [text-wrap:pretty]",
 } as const;
 
+/**
+ * Cabecera de la ficha de una película o serie.
+ *
+ * Antes existían dos árboles JSX completos —uno con `lg:hidden` y otro con
+ * `hidden lg:flex`— que renderizaban los mismos seis componentes. Eso
+ * significaba dos `<h1>` con el mismo título en el documento, contenido
+ * duplicado en el árbol de accesibilidad y el doble de trabajo de render en
+ * todos los tamaños de pantalla; además, cualquier cambio había que hacerlo
+ * dos veces o las dos vistas se desincronizaban. Ahora es un único layout que
+ * cambia de dirección con utilidades responsive.
+ */
 export function HeroSection({ media, onPosterClick, title, refreshReviews }: HeroSectionProps) {
-  // Mapeo exacto de tipo
-  const getItemType = (tipo: 'pelicula' | 'serie'): 'movie' | 'series' =>
-    tipo === 'pelicula' ? 'movie' : 'series';
+  const itemType = media.tipo === 'pelicula' ? 'movie' : 'series';
 
   return (
-    <div className={STYLES.container}>
-      {/* Backdrop con degradado */}
+    <header className={STYLES.container}>
       <BackdropImage backdropUrl={media.backdrop} />
-      
-      {/* Content */}
+
       <div className={STYLES.contentWrapper}>
-        {/* Mobile Layout */}
-        <div className={STYLES.mobile.layout}>
-          <div className={STYLES.mobile.innerContainer}>
-            <MediaPoster 
-              posterUrl={media.poster} 
-              title={media.titulo} 
-              onClick={onPosterClick}
-              className={STYLES.mobile.posterWidth} 
+        <div className={STYLES.layout}>
+          <MediaPoster
+            posterUrl={media.poster}
+            title={media.titulo}
+            onClick={onPosterClick}
+            className={STYLES.poster}
+            type={itemType}
+          />
+
+          <div className={STYLES.content}>
+            <MediaTitle title={media.titulo} />
+            <MediaMetadata media={media} />
+            <GenresList genres={media.generos} />
+            <CreatorInfo media={media} />
+
+            <p className={STYLES.synopsis}>{media.sinopsis}</p>
+
+            <ActionButtons
+              tmdbId={Number(media.id)}
+              itemType={itemType}
+              title={title}
+              refreshReviews={refreshReviews}
             />
-            <div className={STYLES.mobile.content}>
-              <MediaTitle title={media.titulo} score={media.puntuacion} />
-              <GenresList genres={media.generos} />
-              <MediaMetadata media={media} />
-              <CreatorInfo media={media} />
-              
-              <p className={STYLES.mobile.synopsis}>
-                {media.sinopsis}
-              </p>
-
-              <ActionButtons 
-                tmdbId={Number(media.id)} 
-                itemType={getItemType(media.tipo)}
-                title={title}
-                refreshReviews={refreshReviews}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Layout */}
-        <div className={STYLES.desktop.layout}>
-          <div className={STYLES.desktop.innerContainer}>
-            <MediaPoster 
-              posterUrl={media.poster} 
-              title={media.titulo} 
-              onClick={onPosterClick} 
-            />
-            
-            <div className={STYLES.desktop.content}>
-              <MediaTitle title={media.titulo} score={media.puntuacion} />
-              <GenresList genres={media.generos} />
-              <MediaMetadata media={media} />
-              <CreatorInfo media={media} />
-              
-              <p className={STYLES.desktop.synopsis}>
-                {media.sinopsis}
-              </p>
-
-              <ActionButtons 
-                tmdbId={Number(media.id)} 
-                itemType={getItemType(media.tipo)}
-                title={title}
-                refreshReviews={refreshReviews}
-              />
-            </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
-} 
+}
