@@ -247,9 +247,20 @@ export const Navbar = () => {
         <div
           className={`${STYLES.containerBase} ${isDocked ? STYLES.containerDocked : STYLES.containerFloating}`}
         >
-          {/* Prefetch en el logo para navegación al inicio */}
-          <Link href="/" className={STYLES.logo} prefetch={true}>
-            <h1 className={STYLES.logoText}>Pixela</h1>
+          {/*
+            El logo era un <h1>, así que cada página del sitio arrancaba con un
+            encabezado de nivel 1 que dice "Pixela" y compite con el título real
+            del contenido: en la ficha de una película el primer <h1> del
+            documento no era el nombre de la película. Es un enlace al inicio,
+            no un encabezado; el estilo se mantiene idéntico.
+          */}
+          <Link
+            href="/"
+            className={STYLES.logo}
+            prefetch={true}
+            aria-label="Pixela — ir al inicio"
+          >
+            <span className={STYLES.logoText}>Pixela</span>
           </Link>
           
           <div className={STYLES.navLinks}>

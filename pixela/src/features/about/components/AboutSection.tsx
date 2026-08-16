@@ -204,10 +204,15 @@ const AboutSection = () => {
       <div className={STYLES.container}>
         {/* Título y Subtítulo */}
         <div className={STYLES.teamHeader}>
-          <h1 className={STYLES.title} ref={titleRef}>
+          {/*
+            Era un <h1>. Es una sección más dentro de la portada —las de
+            tendencias, cartelera, fin de semana y descubre usan <h2>—, así que
+            introducía un segundo encabezado de nivel 1 en la misma página.
+          */}
+          <h2 className={STYLES.title} ref={titleRef}>
             Quiénes Somos
             <span className={STYLES.titleUnderline}></span>
-          </h1>
+          </h2>
           <div className={STYLES.teamHeaderText}>
             <p className={STYLES.subtitle} ref={subtitleRef}>
               Somos apasionados del cine y la televisión. Por eso creamos una plataforma única, donde quienes aman las historias pueden descubrir, compartir y celebrar lo que los hace soñar.
