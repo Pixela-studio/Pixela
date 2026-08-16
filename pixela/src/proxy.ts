@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Middleware de seguridad.
+ * Proxy de seguridad (antes `middleware.ts`; Next 16 renombró la convención).
  *
- * El proyecto no tenía middleware: ninguna respuesta llevaba cabeceras de
+ * El proyecto no tenía nada aquí: ninguna respuesta llevaba cabeceras de
  * seguridad, así que la app era encuadrable en un iframe (clickjacking), no
  * declaraba política de referrer y confiaba en el sniffing de MIME del navegador.
  *
@@ -53,7 +53,7 @@ function hasSessionCookie(request: NextRequest): boolean {
   return SESSION_COOKIES.some((name) => Boolean(request.cookies.get(name)?.value));
 }
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   const needsAuth = PROTECTED_PREFIXES.some(
@@ -78,7 +78,7 @@ export const config = {
   matcher: [
     /*
      * Todas las rutas salvo assets estáticos y el endpoint de imágenes de Next,
-     * que no se benefician de estas cabeceras y sí pagan el coste del middleware.
+     * que no se benefician de estas cabeceras y sí pagarían el coste del proxy.
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|woff|woff2|ttf)$).*)",
   ],
