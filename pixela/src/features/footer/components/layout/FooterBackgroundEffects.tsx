@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { BackgroundEffectProps } from "@/features/footer/types/components";
+import { seededRange } from "@/lib/deterministicRandom";
 
 const STYLES = {
   // Contenedor principal
@@ -24,62 +24,55 @@ const STYLES = {
   backgroundText: "pointer-events-none select-none absolute inset-0 w-full h-full hidden md:flex items-center justify-center font-black uppercase tracking-tighter z-0 leading-none text-transparent transition-opacity duration-1000"
 } as const;
 
+/*
+ * Los valores decorativos se calculan una sola vez al cargar el módulo y son
+ * deterministas: antes salían de `Math.random()` dentro de `useMemo`, lo que
+ * hacía saltar de sitio toda la decoración en cuanto React descartaba el memo,
+ * y obligaba a cargar el componente con `ssr: false` para no romper la
+ * hidratación.
+ */
+const TRIANGLE_ELEMENTS = Array.from({ length: 8 }, (_, i) => ({
+  id: i,
+  size: seededRange(i, 0, 4, 10),
+  top: seededRange(i, 1, 5, 95),
+  left: seededRange(i, 2, 5, 95),
+  rotation: seededRange(i, 3, 0, 360),
+  duration: seededRange(i, 4, 25, 40),
+  delay: seededRange(i, 5, 0, 5),
+}));
+
+const PIXEL_ELEMENTS = Array.from({ length: 12 }, (_, i) => ({
+  id: i,
+  size: seededRange(i, 6, 2, 5),
+  top: seededRange(i, 7, 0, 100),
+  left: seededRange(i, 8, 0, 100),
+  duration: seededRange(i, 9, 20, 30),
+  delay: seededRange(i, 10, 0, 5),
+}));
+
+const FLOW_LINES = Array.from({ length: 8 }, (_, i) => ({
+  id: i,
+  height: seededRange(i, 11, 0.5, 1.5),
+  width: seededRange(i, 12, 10, 25),
+  top: seededRange(i, 13, 0, 100),
+  left: seededRange(i, 14, 0, 50),
+  rotation: seededRange(i, 15, -10, 10),
+  duration: seededRange(i, 16, 8, 12),
+  delay: seededRange(i, 17, 0, 3),
+}));
+
+const BUBBLES = Array.from({ length: 5 }, (_, i) => ({
+  id: i,
+  size: seededRange(i, 18, 2, 8),
+  left: 5 + i * 20 + seededRange(i, 19, 0, 10),
+  delay: seededRange(i, 20, 0, 5),
+}));
+
 export const FooterBackgroundEffects: React.FC<BackgroundEffectProps> = ({ isAnimated }) => {
-  // Generar elementos decorativos con useMemo para evitar recálculos
-  const triangleElements = useMemo(() => {
-    return Array.from({ length: 8 }, (_, i) => {
-      const size = Math.random() * 6 + 4;
-      return {
-        id: i,
-        size,
-        top: Math.random() * 90 + 5,
-        left: Math.random() * 90 + 5,
-        rotation: Math.random() * 360,
-        duration: Math.random() * 15 + 25,
-        delay: Math.random() * 5
-      };
-    });
-  }, []);
-
-  const pixelElements = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => {
-      const size = Math.random() * 3 + 2;
-      return {
-        id: i,
-        size,
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        duration: Math.random() * 10 + 20,
-        delay: Math.random() * 5
-      };
-    });
-  }, []);
-
-  const flowLines = useMemo(() => {
-    return Array.from({ length: 8 }, (_, i) => {
-      return {
-        id: i,
-        height: Math.random() * 1 + 0.5,
-        width: Math.random() * 15 + 10,
-        top: Math.random() * 100,
-        left: Math.random() * 50,
-        rotation: Math.random() * 20 - 10,
-        duration: Math.random() * 4 + 8,
-        delay: Math.random() * 3
-      };
-    });
-  }, []);
-
-  const bubbles = useMemo(() => {
-    return Array.from({ length: 5 }, (_, i) => {
-      return {
-        id: i,
-        size: Math.random() * 6 + 2,
-        left: 5 + (i * 20) + Math.random() * 10,
-        delay: Math.random() * 5
-      };
-    });
-  }, []);
+  const triangleElements = TRIANGLE_ELEMENTS;
+  const pixelElements = PIXEL_ELEMENTS;
+  const flowLines = FLOW_LINES;
+  const bubbles = BUBBLES;
 
   return (
     <>

@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useCallback } from "react";
 import { FiX, FiCheck, FiImage } from "react-icons/fi";
 import Image from "next/image";
 import clsx from "clsx";
 import { fetchFromAPI } from "@/api/shared/apiHelpers";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 
 interface BannerSelectorModalProps {
   isOpen: boolean;
@@ -16,33 +17,31 @@ interface BannersResponse {
   banners: string[];
 }
 
+const EMPTY_BANNERS: string[] = [];
+
 export const BannerSelectorModal = ({
   isOpen,
   onClose,
   onSelect,
   currentBanner,
 }: BannerSelectorModalProps) => {
-  const [banners, setBanners] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Solo se piden los banners cuando el modal está abierto: antes el efecto
+  // dependía de `banners.length`, así que si la respuesta llegaba vacía volvía
+  // a lanzar la petición en cada render.
+  const fetchBanners = useCallback(async () => {
+    const data = await fetchFromAPI<BannersResponse>("/api/banners");
+    return data.success ? data.banners : EMPTY_BANNERS;
+  }, []);
 
-  useEffect(() => {
-    if (isOpen && banners.length === 0) {
-      // Fetch banners
-      setLoading(true);
-      fetchFromAPI<BannersResponse>("/api/banners")
-        .then((data) => {
-          if (data.success) {
-            setBanners(data.banners);
-          }
-        })
-        .catch((err) => {
-          console.error("Error loading banners:", err);
-          setError("Error cargando imágenes");
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [isOpen, banners.length]);
+  const {
+    data: banners,
+    loading,
+    error,
+  } = useAsyncResource(fetchBanners, EMPTY_BANNERS, {
+    enabled: isOpen,
+    errorMessage: "Error cargando imágenes",
+    label: "banners",
+  });
 
   if (!isOpen) return null;
 

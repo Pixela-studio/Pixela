@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { favoritesAPI } from "@/api/favorites/favorites";
 import type { FavoriteWithDetails } from "@/api/favorites/types";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 import { FiLoader, FiAlertCircle } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
 import Image from "next/image";
@@ -24,10 +25,21 @@ interface ProfileFavoritesProps {
   onStatsUpdate?: () => void;
 }
 
+const EMPTY_FAVORITES: FavoriteWithDetails[] = [];
+
 export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
-  const [favorites, setFavorites] = useState<FavoriteWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const fetchFavorites = useCallback(() => favoritesAPI.listWithDetails(), []);
+  const {
+    data: favorites,
+    loading,
+    error,
+    setData: setFavorites,
+    setError,
+  } = useAsyncResource(fetchFavorites, EMPTY_FAVORITES, {
+    errorMessage: ERROR_MESSAGES.LOAD,
+    label: "favorites",
+  });
+
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handleDelete = async (e: React.MouseEvent, favoriteId: number) => {
@@ -44,16 +56,6 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
       setDeletingId(null);
     }
   };
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    favoritesAPI
-      .listWithDetails()
-      .then(setFavorites)
-      .catch(() => setError(ERROR_MESSAGES.LOAD))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) {
     return (

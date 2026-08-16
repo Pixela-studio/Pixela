@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { User } from "@/api/users/types";
 import { usersAPI } from "@/api/users/users";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 import { FiLoader, FiAlertCircle, FiEdit, FiCheck, FiX } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
 import { UserAvatar } from "@/features/profile/components/avatar/UserAvatar";
@@ -89,25 +90,31 @@ const STYLES = {
  * @param {ProfileUsersProps} props - Props del componente
  * @returns {JSX.Element} Componente ProfileUsers
  */
+const EMPTY_USERS: User[] = [];
+
 export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // `refresh` es un booleano que el padre invierte para forzar una recarga; se
+  // incluye en las dependencias del fetcher para que el hook vuelva a pedir.
+  const fetchUsers = useCallback(async () => {
+    void refresh;
+    const data = await usersAPI.list();
+    return Array.isArray(data) ? data : EMPTY_USERS;
+  }, [refresh]);
+
+  const {
+    data: users,
+    loading,
+    error,
+    reload: reloadUsers,
+    setError,
+  } = useAsyncResource(fetchUsers, EMPTY_USERS, {
+    errorMessage: ERROR_MESSAGES.LOAD,
+    label: "users",
+  });
+
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    usersAPI
-      .list()
-      .then((data) => {
-        setUsers(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setError(ERROR_MESSAGES.LOAD))
-      .finally(() => setLoading(false));
-  }, [refresh]);
 
   /**
    * Maneja la eliminación de un usuario
@@ -117,8 +124,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
     setDeletingId(userId);
     try {
       await usersAPI.delete(userId);
-      const refreshedUsers = await usersAPI.list();
-      setUsers(refreshedUsers);
+      await reloadUsers();
     } catch {
       setError(ERROR_MESSAGES.DELETE);
     } finally {
@@ -154,8 +160,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
       delete userToUpdate.password;
 
       await usersAPI.update(userToUpdate);
-      const refreshedUsers = await usersAPI.list();
-      setUsers(Array.isArray(refreshedUsers) ? refreshedUsers : []);
+      await reloadUsers();
 
       // Notificar al componente padre sobre la actualización
       onUserUpdated?.(editingUser);
