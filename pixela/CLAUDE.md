@@ -34,7 +34,7 @@ pixela/
 │   │   └── api/            # Route-handler layer: guards, responses, schemas, TMDB proxy
 │   ├── api/                # HTTP client wrappers per resource
 │   ├── stores/             # Cross-feature Zustand stores (auth)
-│   ├── middleware.ts       # Security headers (CSP) + redirect for protected routes
+│   ├── proxy.ts            # Security headers (CSP) + redirect for protected routes
 │   └── auth.ts             # NextAuth config
 ├── prisma/                 # schema + migrations + seeds
 └── public/
@@ -79,7 +79,13 @@ Every route handler goes through these. Don't hand-roll auth or validation in a 
 - **`rateLimit.ts`** — fixed-window limiter in memory. Per-process, so a multi-instance deploy multiplies the effective limit; swap the `Map` for Redis if that stops being acceptable, keeping the signature.
 - **`mediaEnrichment.ts`** — `enrichWithTmdb` resolves TMDB metadata for a list of own rows, deduplicating by `(itemType, tmdbId)`.
 
-`src/middleware.ts` adds the CSP and security headers, and redirects to `/login` when the session cookie is missing. That redirect is UX only — real authorization lives in the handlers.
+`src/proxy.ts` adds the CSP and security headers, and redirects to `/login` when the session cookie is missing. That redirect is UX only — real authorization lives in the handlers. (Next 16 renamed the `middleware.ts` convention to `proxy.ts`; the exported function is the default export.)
+
+## Gotchas
+
+- **Run everything from `pixela/`, with Bun.** There is no `package.json` at the repo root, so `bun dev` one level up fails with `Script not found "dev"`. Don't use pnpm/npm here — the lockfile is `bun.lock`.
+- **`outputFileTracingRoot` in `next.config.js` is load-bearing.** Next infers the workspace root by walking up looking for lockfiles. A stray `package.json`/`pnpm-lock.yaml` in the user's home directory makes it pick that as the root and trace through AppData, OneDrive and Windows junctions; the dev worker then dies with `Jest worker encountered 2 child process exceptions` and `/api/auth/session` returns HTML, surfacing as an Auth.js `ClientFetchError`. Don't remove that setting.
+- **`next start` locally fails Auth.js with `UntrustedHost`.** Auth.js only trusts the host automatically in development or on Vercel. To exercise a production build locally, set `AUTH_URL=http://localhost:3000` (or `AUTH_TRUST_HOST=true`) in `.env.local`. Not needed for the Vercel deploy.
 
 ## Known tech debt
 
