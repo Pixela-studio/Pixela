@@ -1,6 +1,7 @@
 import { MediaPage } from '@/features/media/pages/MediaPage';
 import { notFound } from 'next/navigation';
 import { getSeriesData } from '@/features/media/services/seriesService';
+import { getMediaReviewsSafe } from '@/lib/api/reviewsQuery';
 
 export { generateMetadata } from '@/features/media/services/seriesMetadata';
 
@@ -44,8 +45,18 @@ export default async function SeriePage(
   const { id } = await params;
 
   try {
-    const serie = await getSeriesData(id);
-    return <MediaPage media={serie} />;
+    /*
+     * Las reseñas se resuelven aquí, en el servidor, y viajan como prop.
+     * Antes las pedía `MediaPage` en un `useEffect`, o sea una petición más por
+     * cada visita a la ficha. En paralelo con el detalle: son dos orígenes
+     * distintos (TMDB y nuestra base de datos) y no dependen entre sí.
+     */
+    const [serie, initialReviews] = await Promise.all([
+      getSeriesData(id),
+      getMediaReviewsSafe(Number(id), 'series'),
+    ]);
+
+    return <MediaPage media={serie} initialReviews={initialReviews} />;
   } catch (error) {
     console.error('Error al obtener los datos de la serie:', error);
     notFound();
