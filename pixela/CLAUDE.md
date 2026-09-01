@@ -115,6 +115,46 @@ Every route handler goes through these. Don't hand-roll auth or validation in a 
 - `src/lib/deterministicRandom.ts` — seeded values for decorative elements. Do not call `Math.random()` during render.
 - `src/lib/constants/reviews.ts` — review limits shared by the form and the API schema.
 
+## Deployment (Vercel)
+
+Audited 2026-09-01. State at that moment, and the traps found:
+
+**The project is disabled by Vercel.** `https://pixela-seven.vercel.app` answers `402 Payment Required` with `X-Vercel-Error: DEPLOYMENT_DISABLED` — the free-plan quota was exceeded and Vercel hard-paused it. **While it is in that state no push deploys**: the last deployment GitHub recorded is `07cd37b` from 2026-07-04, and pushes made on 2026-09-01 produced none. Re-enable the project in the dashboard before expecting any change to reach production.
+
+**Two Vercel projects were wired to the same repo**, `pixela` and `pixela199x`, both under the `envyx10s-projects` team and therefore the same quota. Every push built and deployed twice — the GitHub deployment list shows the same commit deployed to both within a minute. `pixela199x.vercel.app` now answers `DEPLOYMENT_NOT_FOUND`, so it looks abandoned. Delete it or disconnect it from the repo; otherwise every fix to request volume is paid for twice in build time.
+
+**URLs that are not ours.** `pixela.io` is **not** this project's domain: it is parked and for sale on Spaceship.com (`Server: openresty`, title "Pixela.io for sale"). It was nonetheless the canonical URL in `layout.tsx`. `pixela.vercel.app` belongs to an unrelated Vercel user (a pixe.la graph embed). The real production URL is `pixela-seven.vercel.app`, which is also the repo's `homepage` field. Canonical URL now lives in **`src/lib/site.ts`** — `layout.tsx`, `robots.ts` and `sitemap.ts` all import `SITE_URL` from there, so they cannot drift. Override with `NEXT_PUBLIC_SITE_URL` once there is a real domain.
+
+Still stale: the footer advertises `pixel@pixela.io`, a mailbox on a domain we do not control. Nobody receives mail sent there.
+
+### `vercel.json`
+
+JSON takes no comments, so the `ignoreCommand` is explained here. Semantics are inverted and easy to get backwards:
+
+- **exit 0 → build is SKIPPED**
+- **exit 1 → build PROCEEDS**
+
+The command builds `main`, skips every other branch, and offers an escape hatch: put `[deploy]` anywhere in the commit message to force a preview build of a branch. This stops preview deployments from consuming quota on every branch push. To go back to previews for everything, delete the `ignoreCommand` key.
+
+`github.silent` only suppresses the deployment comments Vercel posts on PRs; it has no effect on quota.
+
+### Environment variables the deploy needs
+
+Derived from every `process.env` reference in `src/` plus `prisma/schema.prisma`:
+
+| Variable | Required | Notes |
+|---|---|---|
+| `TMDB_API_KEY` | **yes** | `src/lib/tmdb.ts` throws at module load if missing, so the **build itself fails** — not just requests. |
+| `TMDB_BASE_URL` | **yes** | `https://api.themoviedb.org/3`. Not guarded: if absent, every TMDB URL is built as `undefined/...`. |
+| `DATABASE_URL` | **yes** | The only var `schema.prisma` reads. Use the Supabase pooler (`:6543`, `pgbouncer=true`) for the runtime. |
+| `AUTH_SECRET` | **yes** | Auth.js. |
+| `NEXT_PUBLIC_SITE_URL` | recommended | Overrides `src/lib/site.ts`. Without it the fallback `https://pixela-seven.vercel.app` is used. |
+| `NEXT_PUBLIC_API_URL` | no | Only a localhost fallback now. Every `API_ENDPOINTS` consumer left is client-side, and in the browser off localhost `getBaseUrl()` returns the relative `/api`. The server no longer calls its own API. |
+| `DIRECT_URL` | no | Present in `.env.local` for migrations but **not referenced** by `schema.prisma`; add `directUrl` to the datasource block if you want it honored. |
+| `AUTH_URL` / `AUTH_TRUST_HOST` | no | Only for exercising a production build locally — see Gotchas. |
+
+`NEXT_PUBLIC_BACKEND_URL` and `NEXT_PUBLIC_FRONTEND_URL` appear in `.env.local` but no code reads them; leftovers from the Laravel backend.
+
 ## Request budget (Vercel Edge Requests)
 
 The free plan caps Edge Requests at 1M/month and this project blew past it. **Every** HTTP request that reaches the deployment counts, cache hit or not, so the metric is driven by the *number* of requests a page triggers — not by how fast they are. Before adding a fetch, an image, or a prefetch, ask what it costs per page view.

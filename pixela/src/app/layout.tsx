@@ -3,8 +3,14 @@ import "./globals.css";
 import { outfit, roboto } from "./ui/fonts";
 import { Providers } from "./providers";
 import ClientLayout from "./ClientLayout";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  /*
+   * Base para resolver cualquier URL relativa de los metadatos. Sin ella Next
+   * avisa en build y las rutas relativas quedan a medias.
+   */
+  metadataBase: new URL(SITE_URL),
   title: "Pixela - Descubre y comparte apasionantes historias cinematográficas",
   description:
     "Pixela es una comunidad para los amantes del cine y las series. Descubre historias que te conectan con grandes producciones audiovisuales.",
@@ -33,7 +39,11 @@ export const metadata: Metadata = {
     title: "Pixela - Pasión por el cine y las series",
     description:
       "Descubre, colecciona y comparte experiencias audiovisuales en una comunidad de apasionados del cine y las series.",
-    url: "https://pixela.io",
+    /*
+     * Era `https://pixela.io`, un dominio que no pertenece al proyecto: está
+     * aparcado y en venta. Ver `@/lib/site` para el detalle.
+     */
+    url: SITE_URL,
     siteName: "Pixela",
     // Sin `images`: la que se declaraba (`/images/pixela-og-image.jpg`) tampoco
     // existe, y cada validador de enlaces la pedía para encontrarse un 404.

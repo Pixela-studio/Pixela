@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * `robots.txt` generado por Next (`/robots.txt`).
@@ -18,9 +19,6 @@ import type { MetadataRoute } from "next";
  * `robots.txt` es una convención, no un control de acceso: los bots que la
  * ignoran se bloquean en `src/proxy.ts` por user-agent.
  */
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://pixela.io";
 
 /** Rutas que no aportan nada a un buscador y sí generan tráfico. */
 const DISALLOWED_PATHS = [

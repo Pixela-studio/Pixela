@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * `sitemap.xml` generado por Next.
@@ -12,9 +13,6 @@ import type { MetadataRoute } from "next";
  * `robots.txt` pediría un `/sitemap.xml` inexistente, y un 404 en App Router
  * también invoca la función.
  */
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://pixela.io";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
