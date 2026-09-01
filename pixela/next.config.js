@@ -82,10 +82,6 @@ const nextConfig = {
                 headers: [{ key: 'Cache-Control', value: IMMUTABLE }],
             },
             {
-                source: '/about/:path*',
-                headers: [{ key: 'Cache-Control', value: IMMUTABLE }],
-            },
-            {
                 source: '/:path*.:ext(ico|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|otf)',
                 headers: [{ key: 'Cache-Control', value: IMMUTABLE }],
             },
