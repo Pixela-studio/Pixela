@@ -1,5 +1,3 @@
-"use client";
-
 import { WeekendHeader } from "./WeekendHeader";
 import type { WeekendMovie, WeekendSerie } from "../types";
 

@@ -1,7 +1,7 @@
 import { Pelicula } from '@/features/media/types/content';
 import { Actor } from '@/features/media/types/people';
 import { Trailer } from '@/features/media/types/trailer';
-import { ApiActor, ApiPelicula, ApiTrailer } from '../types';
+import { ApiActor, ApiImage, ApiPelicula, ApiProvider, ApiTrailer } from '../types';
 import { buildTmdbImageUrl, DEFAULT_IMAGE_SIZES } from '@/lib/constants/tmdb';
 
 /**
@@ -42,7 +42,7 @@ const mapTrailer = (trailer: ApiTrailer): Trailer => ({
  * @param provider
  * @returns 
  */
-const mapProvider = (provider: any) => ({
+const mapProvider = (provider: ApiProvider) => ({
   id: provider.provider_id?.toString() || '',
   nombre: provider.provider_name || '',
   logo: formatImageUrl(provider.logo_path || ''),
@@ -53,7 +53,7 @@ const mapProvider = (provider: any) => ({
  * @param image
  * @returns 
  */
-const mapImage = (image: any) => ({
+const mapImage = (image: ApiImage): ApiImage => ({
   ...image,
   file_path: formatImageUrl(image.file_path || ''),
 });

@@ -1,5 +1,4 @@
 import { fetchFromTmdb } from '@/lib/tmdb';
-import { tmdbImageHelpers, DEFAULT_IMAGE_SIZES } from '@/lib/constants/tmdb';
 
 export interface ActorDetails {
   id: number;

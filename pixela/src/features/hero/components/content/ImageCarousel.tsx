@@ -19,7 +19,9 @@ const STYLES = {
   // Capas de superposición y efectos visuales
   overlays: {
     base: "absolute inset-0",
-    darkOverlay: "bg-pixela-dark/300",
+    // Antes había un darkOverlay con `bg-pixela-dark/300` — /300 no existe en
+    // la escala de opacidad de Tailwind, así que esa capa nunca aplicaba.
+    // Eliminada.
     gradientOverlay:
       "bg-gradient-to-t from-pixela-dark/90 via-pixela-dark/50 to-pixela-dark/80",
     topGradient:
@@ -31,10 +33,21 @@ const STYLES = {
   // Estilos de la imagen
   image: {
     container: "relative w-full h-full lg:pt-16",
-    base: "w-full h-full object-cover grayscale",
+    // Concepto B&W preservado. Ligero boost de contraste para que la escala
+    // de grises no se lea plana sobre el gradiente oscuro.
+    base: "w-full h-full object-cover grayscale contrast-[1.08]",
     mobile: "block md:hidden", // Visible solo en móvil
     desktop: "hidden md:block", // Visible solo en escritorio
   },
+
+  // Grano de peli sobre la imagen. Reutiliza .noise-effect (opacity 0.04)
+  // ya definida en globals.css, con una máscara que lo desvanece en el
+  // borde superior (bajo la barra de nav) y en el inferior (donde el hero
+  // se une a Tendencias). Sin la máscara el grano llega hasta el último
+  // píxel del hero mientras la sección siguiente arranca limpia, y esa
+  // diferencia se lee como una línea horizontal en la unión.
+  grain:
+    "noise-effect [mask-image:linear-gradient(to_bottom,transparent_0%,black_12%,black_82%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_12%,black_82%,transparent_100%)]",
 } as const;
 
 /**
@@ -43,13 +56,12 @@ const STYLES = {
  */
 const VisualOverlays = () => (
   <>
-    <div className={clsx(STYLES.overlays.base, STYLES.overlays.darkOverlay)} />
     <div
       className={clsx(STYLES.overlays.base, STYLES.overlays.gradientOverlay)}
     />
     <div className={STYLES.overlays.topGradient} />
-    <div className={STYLES.overlays.topGradient} />
     <div className={STYLES.overlays.bottomGradient} />
+    <div className={STYLES.grain} />
   </>
 );
 

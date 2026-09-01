@@ -1,21 +1,12 @@
 import { create } from 'zustand';
-import { getCategoriesForMediaType } from '@/api/categories/categories';
+import { getAllCategories, filterCategoriesForMediaType } from '@/api/categories/categories';
 import { Category } from '@/api/categories/categories';
 import { MediaType } from '../types/media';
 
 /**
- * Interfaz para el estado de las categorías
- * @interface CategoriesState
- * @property {Category[]} categories - Las categorías disponibles
- * @property {boolean} loading - Indica si se está cargando o no las categorías
- * @property {string | null} error - El mensaje de error si ocurre
- * @property {MediaType} selectedMediaType - El tipo de medio seleccionado
- * @property {string | null} selectedCategory - La categoría seleccionada
- * @property {function} fetchCategories - Función para cargar las categorías      
- * @property {function} setSelectedMediaType - Función para establecer el tipo de medio seleccionado
- * @property {function} setSelectedCategory - Función para establecer la categoría seleccionada
+ * Estado de las categorías. Interno al store: no lo consume nadie fuera.
  */
-export interface CategoriesState {
+interface CategoriesState {
     categories: Category[];
     loading: boolean;
     error: string | null;
@@ -24,6 +15,40 @@ export interface CategoriesState {
     fetchCategories: (mediaType?: MediaType) => Promise<void>;
     setSelectedMediaType: (type: MediaType) => void;
     setSelectedCategory: (category: string | null) => void;
+}
+
+/**
+ * Caché de la lista completa de géneros para toda la sesión.
+ *
+ * `/api/tmdb/categories` se pedía tres veces cada vez que se cambiaba de tipo de
+ * medio: una desde `setSelectedMediaType` y otra por cada `CategoriesList`
+ * montado (hay dos, la barra lateral de escritorio y el desplegable móvil, y
+ * ambos llaman a `fetchCategories` en su efecto de montaje).
+ *
+ * Las tres pedían además **lo mismo**: la API devuelve siempre el catálogo
+ * completo de géneros de TMDB y el filtrado por tipo de medio es local. Con una
+ * sola petición por sesión sobra: los géneros de TMDB no cambian.
+ */
+let cachedCategories: Category[] | null = null;
+
+/** Petición en vuelo, para que dos montajes simultáneos compartan la misma. */
+let inFlight: Promise<Category[]> | null = null;
+
+function loadAllCategories(): Promise<Category[]> {
+    if (cachedCategories) return Promise.resolve(cachedCategories);
+
+    if (!inFlight) {
+        inFlight = getAllCategories()
+            .then((categories) => {
+                cachedCategories = categories;
+                return categories;
+            })
+            .finally(() => {
+                inFlight = null;
+            });
+    }
+
+    return inFlight;
 }
 
 /**
@@ -42,17 +67,33 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
     selectedCategory: null,
 
     fetchCategories: async (mediaType?: MediaType) => {
+        const currentMediaType = mediaType || get().selectedMediaType;
+        // Para 'random', usamos 'all' para obtener todas las categorías
+        const apiMediaType = currentMediaType === 'random' ? 'all' : currentMediaType;
+
+        // Con el catálogo ya en memoria no hay ni petición ni parpadeo de carga:
+        // el filtrado es síncrono.
+        if (cachedCategories) {
+            set({
+                categories: filterCategoriesForMediaType(cachedCategories, apiMediaType),
+                loading: false,
+                error: null,
+            });
+            return;
+        }
+
         set({ loading: true, error: null });
+
         try {
-            const currentMediaType = mediaType || get().selectedMediaType;
-            // Para 'random', usamos 'all' para obtener todas las categorías
-            const apiMediaType = currentMediaType === 'random' ? 'all' : currentMediaType;
-            const categories = await getCategoriesForMediaType(apiMediaType);
-            set({ categories, loading: false });
+            const all = await loadAllCategories();
+            set({
+                categories: filterCategoriesForMediaType(all, apiMediaType),
+                loading: false,
+            });
         } catch (error) {
-            set({ 
+            set({
                 error: error instanceof Error ? error.message : 'Error al cargar las categorías',
-                loading: false 
+                loading: false
             });
         }
     },
@@ -73,4 +114,4 @@ export const useCategoriesStore = create<CategoriesState>((set, get) => ({
      * @returns {void} - No devuelve nada
      */
     setSelectedCategory: (category: string | null) => set({ selectedCategory: category }),
-})); 
+}));

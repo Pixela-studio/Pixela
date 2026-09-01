@@ -1,59 +1,53 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@/auth";
-import { WatchStatus } from "@prisma/client";
+import { requireUser } from "@/lib/api/guards";
+import {
+  apiError,
+  handleRouteError,
+  parseJsonBody,
+  validationError,
+} from "@/lib/api/responses";
+import { resourceIdSchema, updateLibraryItemSchema } from "@/lib/api/schemas";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const parsedId = resourceIdSchema.safeParse((await params).id);
+  if (!parsedId.success) return apiError("ID inválido", 400);
+  const libraryItemId = parsedId.data;
+
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
+
+  const parsed = updateLibraryItemSchema.safeParse(body.data);
+  if (!parsed.success) return validationError(parsed.error);
+
   try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
-
-    const { id } = await params;
-    const body = await request.json();
-    const { status } = body;
-
-    if (!status || !Object.values(WatchStatus).includes(status)) {
-      return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
-    }
-
-    const userId = parseInt(session.user.id);
-    const libraryItemId = parseInt(id);
-
-    // Verificar que el item pertenezca al usuario
     const existingItem = await prisma.libraryItem.findUnique({
       where: { id: libraryItemId },
     });
 
-    if (!existingItem || existingItem.userId !== userId) {
-      return NextResponse.json(
-        { error: "Item no encontrado o no autorizado" },
-        { status: 404 },
-      );
+    if (!existingItem || existingItem.userId !== guard.user.id) {
+      return apiError("Item no encontrado o no autorizado", 404);
     }
 
     const updatedItem = await prisma.libraryItem.update({
       where: { id: libraryItemId },
-      data: { status },
+      data: { status: parsed.data.status },
     });
 
     return NextResponse.json({
       success: true,
-      data: {
-        ...updatedItem,
-        tmdbId: updatedItem.tmdbId.toString(),
-      },
+      data: { ...updatedItem, tmdbId: updatedItem.tmdbId.toString() },
     });
   } catch (error) {
-    console.error("Error updating library item:", error);
-    return NextResponse.json(
-      { error: "Error al actualizar item" },
-      { status: 500 },
-    );
+    return handleRouteError("Failed to update library item", error, {
+      libraryItemId,
+    });
   }
 }
 
@@ -61,37 +55,28 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const parsedId = resourceIdSchema.safeParse((await params).id);
+  if (!parsedId.success) return apiError("ID inválido", 400);
+  const libraryItemId = parsedId.data;
+
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
   try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
-
-    const { id } = await params;
-    const userId = parseInt(session.user.id);
-    const libraryItemId = parseInt(id);
-
     const existingItem = await prisma.libraryItem.findUnique({
       where: { id: libraryItemId },
     });
 
-    if (!existingItem || existingItem.userId !== userId) {
-      return NextResponse.json(
-        { error: "Item no encontrado o no autorizado" },
-        { status: 404 },
-      );
+    if (!existingItem || existingItem.userId !== guard.user.id) {
+      return apiError("Item no encontrado o no autorizado", 404);
     }
 
-    await prisma.libraryItem.delete({
-      where: { id: libraryItemId },
-    });
+    await prisma.libraryItem.delete({ where: { id: libraryItemId } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting library item:", error);
-    return NextResponse.json(
-      { error: "Error al eliminar item" },
-      { status: 500 },
-    );
+    return handleRouteError("Failed to delete library item", error, {
+      libraryItemId,
+    });
   }
 }

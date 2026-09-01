@@ -1,75 +1,82 @@
 import { TrendingSerie, TrendingMovie } from "@/features/trending/types";
-import { MediaType } from "@/features/trending/types/common";
 import { FetchOptions } from "@/features/trending/types/api";
-import { API_BASE_URL } from "@/api/shared/apiEndpoints"; // PROD   UCTION: Cambiar {API_BASE_URL} por {API_URL}
-import { DEFAULT_FETCH_OPTIONS } from "@/api/shared/apiHelpers";
+import { fetchFromTmdb } from "@/lib/tmdb";
+
+/**
+ * Tendencias de la semana.
+ *
+ * Este módulo lo consume únicamente `app/page.tsx`, que es un Server Component:
+ * por eso puede hablar con TMDB directamente.
+ *
+ * Antes hacía `fetch("https://<dominio>/api/series/trending")`, es decir, el
+ * servidor se pedía a sí mismo por HTTP público una ruta que a su vez llamaba a
+ * TMDB. Cada render de la portada salía del servidor, volvía a entrar por el
+ * edge de Vercel y despertaba otra función: dos Edge Requests y dos
+ * invocaciones por sección, cuatro en total solo para tendencias y descubrir.
+ * Y como iba con `cache: "no-store"`, se repetía en cada visita.
+ *
+ * Llamando a `fetchFromTmdb` se salta ese rodeo y además entra en la Data Cache
+ * de Next (`revalidate: 3600`), así que varias visitas comparten la misma
+ * respuesta.
+ */
 
 const DEFAULT_LIMIT = 20;
 const DEFAULT_OFFSET = 0;
 
-// Interface para respuesta de la API de tendencias
-interface TrendingResponse<T> {
-    data: T[];
+interface TmdbListResponse<T> {
+  results?: T[];
 }
 
 /**
- * Función base para realizar peticiones a la API de tendencias
- * @param mediaType Tipo de contenido (series o películas)
- * @param options Opciones de paginación
- * @returns Datos de la respuesta
+ * Nota sobre `limit`/`offset`: la ruta `/api/{tipo}/trending` los aceptaba en la
+ * query pero nunca los aplicaba —devolvía siempre la página completa de TMDB—,
+ * así que se mantiene ese mismo comportamiento para no alterar lo que se ve en
+ * portada. `offset` se traduce a la paginación de TMDB, que es lo único que el
+ * proveedor admite.
  */
 async function fetchTrendingMedia<T>(
-    mediaType: MediaType,
-    options: FetchOptions = {}
+  tmdbType: "movie" | "tv",
+  { offset = DEFAULT_OFFSET }: FetchOptions = {},
 ): Promise<T[]> {
-    const { limit = DEFAULT_LIMIT, offset = DEFAULT_OFFSET } = options;
-    const endpoint = `${API_BASE_URL}/${mediaType}/trending?limit=${limit}&offset=${offset}`; // PRODUCTION: Cambiar {API_BASE_URL} por {API_URL}
+  try {
+    const page = Math.max(1, Math.floor(offset / DEFAULT_LIMIT) + 1);
 
-    try {
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`Fetching trending ${mediaType} from: ${endpoint}`);
-        }
-        const response = await fetch(endpoint, {
-            ...DEFAULT_FETCH_OPTIONS,
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Error de API: ${response.status} ${response.statusText}`);
-        }
+    const data = await fetchFromTmdb<TmdbListResponse<T>>(
+      `/trending/${tmdbType}/week`,
+      { page },
+    );
 
-        const data: TrendingResponse<T> = await response.json();
-        return data.data;
-
-    } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-            console.error(`Error fetching trending ${mediaType}:`, error);
-        }
-        return [];
+    return data.results ?? [];
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error(`Error fetching trending ${tmdbType}:`, error);
     }
+    return [];
+  }
 }
 
 /**
  * Obtiene las series en tendencia
- * @param limit Número de series a obtener
+ * @param limit Se conserva por compatibilidad con las llamadas existentes
  * @param offset Punto de inicio para la paginación
  * @returns Lista de series en tendencia
  */
 export async function getTrendingSeries(
-    limit = DEFAULT_LIMIT,
-    offset = DEFAULT_OFFSET
+  limit = DEFAULT_LIMIT,
+  offset = DEFAULT_OFFSET,
 ): Promise<TrendingSerie[]> {
-    return fetchTrendingMedia<TrendingSerie>('series', { limit, offset });
+  return fetchTrendingMedia<TrendingSerie>("tv", { limit, offset });
 }
 
 /**
  * Obtiene las películas en tendencia
- * @param limit Número de películas a obtener
+ * @param limit Se conserva por compatibilidad con las llamadas existentes
  * @param offset Punto de inicio para la paginación
  * @returns Lista de películas en tendencia
  */
 export async function getTrendingMovies(
-    limit = DEFAULT_LIMIT,
-    offset = DEFAULT_OFFSET
+  limit = DEFAULT_LIMIT,
+  offset = DEFAULT_OFFSET,
 ): Promise<TrendingMovie[]> {
-    return fetchTrendingMedia<TrendingMovie>('movies', { limit, offset });
-} 
+  return fetchTrendingMedia<TrendingMovie>("movie", { limit, offset });
+}

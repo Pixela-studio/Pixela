@@ -8,6 +8,9 @@ import { TextInput } from '@/features/auth/components/TextInput';
 import { RoundedButton } from '@/features/auth/components/RoundedButton';
 import { VscAccount, VscMail, VscLock, VscCheck } from 'react-icons/vsc';
 
+/** Debe coincidir con `registerSchema` en `/api/auth/register`. */
+const MIN_PASSWORD_LENGTH = 8;
+
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +29,14 @@ export default function RegisterPage() {
 
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
+      setLoading(false);
+      return;
+    }
+
+    // Mismo mínimo que exige la API: mejor avisar aquí que tras el viaje de ida
+    // y vuelta con un 400.
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(`La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
       setLoading(false);
       return;
     }
@@ -59,8 +70,8 @@ export default function RegisterPage() {
         router.refresh();
       }
       
-    } catch (err: any) {
-      setError(err.message || 'Ocurrió un error inesperado.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado.');
     } finally {
       setLoading(false);
     }

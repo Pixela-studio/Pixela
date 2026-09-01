@@ -1,50 +1,53 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { FiHeart, FiStar, FiActivity } from "react-icons/fi";
 import { favoritesAPI } from "@/api/favorites/favorites";
 import { reviewsAPI } from "@/api/reviews/reviews";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
+
+type ProfileStat = { label: string; value: string; icon: typeof FiHeart };
+
+const INITIAL_STATS: ProfileStat[] = [
+  { label: "Favoritos", value: "0", icon: FiHeart },
+  { label: "Reseñas", value: "0", icon: FiStar },
+  { label: "Nivel", value: "Novato", icon: FiActivity },
+];
+
+/** Umbrales de nivel, del más alto al más bajo: gana el primero que se cumple. */
+const LEVELS: { name: string; reviews: number; favorites: number }[] = [
+  { name: "Maestro", reviews: 50, favorites: 100 },
+  { name: "Crítico", reviews: 30, favorites: 50 },
+  { name: "Cinéfilo", reviews: 15, favorites: 30 },
+  { name: "Aficionado", reviews: 5, favorites: 10 },
+];
+
+const resolveLevel = (reviewCount: number, favoriteCount: number): string =>
+  LEVELS.find(
+    (level) => reviewCount > level.reviews || favoriteCount > level.favorites,
+  )?.name ?? "Novato";
 
 export const useProfileStats = () => {
-  const [stats, setStats] = useState([
-    { label: "Favoritos", value: "0", icon: FiHeart },
-    { label: "Reseñas", value: "0", icon: FiStar },
-    { label: "Nivel", value: "Novato", icon: FiActivity },
-  ]);
-  const [loading, setLoading] = useState(true);
+  const fetchStats = useCallback(async (): Promise<ProfileStat[]> => {
+    const [favorites, reviews] = await Promise.all([
+      favoritesAPI.listWithDetails(),
+      reviewsAPI.list(),
+    ]);
 
-  const fetchStats = useCallback(async () => {
-    try {
-      setLoading(true);
-      const [favorites, reviews] = await Promise.all([
-        favoritesAPI.listWithDetails(),
-        reviewsAPI.list(),
-      ]);
-
-      const favCount = favorites.length;
-      const reviewCount = reviews.length;
-
-      // Determine level based on activity
-      let level = "Novato";
-      if (reviewCount > 5 || favCount > 10) level = "Aficionado";
-      if (reviewCount > 15 || favCount > 30) level = "Cinéfilo";
-      if (reviewCount > 30 || favCount > 50) level = "Crítico";
-      if (reviewCount > 50 || favCount > 100) level = "Maestro";
-
-      setStats([
-        { label: "Favoritos", value: favCount.toString(), icon: FiHeart },
-        { label: "Reseñas", value: reviewCount.toString(), icon: FiStar },
-        { label: "Nivel", value: level, icon: FiActivity },
-      ]);
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    } finally {
-      setLoading(false);
-    }
+    return [
+      { label: "Favoritos", value: String(favorites.length), icon: FiHeart },
+      { label: "Reseñas", value: String(reviews.length), icon: FiStar },
+      {
+        label: "Nivel",
+        value: resolveLevel(reviews.length, favorites.length),
+        icon: FiActivity,
+      },
+    ];
   }, []);
 
-  // Initial fetch
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const { data: stats, loading, reload } = useAsyncResource(
+    fetchStats,
+    INITIAL_STATS,
+    { errorMessage: "No se pudieron cargar las estadísticas", label: "profile stats" },
+  );
 
-  return { stats, loading, refreshStats: fetchStats };
+  return { stats, loading, refreshStats: reload };
 };

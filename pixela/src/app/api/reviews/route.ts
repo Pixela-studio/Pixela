@@ -1,154 +1,141 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from "@/auth";
-import { fetchFromTmdb } from '@/lib/tmdb';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { fetchFromTmdb } from "@/lib/tmdb";
+import { logger } from "@/lib/logger";
+import { requireUser } from "@/lib/api/guards";
+import {
+  handleRouteError,
+  parseJsonBody,
+  validationError,
+} from "@/lib/api/responses";
+import { createReviewSchema } from "@/lib/api/schemas";
+import { enforceRateLimit } from "@/lib/api/rateLimit";
 
 interface TmdbMediaDetails {
   title?: string;
   name?: string;
-  poster_path?: string;
-  [key: string]: unknown;
+  poster_path?: string | null;
 }
 
+/** Escrituras de reseñas permitidas por usuario y minuto. */
+const REVIEW_WRITE_LIMIT = { name: "review-write", limit: 20, windowMs: 60_000 };
+
 export async function GET() {
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
   try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    const userId = parseInt(session.user.id);
-
     const reviews = await prisma.review.findMany({
-      where: { userId: userId },
-      orderBy: { createdAt: 'desc' },
+      where: { userId: guard.user.id },
+      orderBy: { createdAt: "desc" },
       include: {
-        user: {
-          select: {
-            name: true,
-            photoUrl: true
-          }
-        }
-      }
+        user: { select: { name: true, photoUrl: true } },
+      },
     });
 
-    // Enriquecer reseñas con datos de TMDB (Título y Poster)
-    const enrichedReviews = await Promise.all(
-        reviews.map(async (review) => {
-            try {
-                const tmdbType = review.itemType === 'movie' ? 'movie' : 'tv';
-                const tmdbData = await fetchFromTmdb<TmdbMediaDetails>(`${tmdbType}/${review.tmdbId}`);
-
-                return {
-                    id: review.id,
-                    user_id: review.userId,
-                    user_name: review.user.name,
-                    photo_url: review.user.photoUrl,
-                    tmdb_id: Number(review.tmdbId),
-                    item_type: review.itemType,
-                    rating: Number(review.rating),
-                    review: review.review,
-                    created_at: review.createdAt.toISOString(),
-                    updated_at: review.updatedAt.toISOString(),
-                    // Campos extraídos de TMDB
-                    title: tmdbData.title || tmdbData.name || 'Sin título',
-                    poster_path: tmdbData.poster_path,
-                };
-            } catch (error) {
-                logger.error(`Error enrichment for review ${review.id}`, error);
-                return {
-                    id: review.id,
-                    user_id: review.userId,
-                    user_name: review.user.name,
-                    photo_url: review.user.photoUrl,
-                    tmdb_id: Number(review.tmdbId),
-                    item_type: review.itemType,
-                    rating: Number(review.rating),
-                    review: review.review,
-                    created_at: review.createdAt.toISOString(),
-                    updated_at: review.updatedAt.toISOString(),
-                    title: `Media #${review.tmdbId}`,
-                    poster_path: null,
-                };
-            }
-        })
+    // Enriquecer con TMDB. `allSettled` en vez de un try/catch por item:
+    // el mapeo del fallback estaba duplicado palabra por palabra.
+    const details = await Promise.allSettled(
+      reviews.map((review) =>
+        fetchFromTmdb<TmdbMediaDetails>(
+          `${review.itemType === "movie" ? "movie" : "tv"}/${review.tmdbId}`,
+        ),
+      ),
     );
 
-    return NextResponse.json({
-        success: true,
-        data: enrichedReviews
+    const enrichedReviews = reviews.map((review, index) => {
+      const result = details[index];
+      const tmdbData = result.status === "fulfilled" ? result.value : null;
+
+      if (result.status === "rejected") {
+        logger.error(`Error enriching review ${review.id}`, result.reason);
+      }
+
+      return {
+        id: review.id,
+        user_id: review.userId,
+        user_name: review.user.name,
+        photo_url: review.user.photoUrl,
+        tmdb_id: Number(review.tmdbId),
+        item_type: review.itemType,
+        rating: Number(review.rating),
+        review: review.review,
+        created_at: review.createdAt.toISOString(),
+        updated_at: review.updatedAt.toISOString(),
+        title:
+          tmdbData?.title ?? tmdbData?.name ?? `Media #${review.tmdbId}`,
+        poster_path: tmdbData?.poster_path ?? null,
+      };
     });
+
+    return NextResponse.json({ success: true, data: enrichedReviews });
   } catch (error) {
-    logger.error('Failed to list reviews', error);
-    return NextResponse.json({ error: 'Error al listar reseñas' }, { status: 500 });
+    return handleRouteError("Failed to list reviews", error);
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
+  const limited = enforceRateLimit(
+    request,
+    REVIEW_WRITE_LIMIT,
+    String(guard.user.id),
+  );
+  if (limited) return limited;
+
+  const body = await parseJsonBody(request);
+  if (!body.ok) return body.response;
+
+  /*
+   * El handler anterior solo comprobaba presencia de campos y pasaba `rating`
+   * crudo a Prisma: se aceptaban puntuaciones negativas o de tres cifras (que
+   * reventaban el Decimal(3,1) con un 500) y reseñas de longitud ilimitada.
+   */
+  const parsed = createReviewSchema.safeParse(body.data);
+  if (!parsed.success) return validationError(parsed.error);
+
+  const { tmdb_id, item_type, rating, review } = parsed.data;
+
   try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    const userId = parseInt(session.user.id);
-    const body = await req.json();
-    
-    // El frontend envía snake_case
-    const { tmdb_id, item_type, rating, review } = body;
-
-    if (!tmdb_id || !item_type || rating === undefined) {
-        return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
-    }
-
     const newReview = await prisma.review.upsert({
       where: {
         userId_itemType_tmdbId: {
-          userId,
+          userId: guard.user.id,
           itemType: item_type,
-          tmdbId: BigInt(tmdb_id)
-        }
+          tmdbId: BigInt(tmdb_id),
+        },
       },
-      update: {
-        rating,
-        review,
-      },
+      update: { rating, review: review ?? null },
       create: {
-        userId,
+        userId: guard.user.id,
         itemType: item_type,
         tmdbId: BigInt(tmdb_id),
         rating,
-        review,
+        review: review ?? null,
       },
       include: {
-          user: {
-              select: {
-                  name: true,
-                  photoUrl: true
-              }
-          }
-      }
+        user: { select: { name: true, photoUrl: true } },
+      },
     });
 
     return NextResponse.json({
       success: true,
       data: {
-          id: newReview.id,
-          user_id: newReview.userId,
-          user_name: newReview.user.name,
-          photo_url: newReview.user.photoUrl,
-          tmdb_id: Number(newReview.tmdbId),
-          item_type: newReview.itemType,
-          rating: Number(newReview.rating),
-          review: newReview.review,
-          created_at: newReview.createdAt.toISOString(),
-          updated_at: newReview.updatedAt.toISOString()
-      }
+        id: newReview.id,
+        user_id: newReview.userId,
+        user_name: newReview.user.name,
+        photo_url: newReview.user.photoUrl,
+        tmdb_id: Number(newReview.tmdbId),
+        item_type: newReview.itemType,
+        rating: Number(newReview.rating),
+        review: newReview.review,
+        created_at: newReview.createdAt.toISOString(),
+        updated_at: newReview.updatedAt.toISOString(),
+      },
     });
-
   } catch (error) {
-    logger.error('Failed to create/update review', error);
-    return NextResponse.json({ error: 'Error al procesar la reseña' }, { status: 500 });
+    return handleRouteError("Failed to create/update review", error);
   }
 }

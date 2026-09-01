@@ -1,5 +1,3 @@
-"use client";
-
 import { GenresListProps } from '@/features/media/types/genres';
 
 const STYLES = {

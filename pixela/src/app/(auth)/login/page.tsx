@@ -1,17 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { TextInput } from '@/features/auth/components/TextInput';
 import { RoundedButton } from '@/features/auth/components/RoundedButton';
 import { VscMail, VscLock } from 'react-icons/vsc';
 
-export default function LoginPage() {
+/** Solo se aceptan rutas internas: evita un open redirect vía `?callbackUrl=`. */
+const safeCallbackUrl = (raw: string | null): string => {
+  if (!raw) return '/';
+  if (!raw.startsWith('/') || raw.startsWith('//')) return '/';
+  return raw;
+};
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // `middleware.ts` redirige aquí con la ruta original cuando falta sesión.
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
+  const justRegistered = searchParams.get('registered') === 'true';
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -19,23 +31,22 @@ export default function LoginPage() {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
 
     try {
       const res = await signIn('credentials', {
-        email,
-        password,
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
         redirect: false,
       });
 
       if (res?.error) {
         setError('Estas credenciales no coinciden con nuestros registros.');
-      } else {
-        router.push('/');
-        router.refresh(); // Actualizar componentes servidor
+        return;
       }
-    } catch (err) {
+
+      router.push(callbackUrl);
+      router.refresh();
+    } catch {
       setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
@@ -44,65 +55,72 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={handleSubmit} className="py-4 space-y-6 w-full max-w-xs mx-auto px-4">
-      {/* Title */}
       <h2 className="text-[24px] font-['Outfit'] text-white font-bold mb-8">
         Bienvenido a Pixela | <span className="text-gray-500">Iniciar sesión</span>
       </h2>
 
-      {/* Email Address */}
+      {justRegistered && (
+        <p
+          role="status"
+          className="text-[14px] font-['Outfit'] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2"
+        >
+          Cuenta creada. Inicia sesión para continuar.
+        </p>
+      )}
+
       <div className="relative mb-5">
-        <TextInput 
-          id="email" 
+        <TextInput
+          id="email"
           name="email"
           type="email"
           placeholder="Email"
           icon={<VscMail />}
-          required 
-          autoFocus 
+          required
+          autoFocus
           autoComplete="username"
         />
       </div>
 
-      {/* Password */}
       <div className="relative mb-5">
-        <TextInput 
+        <TextInput
           id="password"
           name="password"
           type="password"
           placeholder="Contraseña"
           icon={<VscLock />}
-          required 
+          required
           autoComplete="current-password"
         />
       </div>
 
-      {/* Mensaje de error */}
+      {/* `role="alert"` para que un lector de pantalla anuncie el fallo. */}
       {error && (
-        <div className="text-[#ec1b69] text-[14px] font-['Outfit']">
+        <div role="alert" className="text-[#ec1b69] text-[14px] font-['Outfit']">
           {error}
         </div>
       )}
 
-      {/* Iniciar button */}
       <div className="mb-6">
         <RoundedButton type="submit" disabled={loading}>
           {loading ? 'Iniciando...' : 'Iniciar'}
         </RoundedButton>
       </div>
-      
-      {/* Enlaces de ayuda */}
+
       <div className="flex flex-col gap-4">
-        <Link 
-          href="/forgot-password" // TODO: Implementar
-          className="text-[15px] font-['Outfit'] text-gray-400 hover:text-[#ec1b69] transition-colors duration-300"
+        {/* El enlace apuntaba a /forgot-password, una ruta que no existe: cada
+            clic llevaba a un 404. Hasta que haya recuperación por email se
+            muestra como texto deshabilitado en vez de prometer algo que falla. */}
+        <span
+          className="text-[15px] font-['Outfit'] text-gray-600 cursor-not-allowed select-none"
+          title="Disponible próximamente"
         >
           ¿Olvidaste tu contraseña?
-        </Link>
-          
+        </span>
+
         <div className="text-[15px] font-['Outfit'] text-gray-400">
           ¿No tienes cuenta?
-          <Link 
-            href="/register" 
+          <Link
+            href="/register"
             className="ml-2 text-[#ec1b69] hover:text-[#ec1b69]/80 transition-colors duration-300"
           >
             Registrarse
@@ -110,5 +128,14 @@ export default function LoginPage() {
         </div>
       </div>
     </form>
+  );
+}
+
+export default function LoginPage() {
+  // `useSearchParams` obliga a un límite de Suspense en el App Router.
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

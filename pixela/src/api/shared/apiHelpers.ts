@@ -12,6 +12,26 @@ export class ApiError extends Error {
 }
 
 /**
+ * Extrae el mensaje legible que devuelve la API en `{ success: false, error }`.
+ *
+ * `ApiError.message` es siempre "Request failed with status NNN", que no dice
+ * nada al usuario. El detalle útil viaja en el cuerpo de la respuesta.
+ */
+export function parseApiErrorMessage(
+  error: unknown,
+  fallback = 'Ha ocurrido un error inesperado',
+): string {
+  if (!(error instanceof ApiError) || !error.response) return fallback;
+
+  try {
+    const parsed = JSON.parse(error.response) as { error?: string; message?: string };
+    return parsed.error || parsed.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Opciones por defecto para las peticiones fetch
  * @type {RequestInit}
  */
@@ -65,6 +85,12 @@ export async function fetchFromAPI<T>(url: string, options: RequestInit = {}): P
 
 /**
  * Helper para hacer fetch con manejo de errores unificado
+ *
+ * Nota: `DEFAULT_FETCH_OPTIONS` fuerza `cache: "no-store"`. Es correcto para
+ * datos de usuario (favoritos, biblioteca, reseñas), pero **no** lo uses para
+ * catálogo público: eso obliga a una petición nueva en cada llamada. El
+ * catálogo se resuelve en el servidor con `fetchFromTmdb`, que sí cachea.
+ *
  * @param url - URL de la petición
  * @returns - Respuesta de la petición o null si hay error
  */

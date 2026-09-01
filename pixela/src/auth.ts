@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials"
 import { z } from "zod"
 import bcrypt from "bcryptjs"
 import prisma from "@/lib/prisma"
-import type { JWT } from "@auth/core/jwt"
 
 // Extender tipos de NextAuth correctamente
 declare module "next-auth" {

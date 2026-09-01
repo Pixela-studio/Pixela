@@ -21,8 +21,5 @@ export {
   CastSkeleton
 } from './MediaSkeletons';
 
-// Discover skeleton (usado en sección discover)
-export { DiscoverGridSkeleton } from './DiscoverSkeletons';
-
 // Categories skeleton (usado en página de categorías)
 export { ContentSkeleton } from './CategorySkeletons'; 

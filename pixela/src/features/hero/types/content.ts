@@ -45,11 +45,13 @@ export interface HeroContent {
  * Interfaz para las propiedades del título del hero
  * @interface HeroTitleProps
  * @property {string} title - Título principal
- * @property {string} accentTitle - Título con acento
+ * @property {string} [accentTitle] - Título con acento (opcional: cuando la
+ *   diapositiva es dinámica se usa el título de la película entero, sin
+ *   trocearlo en dos, así que no hay accent)
  */
 export interface HeroTitleProps {
   title: string;
-  accentTitle: string;
+  accentTitle?: string;
 }
 
 /**
@@ -130,31 +132,3 @@ export interface NavigationButtonProps {
   direction: "prev" | "next";
   onClick: () => void;
 }
-
-/**
- * Tipo que representa un medio audiovisual (película o serie)
- * @property {string} id - Identificador único del medio
- * @property {'movie' | 'serie'} type - Tipo de medio (película o serie)
- */
-export type MediaItem = {
-  id: string;
-  type: "movie" | "serie";
-};
-
-/**
- * Props para el componente ProgressIndicator
- * @property {HeroImage[]} images - Array de objetos de imágenes para el carrusel
- */
-export interface ProgressIndicatorProps {
-  images: HeroImage[];
-}
-
-/**
- * Tipo que representa la respuesta de la API para un medio
- * @property {string} [backdrop] - URL opcional del fondo del medio
- * @property {string} [poster] - URL opcional del poster del medio
- */
-export type MediaResponse = {
-  backdrop?: string;
-  poster?: string;
-};

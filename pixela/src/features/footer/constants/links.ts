@@ -1,6 +1,13 @@
 import { FooterLink } from '../types/links';
 
-// Enlaces para las columnas - Extraídos como constantes para evitar re-creación en cada render
+/**
+ * Enlaces del pie de página.
+ *
+ * Todos los destinos de esta lista deben existir como ruta real. La versión
+ * anterior enlazaba a `/terms`, `/privacy`, `/cookies`, `/contact`, `/reviews`,
+ * `/favorites` y `/lists`: siete rutas que nunca se implementaron, así que cada
+ * clic en la columna "Compañía" del footer terminaba en la página 404.
+ */
 export const DISCOVER_LINKS: FooterLink[] = [
   { name: 'Inicio', href: '/' },
   { name: 'Tendencias', href: '/#trending' },
@@ -9,16 +16,10 @@ export const DISCOVER_LINKS: FooterLink[] = [
   { name: 'Sobre Nosotros', href: '/#about' }
 ];
 
-export const COMMUNITY_LINKS: FooterLink[] = [
-  { name: 'Reseñas', href: '/reviews' },
-  { name: 'Favoritos', href: '/favorites' },
-  { name: 'Listas', href: '/lists' },
-  { name: 'Perfil', href: '/profile' }
+/** Accesos de cuenta. `/profile` redirige a `/login` si no hay sesión. */
+export const ACCOUNT_LINKS: FooterLink[] = [
+  { name: 'Mi perfil', href: '/profile' },
+  { name: 'Mi biblioteca', href: '/profile' },
+  { name: 'Iniciar sesión', href: '/login' },
+  { name: 'Crear cuenta', href: '/register' }
 ];
-
-export const LEGAL_LINKS: FooterLink[] = [
-  { name: 'Términos', href: '/terms' },
-  { name: 'Privacidad', href: '/privacy' },
-  { name: 'Cookies', href: '/cookies' },
-  { name: 'Contacto', href: '/contact' }
-]; 

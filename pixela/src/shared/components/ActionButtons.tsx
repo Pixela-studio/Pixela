@@ -1,12 +1,8 @@
 'use client';
 
 import { FaBookmark } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { favoritesAPI } from '@/api/favorites/favorites';
-import { toast } from '@/lib/toast';
+import { useFavoriteToggle } from '@/hooks/useFavoriteToggle';
 
 const STYLES = {
   container: 'absolute top-3 right-3 z-50',
@@ -37,18 +33,16 @@ interface ActionButtonsProps {
   infoLabel?: string;
   followLabel?: string;
   variant?: 'hero' | 'default';
-  onDetailsClick?: () => void;
-  detailsLabel?: string;
   followTitle?: string;
-  detailsHref?: string;
   tmdbId?: number;
   itemType?: 'movie' | 'series';
 }
 
 /**
- * Componente que renderiza botones de acción para películas y series
- * @param {ActionButtonsProps} props - Propiedades del componente
- * @returns {JSX.Element} Componente de botones de acción
+ * Botones de acción sobre una tarjeta de película o serie.
+ *
+ * La lógica de favoritos vive en `useFavoriteToggle`, compartida con los
+ * botones de la ficha de detalle.
  */
 export const ActionButtons = ({
   onInfoClick,
@@ -60,120 +54,63 @@ export const ActionButtons = ({
   tmdbId,
   itemType
 }: ActionButtonsProps) => {
-  const [isFavorited, setIsFavorited] = useState<boolean | null>(null);
-  const router = useRouter();
-  const [favoriteId, setFavoriteId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated, checkAuth } = useAuthStore();
+  const { isFavorited, isLoading, isAuthenticated, toggleFavorite } =
+    useFavoriteToggle({ tmdbId, itemType });
+
   const isHero = variant === 'hero';
+  const tracksFavorite = Boolean(tmdbId && itemType);
 
-  useEffect(() => {
-    if (!tmdbId || !itemType || !isAuthenticated) {
-      setIsFavorited(false);
-      return;
-    }
-    
-    const checkFavoriteStatus = async () => {
-      try {
-        const favorites = await favoritesAPI.listWithDetails();
-        const fav = favorites.find(fav =>
-          fav.tmdb_id === tmdbId && fav.item_type === itemType
-        );
-        setIsFavorited(!!fav);
-        setFavoriteId(fav ? fav.id : null);
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Error checking favorite status:', error);
-        }
-        setIsFavorited(false);
-      }
-    };
-    
-    checkFavoriteStatus();
-  }, [isAuthenticated, tmdbId, itemType]);
+  const handleFollow = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-  const handleFollow = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!isAuthenticated) {
-      toast.info('Inicia sesión para agregar a favoritos', {
-        title: 'Autenticación requerida',
-        duration: 3000,
-      });
-      router.push('/login');
-      return;
-    }
-
-    if (!tmdbId || !itemType) {
+    if (!tracksFavorite) {
       onFollowClick?.();
       return;
     }
 
-    setIsLoading(true);
-    try {
-      if (isFavorited && favoriteId) {
-        await favoritesAPI.deleteFavorite(favoriteId);
-      } else {
-        await favoritesAPI.addFavorite({
-          tmdb_id: tmdbId,
-          item_type: itemType,
-        });
-      }
-
-      const favorites = await favoritesAPI.listWithDetails();
-      const fav = favorites.find(fav =>
-        fav.tmdb_id === tmdbId && fav.item_type === itemType
-      );
-      setIsFavorited(!!fav);
-      setFavoriteId(fav ? fav.id : null);
-
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error toggling favorite:', error);
-      }
-      if (error instanceof Error && error.message.includes('401')) {
-        await checkAuth();
-        router.push('/login');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    void toggleFavorite();
   };
 
-  const InfoButton = onInfoClick && (
-    <button 
-      className={clsx(STYLES.button.primary[isHero ? 'hero' : 'default'])}
-      onClick={onInfoClick}
-    >
-      {infoLabel}
-    </button>
-  );
+  // Sin estado conocido todavía: no pintamos un icono que luego cambie solo.
+  if (isFavorited === null && isAuthenticated) return null;
 
-  // No renderizamos el botón hasta que sepamos el estado inicial
-  // Si no está autenticado, asumimos false para pintar el botón 'inactivo' pero funcional (que redirige a login)
-  if (isFavorited === null && isAuthenticated) return null; // Solo esperamos si está intentando cargar estado
+  const label = isFavorited ? 'Quitar de favoritos' : 'Añadir a favoritos';
 
   return (
     <div className={STYLES.container}>
-      {InfoButton}
-      <button 
+      {onInfoClick && (
+        <button
+          type="button"
+          className={clsx(STYLES.button.primary[isHero ? 'hero' : 'default'])}
+          onClick={onInfoClick}
+        >
+          {infoLabel}
+        </button>
+      )}
+      <button
+        type="button"
         className={clsx(
-          tmdbId && itemType
-            ? isFavorited 
-              ? STYLES.button.favorite.active 
+          tracksFavorite
+            ? isFavorited
+              ? STYLES.button.favorite.active
               : STYLES.button.favorite.inactive
             : STYLES.button.secondary[isHero ? 'hero' : 'default']
         )}
         onClick={handleFollow}
-        title={followTitle || followLabel}
+        title={followTitle || (tracksFavorite ? label : followLabel)}
+        aria-label={tracksFavorite ? label : followLabel}
+        aria-pressed={tracksFavorite ? Boolean(isFavorited) : undefined}
         disabled={isLoading}
       >
-        <FaBookmark className={
-          tmdbId && itemType
-            ? STYLES.icon.favorite
-            : STYLES.icon[isHero ? 'hero' : 'default']
-        } />
+        <FaBookmark
+          aria-hidden="true"
+          className={
+            tracksFavorite
+              ? STYLES.icon.favorite
+              : STYLES.icon[isHero ? 'hero' : 'default']
+          }
+        />
         {isHero && <span>{followLabel}</span>}
       </button>
     </div>

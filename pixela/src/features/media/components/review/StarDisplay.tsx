@@ -1,5 +1,3 @@
-"use client";
-
 import { FiStar } from 'react-icons/fi';
 import { StarDisplayProps } from '@/features/media/types/reviews';
 

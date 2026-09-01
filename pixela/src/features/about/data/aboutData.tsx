@@ -1,33 +1,5 @@
 import { FaFilm, FaUsers, FaHeart } from 'react-icons/fa';
-import { TeamMember, FeatureCard } from '@/features/about/types/components';
-
-/**
- * Lista de miembros del equipo de Pixela
- * @constant
- * @type {TeamMember[]}
- */
-export const TEAM_MEMBERS: TeamMember[] = [
-  {
-    name: "Envyx10",
-    role: "Desarrollador Full Stack",
-    image: "/about/img/aboutus-envyx10.jpg",
-    linkedin: "https://www.linkedin.com/in/envyx10/",
-    github: "https://github.com/envyx10",
-    favoriteSeries: "Black Mirror",
-    favoriteMovie: "Interstellar",
-    quote: "Cada línea de código es una historia por contar, cada proyecto una nueva aventura cinematográfica."
-  },
-  {
-    name: "Ruyi",
-    role: "Desarrolladora Full Stack",
-    image: "/about/img/aboutus-ruyi.jpg",
-    linkedin: "https://www.linkedin.com/in/ruyi-xia-ye-b19853189/",
-    github: "https://github.com/rxy94",
-    favoriteSeries: "The Office",
-    favoriteMovie: "Interstellar",
-    quote: "Transformando ideas en experiencias digitales que conectan a los amantes del cine."
-  }
-];
+import { FeatureCard } from '@/features/about/types/components';
 
 /**
  * Lista de características principales de Pixela

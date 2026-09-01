@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FiChevronRight } from "react-icons/fi";
+import { FiChevronRight, FiArrowUpRight } from "react-icons/fi";
 import {
   HeroContent,
   HeroTitleProps,
@@ -11,23 +11,46 @@ import clsx from "clsx";
 import { ProgressIndicator } from "@/features/hero/components/ui/ProgressIndicator";
 
 const STYLES = {
-  // Línea decorativa de acento
+  // Línea decorativa de acento (welcome estático)
   accentLine: {
     base: "w-16 md:w-24 lg:w-24 h-1 bg-pixela-accent",
-    withMargin: "mb-4 md:mb-6 lg:mb-8 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
+    withMargin:
+      "mb-5 md:mb-7 lg:mb-9 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
   },
 
-  // Título principal del hero
-  heroTitle: {
-    base: "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-bold font-outfit text-pixela-light mb-4 md:mb-5 lg:mb-6 2k:mb-4 tracking-tighter uppercase md:tracking-tight md:uppercase leading-[1.0] drop-shadow-sm [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
-    accent: "text-pixela-accent",
+  // Tag de tipo (PELÍCULA / SERIE) — reemplaza la accent line en dinámico.
+  typeTag:
+    "inline-block text-[11px] sm:text-xs md:text-sm font-bold font-outfit uppercase tracking-[0.28em] text-pixela-accent mb-4 md:mb-5 lg:mb-6 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]",
+
+  // Título — común
+  heroTitleBase:
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-black font-outfit text-pixela-light mb-5 md:mb-6 lg:mb-8 2k:mb-6 tracking-tight leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] [text-wrap:balance] [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2 line-clamp-3",
+  // Welcome estático: uppercase (voz de marca).
+  heroTitleStatic: "uppercase",
+  // Dinámico: title case natural del título de peli/serie.
+  heroTitleDynamic: "normal-case",
+  heroTitleAccent: "text-pixela-accent",
+
+  // Descripción — común
+  descriptionBase:
+    "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl max-w-md sm:max-w-lg md:max-w-xl lg:max-w-xl 2k:max-w-2xl drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] leading-relaxed [text-wrap:pretty] line-clamp-3 mt-5 md:mt-6 lg:mt-7 mb-8 md:mb-10 lg:mb-12 [@media(max-height:500px)_and_(orientation:landscape)]:mt-2 [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
+  // Welcome estático: sans, medio peso.
+  descriptionStatic: "text-pixela-light/85",
+  // Dinámico: itálica + font-light — el overview se lee como reseña, no
+  // como copy institucional.
+  descriptionDynamic: "text-pixela-light/90 italic font-light",
+
+  // CTA "Descubrir más" del welcome (chevron link).
+  chevronCta: {
+    base: "group inline-flex items-center transition-all duration-300",
+    text: "font-medium text-pixela-light group-hover:text-white transition-all duration-300 mr-2 text-sm sm:text-base lg:text-base tracking-wide",
+    icon: "h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-pixela-light group-hover:text-pixela-accent opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1",
   },
 
-  // Botón secundario con animación
-  secondaryButton: {
-    base: "group flex items-center transition-all duration-300",
-    text: "font-medium text-pixela-light group-hover:text-white transition-all duration-300 mr-2 text-sm sm:text-base lg:text-base",
-    icon: "h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-pixela-light group-hover:text-pixela-accent opacity-80 group-hover:opacity-100 transition-colors duration-300",
+  // CTA "Ver detalles" cuando hay peli/serie activa (píldora accent).
+  pillCta: {
+    base: "group inline-flex items-center gap-2.5 px-6 py-3 md:px-7 md:py-3.5 rounded-full font-semibold text-sm md:text-base tracking-wide bg-pixela-accent text-white shadow-lg shadow-pixela-accent/30 hover:shadow-pixela-accent/50 hover:bg-pixela-accent/95 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300",
+    icon: "h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5",
   },
 
   // Sección de contenido principal
@@ -36,66 +59,59 @@ const STYLES = {
     container:
       "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24 [@media(max-height:500px)_and_(orientation:landscape)]:pb-8",
     textCard:
-      "w-fit bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-0 p-6 sm:p-7 md:p-8 lg:p-0 rounded-[24px] lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mb-6 md:mb-8 lg:mb-12 2k:mb-8",
-    description:
-      "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl text-pixela-light/90 lg:text-pixela-light/80 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg 2k:max-w-2xl drop-shadow-sm mt-4 md:mt-5 lg:mt-6 [@media(max-height:500px)_and_(orientation:landscape)]:mt-2",
+      "w-fit max-w-full bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-0 p-6 sm:p-7 md:p-8 lg:p-0 rounded-[24px] lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mb-6 md:mb-8 lg:mb-12 2k:mb-8",
     buttonsContainer:
       "flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 lg:gap-8 2k:gap-6 ipad:flex-col ipad:items-start ipad:gap-6",
-    buttonWrapper: "mt-6 md:mt-8 lg:mt-0 ipad:w-full",
+    buttonWrapper: "ipad:w-full",
     progressWrapper: "hidden ipad:block ipad:w-full",
   },
 } as const;
 
-/**
- * Componente para la línea de acento
- * @param {AccentLineProps} props - Propiedades de la línea
- * @returns {JSX.Element} Componente de línea
- */
+const typeLabel = (type?: HeroImage["type"]): string => {
+  if (type === "movie") return "Película";
+  if (type === "serie" || type === "tv") return "Serie";
+  return "Destacado";
+};
+
 const AccentLine = ({ className }: AccentLineProps) => (
   <div className={clsx(STYLES.accentLine.base, className)} />
 );
 
-/**
- * Componente para el título del hero
- * @param {HeroTitleProps} props - Propiedades del título
- * @returns {JSX.Element} Componente de título
- */
 const HeroTitle = ({
   title,
   accentTitle,
-  inline = false,
-}: HeroTitleProps & { inline?: boolean }) => (
-  <h1 className={clsx(STYLES.heroTitle.base, "line-clamp-3 text-ellipsis")}>
+  variant,
+}: HeroTitleProps & { variant: "static" | "dynamic" }) => (
+  <h1
+    className={clsx(
+      STYLES.heroTitleBase,
+      variant === "static" ? STYLES.heroTitleStatic : STYLES.heroTitleDynamic,
+    )}
+  >
     {title}
     {accentTitle && (
       <>
-        {inline ? " " : <br />}
-        <span className={STYLES.heroTitle.accent}>{accentTitle}</span>
+        <br />
+        <span className={STYLES.heroTitleAccent}>{accentTitle}</span>
       </>
     )}
   </h1>
 );
 
-/**
- * Componente para el botón secundario
- * @param {SecondaryButtonProps} props - Propiedades del botón
- * @returns {JSX.Element} Componente de botón
- */
-const SecondaryButton = ({ text, href }: SecondaryButtonProps) => (
-  <Link href={href} className={STYLES.secondaryButton.base}>
-    <span className={STYLES.secondaryButton.text}>{text}</span>
-    <FiChevronRight className={STYLES.secondaryButton.icon} />
+const ChevronCta = ({ text, href }: SecondaryButtonProps) => (
+  <Link href={href} className={STYLES.chevronCta.base}>
+    <span className={STYLES.chevronCta.text}>{text}</span>
+    <FiChevronRight className={STYLES.chevronCta.icon} />
   </Link>
 );
 
-/**
- * Componente que muestra la sección de contenido del hero
- * Incluye título, descripción y botones de acción
- */
-/**
- * Componente que muestra la sección de contenido del hero
- * Incluye título, descripción y botones de acción
- */
+const PillCta = ({ text, href }: SecondaryButtonProps) => (
+  <Link href={href} className={STYLES.pillCta.base}>
+    <span>{text}</span>
+    <FiArrowUpRight className={STYLES.pillCta.icon} />
+  </Link>
+);
+
 export const ContentSection = ({
   title,
   accentTitle,
@@ -105,73 +121,53 @@ export const ContentSection = ({
   currentImageIndex = 0,
 }: HeroContent & { images: HeroImage[] }) => {
   const currentImage = images[currentImageIndex];
+  const isDynamic = !!currentImage?.title;
 
-  // Lógica para separar el título en dos partes para el acento
-  const splitTitle = (
-    fullTitle: string | undefined,
-  ): { main: string; accent: string } => {
-    if (!fullTitle) return { main: "", accent: "" };
+  const displayTitle = currentImage?.title ?? title;
+  const displayAccentTitle = isDynamic ? undefined : accentTitle;
+  const displayDescription = currentImage?.description || description;
 
-    const words = fullTitle.split(" ");
-    if (words.length <= 1) return { main: fullTitle, accent: "" };
-
-    // Punto de corte: aproximadamente a la mitad, favoreciendo la segunda parte para el acento
-    const splitIndex = Math.ceil(words.length / 2);
-
-    const main = words.slice(0, splitIndex).join(" ");
-    const accent = words.slice(splitIndex).join(" ");
-
-    return { main, accent };
-  };
-
-  const { main: dynamicMainTitle, accent: dynamicAccentTitle } = splitTitle(
-    currentImage?.title,
-  );
-
-  // Lógica para mostrar contenido dinámico o estático
-  // Si tenemos título dinámico, usamos la versión partida. Si no, usamos el prop 'title' completo
-  const displayTitle = currentImage?.title ? dynamicMainTitle : title;
-
-  // Si hay título dinámico, el acccent viene de la función split.
-  // Si es estático, usamos el prop 'accentTitle'
-  const displayAccentTitle = currentImage?.title
-    ? dynamicAccentTitle
-    : accentTitle;
-
-  const displayDescription = currentImage?.description
-    ? currentImage.description.length > 200
-      ? `${currentImage.description.substring(0, 200)}...`
-      : currentImage.description
-    : description;
-
-  // URL del botón: si es contenido dinámico, ir a los detalles (placeholder por ahora)
-  // Si es estático, ir a tendencias
   const buttonHref = currentImage?.id
     ? `/${currentImage.type === "serie" ? "series" : "movies"}/${currentImage.id}`
     : "#tendencias";
-
-  const buttonText = currentImage?.id ? "Ver detalles" : secondaryButtonText;
+  const buttonText = isDynamic ? "Ver detalles" : secondaryButtonText;
 
   return (
     <div className={STYLES.contentSection.base}>
       <div className={STYLES.contentSection.container}>
         <div key={currentImageIndex} className="animate-fade-in">
           <div className={STYLES.contentSection.textCard}>
-            <AccentLine className={STYLES.accentLine.withMargin} />
+            {isDynamic ? (
+              <span className={STYLES.typeTag}>
+                {typeLabel(currentImage?.type)}
+              </span>
+            ) : (
+              <AccentLine className={STYLES.accentLine.withMargin} />
+            )}
 
             <HeroTitle
               title={displayTitle}
               accentTitle={displayAccentTitle}
-              inline={!!currentImage?.title}
+              variant={isDynamic ? "dynamic" : "static"}
             />
 
-            <p className={STYLES.contentSection.description}>
+            <p
+              className={clsx(
+                STYLES.descriptionBase,
+                isDynamic
+                  ? STYLES.descriptionDynamic
+                  : STYLES.descriptionStatic,
+              )}
+            >
               {displayDescription}
             </p>
 
-            {/* En móvil, el botón forma parte de la tarjeta para agrupar las llamadas a la acción */}
             <div className={STYLES.contentSection.buttonWrapper}>
-              <SecondaryButton text={buttonText} href={buttonHref} />
+              {isDynamic ? (
+                <PillCta text={buttonText} href={buttonHref} />
+              ) : (
+                <ChevronCta text={buttonText} href={buttonHref} />
+              )}
             </div>
           </div>
 

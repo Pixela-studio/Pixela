@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { favoritesAPI } from "@/api/favorites/favorites";
 import type { FavoriteWithDetails } from "@/api/favorites/types";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 import { FiLoader, FiAlertCircle } from "react-icons/fi";
-import { FaTrash } from "react-icons/fa";
+import { FaBookmark, FaTrash } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { formatYear } from "@/lib/date";
 
 /**
  * URL base para las imágenes de TMDB
@@ -17,17 +20,27 @@ const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 const ERROR_MESSAGES = {
   DELETE: "No se pudo eliminar el favorito",
   LOAD: "No se pudieron cargar los favoritos",
-  EMPTY: "No hay elementos en tus favoritos.",
 } as const;
 
 interface ProfileFavoritesProps {
   onStatsUpdate?: () => void;
 }
 
+const EMPTY_FAVORITES: FavoriteWithDetails[] = [];
+
 export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
-  const [favorites, setFavorites] = useState<FavoriteWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const fetchFavorites = useCallback(() => favoritesAPI.listWithDetails(), []);
+  const {
+    data: favorites,
+    loading,
+    error,
+    setData: setFavorites,
+    setError,
+  } = useAsyncResource(fetchFavorites, EMPTY_FAVORITES, {
+    errorMessage: ERROR_MESSAGES.LOAD,
+    label: "favorites",
+  });
+
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handleDelete = async (e: React.MouseEvent, favoriteId: number) => {
@@ -44,16 +57,6 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
       setDeletingId(null);
     }
   };
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    favoritesAPI
-      .listWithDetails()
-      .then(setFavorites)
-      .catch(() => setError(ERROR_MESSAGES.LOAD))
-      .finally(() => setLoading(false));
-  }, []);
 
   if (loading) {
     return (
@@ -74,10 +77,12 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
 
   if (favorites.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-gray-400">
-        <FiAlertCircle className="w-12 h-12 mb-4" />
-        <p className="text-lg font-outfit">{ERROR_MESSAGES.EMPTY}</p>
-      </div>
+      <EmptyState
+        icon={<FaBookmark />}
+        title="Todavía no tienes favoritos"
+        description="Marca con el icono de marcador las películas y series que quieras tener siempre a mano."
+        action={{ label: "Descubrir títulos", href: "/categories" }}
+      />
     );
   }
 
@@ -91,6 +96,7 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
           <Link
             href={`/${fav.item_type === "movie" ? "movies" : "series"}/${fav.tmdb_id}`}
             className="block w-full h-full"
+            prefetch={false}
           >
             {fav.poster_path ? (
               <Image
@@ -112,17 +118,17 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
                 {fav.title}
               </h3>
               <p className="text-gray-400 text-xs">
-                {fav.release_date
-                  ? new Date(fav.release_date).getFullYear()
-                  : "Sin fecha"}
+                {formatYear(fav.release_date, "Sin fecha")}
               </p>
             </div>
           </Link>
 
           {/* Delete Button */}
           <button
-            className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-red-500/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm transform translate-y-2 group-hover:translate-y-0"
-            title="Eliminar de favoritos"
+            type="button"
+            className="absolute top-2 right-2 translate-y-2 rounded-full bg-black/50 p-2 text-white opacity-0 backdrop-blur-sm transition-all duration-200 hover:bg-red-500/80 group-hover:translate-y-0 group-hover:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            title={`Eliminar «${fav.title}» de favoritos`}
+            aria-label={`Eliminar «${fav.title}» de favoritos`}
             disabled={deletingId === fav.id}
             onClick={(e) => handleDelete(e, fav.id)}
           >

@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { WatchStatus } from "@/api/library/types";
 import { useLibraryItems } from "../../hooks/useLibraryItems";
 import {
   FiLoader,
   FiAlertCircle,
-  FiFilter,
   FiCheck,
   FiClock,
   FiPlay,
@@ -14,6 +13,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { formatYear } from "@/lib/date";
 
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -34,12 +35,7 @@ const STATUS_COLORS = {
   [WatchStatus.DROPPED]: "bg-red-500/20 text-red-400 border-red-500/50",
 };
 
-interface ProfileLibraryProps {
-  onStatsUpdate?: () => void;
-}
-
-export const ProfileLibrary =
-  ({} /* onStatsUpdate */ : ProfileLibraryProps) => {
+export const ProfileLibrary = () => {
     const { items, loading, error } = useLibraryItems();
     const [activeFilter, setActiveFilter] = useState<string>("ALL");
 
@@ -47,6 +43,16 @@ export const ProfileLibrary =
       activeFilter === "ALL"
         ? items
         : items.filter((item) => item.status === activeFilter);
+
+    // Un recuento por estado en una sola pasada, en vez de recorrer `items`
+    // dentro del map de filtros (5 barridos completos en cada render).
+    const counts = useMemo(() => {
+      const tally: Record<string, number> = { ALL: items.length };
+      for (const item of items) {
+        tally[item.status] = (tally[item.status] ?? 0) + 1;
+      }
+      return tally;
+    }, [items]);
 
     if (loading) {
       return (
@@ -67,34 +73,48 @@ export const ProfileLibrary =
 
     return (
       <div className="space-y-6">
-        {/* Filters */}
-        <div className="flex flex-wrap gap-2 pb-4">
+        {/*
+          Los recuentos se muestran en **todos** los filtros, no solo en el
+          activo. Antes sólo aparecía el del filtro seleccionado, que es
+          justamente el único que ya se puede contar mirando la rejilla: el
+          valor de un contador está en decidir a dónde ir antes de pulsar.
+        */}
+        <div
+          role="tablist"
+          aria-label="Filtrar biblioteca por estado"
+          className="flex flex-wrap gap-2 pb-4"
+        >
           {STATUS_FILTERS.map((filter) => {
             const Icon = filter.icon;
             const isActive = activeFilter === filter.id;
-            const count =
-              filter.id === "ALL"
-                ? items.length
-                : items.filter((i) => i.status === filter.id).length;
+            const count = counts[filter.id] ?? 0;
 
             return (
               <button
                 key={filter.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border",
+                  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]",
                   isActive
-                    ? "bg-pixela-accent text-white border-pixela-accent"
-                    : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white",
+                    ? "border-pixela-accent bg-pixela-accent text-white"
+                    : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white",
+                  count === 0 && !isActive && "opacity-50",
                 )}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="h-3 w-3" aria-hidden="true" />
                 {filter.label}
-                {isActive && (
-                  <span className="ml-1 bg-white/20 px-1.5 rounded-full text-[10px]">
-                    {count}
-                  </span>
-                )}
+                <span
+                  className={clsx(
+                    "ml-0.5 rounded-full px-1.5 text-[10px] tabular-nums",
+                    isActive ? "bg-white/20" : "bg-white/10",
+                  )}
+                >
+                  {count}
+                </span>
               </button>
             );
           })}
@@ -102,10 +122,20 @@ export const ProfileLibrary =
 
         {/* Grid */}
         {filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-            <FiFilter className="w-10 h-10 mb-3 opacity-50" />
-            <p>No hay elementos en esta lista.</p>
-          </div>
+          items.length === 0 ? (
+            <EmptyState
+              icon={<FiGrid />}
+              title="Tu biblioteca está vacía"
+              description="Guarda películas y series para llevar la cuenta de lo que quieres ver, lo que estás viendo y lo que ya terminaste."
+              action={{ label: "Explorar catálogo", href: "/categories" }}
+            />
+          ) : (
+            <EmptyState
+              icon={<FiGrid />}
+              title={`Nada marcado como «${STATUS_FILTERS.find((f) => f.id === activeFilter)?.label}»`}
+              description="Cambia el estado de un título desde su ficha para verlo aquí."
+            />
+          )
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fade-in">
             {filteredItems.map((item) => (
@@ -116,6 +146,7 @@ export const ProfileLibrary =
                 <Link
                   href={`/${item.item_type === "movie" ? "movies" : "series"}/${item.tmdb_id}`}
                   className="block w-full h-full relative"
+                  prefetch={false}
                 >
                   {item.poster_path ? (
                     <Image
@@ -150,11 +181,7 @@ export const ProfileLibrary =
                     </h3>
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <span>{item.vote_average.toFixed(1)} ★</span>
-                      <span>
-                        {item.release_date
-                          ? new Date(item.release_date).getFullYear()
-                          : "N/A"}
-                      </span>
+                      <span>{formatYear(item.release_date)}</span>
                     </div>
                   </div>
                 </Link>

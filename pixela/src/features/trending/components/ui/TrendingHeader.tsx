@@ -154,7 +154,7 @@ const ContentState = memo(
     });
 
     return (
-      <div id="tendencias" className={STYLES.container} ref={containerRef}>
+      <div className={STYLES.container} ref={containerRef}>
         <div className={STYLES.content}>
           <div className={STYLES.contentWrapperWithToggle}>
             <div ref={titleRef}>

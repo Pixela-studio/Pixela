@@ -1,47 +1,9 @@
-import { NextResponse } from 'next/server';
-import { fetchFromTmdb } from '@/lib/tmdb';
-import { logger } from '@/lib/logger';
+import { proxyGenre } from "@/lib/api/tmdbProxy";
 
-interface TmdbGenreResponse {
-  results: unknown[];
-  page: number;
-  total_pages: number;
-  total_results: number;
-}
-
-export async function GET(
+export const GET = async (
   request: Request,
-  props: { params: Promise<{ type: string; id: string }> }
-) {
-  const params = await props.params;
-  const { type, id } = params;
-  const { searchParams } = new URL(request.url);
-  const page = searchParams.get('page') || '1';
-  
-  // 'movies' -> 'movie', 'series' -> 'tv'
-  const tmdbType = type === 'series' ? 'tv' : 'movie';
-  
-  try {
-    const data = await fetchFromTmdb<TmdbGenreResponse>(`/discover/${tmdbType}`, {
-        page,
-        with_genres: id,
-        sort_by: 'popularity.desc'
-    });
-    
-    return NextResponse.json({
-        success: true,
-        data: data.results || [],
-        page: data.page,
-        total_pages: data.total_pages,
-        total_results: data.total_results
-    });
-  } catch (error) {
-    logger.error(`Failed to fetch genre content`, error, { type, genreId: id });
-    
-    if (error instanceof Error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-    }
-    
-    return NextResponse.json({ success: false, error: 'Error al obtener contenido por género' }, { status: 500 });
-  }
-}
+  props: { params: Promise<{ type: string; id: string }> },
+) => {
+  const { type, id } = await props.params;
+  return proxyGenre(request, type === "series" ? "series" : "movies", id);
+};

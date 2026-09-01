@@ -13,8 +13,11 @@ import { UserResponse } from "@/api/auth/types";
 export interface ProfileFormData {
   name: string;
   email: string;
+  /** Contraseña nueva. Solo se envía si el usuario la rellena. */
   password?: string;
   password_confirmation?: string;
+  /** Contraseña actual: la API la exige para cambiar la propia contraseña. */
+  current_password?: string;
   cover_url?: string;
   created_at: string;
   is_admin: boolean;

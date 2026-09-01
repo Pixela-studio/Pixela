@@ -1,11 +1,8 @@
 import { Pelicula } from '@/features/media/types/content';
-import { API_ENDPOINTS } from '@/api/shared/apiEndpoints';
-import { fetchWithErrorHandling } from '@/api/shared/apiHelpers';
+import { fetchTmdbDetail, parseTmdbId } from '@/lib/api/tmdbDetails';
 import { mapPeliculaFromApi } from './mapper/mapPelicula'; 
 import type {
-  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor,
-  ApiResponse, ApiCastResponse, ApiVideosResponse, ApiProvidersResponse, 
-  ApiImagesResponse, ApiCreatorResponse
+  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor
 } from './types';
 
 interface CrewMember {
@@ -76,15 +73,28 @@ const extractDirector = (crew: CrewMember[]): Creator | undefined => {
  * @returns Objeto Pelicula completo
  */
 export async function getPeliculaById(id: string): Promise<Pelicula> {
-  const response = await fetchWithErrorHandling<ApiResponse<ExtendedPeliculaResponse>>(
-    API_ENDPOINTS.PELICULAS.GET_BY_ID(id)
-  );
-  
-  if (!response?.data?.id) {
+  /*
+   * Se llama a TMDB directamente en vez de a `/api/peliculas/[id]`.
+   *
+   * Esta función la usan el render de la ficha y su `generateMetadata`, ambos en
+   * el servidor. Cuando iba por la API interna, cada vista de una ficha salía a
+   * la red pública para pedirse a sí misma **dos veces**: dos Edge Requests y
+   * dos invocaciones de función que no hacían nada que no se pudiera hacer aquí.
+   *
+   * Al compartir `fetchTmdbDetail` con la route handler, la Data Cache de Next
+   * reconoce la misma URL y sirve las dos llamadas con una sola salida a TMDB.
+   */
+  const tmdbId = parseTmdbId(id);
+
+  if (tmdbId === null) {
     throw new Error('Movie not found or invalid data');
   }
 
-  const rawPelicula = response.data;
+  const rawPelicula = await fetchTmdbDetail<ExtendedPeliculaResponse>('movie', tmdbId);
+
+  if (!rawPelicula?.id) {
+    throw new Error('Movie not found or invalid data');
+  }
   const actores = rawPelicula.credits?.cast || [];
   const trailers = rawPelicula.videos?.results || [];
   
@@ -112,74 +122,4 @@ export async function getPeliculaById(id: string): Promise<Pelicula> {
     imagenes,
     creador
   });
-}
-
-/**
- * Obtiene los actores de una película
- * @param id ID de la película
- * @returns Array de actores
- */
-export async function getPeliculaActores(id: string): Promise<ApiActor[]> {
-  const data = await fetchWithErrorHandling<ApiCastResponse>(
-    API_ENDPOINTS.PELICULAS.GET_CAST(id)
-  );
-  return data?.success ? (data.data?.cast || []) : [];
-}
-
-/**
- * Obtiene los videos/trailers de una película
- * @param id ID de la película
- * @returns Array de videos
- */
-export async function getPeliculaVideos(id: string): Promise<ApiTrailer[]> {
-  const data = await fetchWithErrorHandling<ApiVideosResponse>(
-    API_ENDPOINTS.PELICULAS.GET_VIDEOS(id)
-  );
-  return data?.success ? (data.data?.results || []) : [];
-}
-
-/**
- * Obtiene los proveedores de streaming de una película
- * @param id ID de la película
- * @param region Región para los proveedores (por defecto ES para España)
- * @returns Array de proveedores de streaming
- */
-export async function getPeliculaProveedores(
-  id: string, 
-  region = 'ES'
-): Promise<ApiProvider[]> {
-  const data = await fetchWithErrorHandling<ApiProvidersResponse>(
-    `${API_ENDPOINTS.PELICULAS.GET_WATCH_PROVIDERS(id)}?region=${region}`
-  );
-  
-  if (!data?.success || !data.data?.results?.[region]) {
-    return [];
-  }
-  
-  const providers = data.data.results[region];
-  const allProviders: ApiProvider[] = [
-    ...(providers.flatrate || []),
-    ...(providers.rent || []),
-    ...(providers.buy || [])
-  ];
-  
-  return deduplicateProviders(allProviders);
-}
-
-/**
- * Obtiene las imágenes de una película (backdrops y posters)
- * @param id ID de la película
- * @returns Array de imágenes
- */
-export async function getPeliculaImagenes(id: string): Promise<ApiImage[]> {
-  const data = await fetchWithErrorHandling<ApiImagesResponse>(
-    API_ENDPOINTS.PELICULAS.GET_IMAGES(id)
-  );
-  
-  if (!data?.success) return [];
-  
-  return [
-    ...(data.data?.backdrops || []), 
-    ...(data.data?.posters || [])
-  ];
 }

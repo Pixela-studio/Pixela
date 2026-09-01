@@ -1,5 +1,6 @@
 import { Serie, WatchProvider } from '../../../features/media/types';
-import { ApiActor, ApiCreator, ApiProvider, ApiSerie, ApiTrailer } from '../types';
+import { Wallpaper } from '@/features/media/types/gallery';
+import { ApiActor, ApiCreator, ApiImageEntry, ApiProvider, ApiSerie, ApiTrailer } from '../types';
 import { buildTmdbImageUrl, DEFAULT_IMAGE_SIZES } from '@/lib/constants/tmdb';
 
 /**
@@ -59,13 +60,20 @@ const mapCreator = (creator: ApiCreator) => ({
 });
 
 /**
- * Mapea una imagen
- * @param image
- * @returns 
+ * Normaliza una imagen de la API al tipo `Wallpaper`.
+ *
+ * El parámetro estaba tipado como `any`, lo que ocultaba que `ApiImageEntry`
+ * declara `width`, `height`, `aspect_ratio` y los votos como opcionales
+ * mientras que `Wallpaper` los exige. Cualquier consumidor que calculara
+ * `width / height` obtenía NaN cuando TMDB omitía el campo.
  */
-const mapImage = (image: any) => ({
-  ...image,
+const mapImage = (image: ApiImageEntry): Wallpaper => ({
   file_path: formatImageUrl(image.file_path || ''),
+  width: image.width ?? 0,
+  height: image.height ?? 0,
+  aspect_ratio: image.aspect_ratio ?? 0,
+  vote_average: image.vote_average ?? 0,
+  vote_count: image.vote_count ?? 0,
 });
 
 /**
@@ -126,7 +134,7 @@ export function mapSerieFromApi(apiData: ApiSerie): Serie {
     episodios: apiData.episodios || apiData.number_of_episodes || 0,
     actores,
     trailers,
-    proveedores: apiData.proveedores?.map((p: any) => mapProvider(p)) || proveedores,
+    proveedores: apiData.proveedores?.map((p) => mapProvider(p)) || proveedores,
     imagenes: {
       backdrops: apiData.imagenes?.backdrops?.map(mapImage) || [],
       posters: apiData.imagenes?.posters?.map(mapImage) || [],

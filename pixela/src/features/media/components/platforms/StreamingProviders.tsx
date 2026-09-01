@@ -1,5 +1,3 @@
-"use client";
-
 import { PlatformCard } from './PlatformCard';
 import { StreamingProvidersProps } from '@/features/media/types/platforms';
 

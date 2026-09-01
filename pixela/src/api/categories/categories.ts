@@ -47,7 +47,6 @@ const MOVIE_ONLY_CATEGORY_IDS = [
  */
 export async function getAllCategories(): Promise<Category[]> {
     const apiUrl = API_ENDPOINTS.CATEGORIES.LIST;
-    console.log(`[DEBUG] getAllCategories - Intentando obtener categorías`);
 
     try {
         const data = await fetchFromAPI<CategoriesApiResponse>(apiUrl);
@@ -59,25 +58,38 @@ export async function getAllCategories(): Promise<Category[]> {
 }
 
 /**
+ * Filtra una lista de categorías ya cargada según el tipo de medio.
+ *
+ * El filtrado es puramente local: la API devuelve siempre el catálogo completo
+ * de géneros. Separarlo de la descarga permite al store pedir la lista una sola
+ * vez por sesión y derivar de ella cada vista, en lugar de repetir la misma
+ * petición cada vez que se cambia de pestaña.
+ *
+ * @param allCategories Catálogo completo de géneros
+ * @param mediaType Tipo de medio ('movies', 'series', 'all')
+ * @returns Array de categorías filtradas
+ */
+export function filterCategoriesForMediaType(
+    allCategories: Category[],
+    mediaType: 'movies' | 'series' | 'all',
+): Category[] {
+    if (mediaType !== 'series') {
+        return allCategories;
+    }
+
+    return allCategories.filter(category => {
+        const isMovieOnlyByName = MOVIE_ONLY_CATEGORIES.includes(category.name);
+        const isMovieOnlyById = MOVIE_ONLY_CATEGORY_IDS.includes(category.id);
+
+        return !isMovieOnlyByName && !isMovieOnlyById;
+    });
+}
+
+/**
  * Obtiene categorías filtradas según el tipo de medio
  * @param mediaType Tipo de medio ('movies', 'series', 'all')
  * @returns Array de categorías filtradas
  */
 export async function getCategoriesForMediaType(mediaType: 'movies' | 'series' | 'all'): Promise<Category[]> {
-    const allCategories = await getAllCategories();
-    
-    if (mediaType === 'all' || mediaType === 'movies') {
-        return allCategories;
-    }
-    
-    if (mediaType === 'series') {
-        return allCategories.filter(category => {
-            const isMovieOnlyByName = MOVIE_ONLY_CATEGORIES.includes(category.name);
-            const isMovieOnlyById = MOVIE_ONLY_CATEGORY_IDS.includes(category.id);
-            
-            return !isMovieOnlyByName && !isMovieOnlyById;
-        });
-    }
-    
-    return allCategories;
+    return filterCategoriesForMediaType(await getAllCategories(), mediaType);
 } 

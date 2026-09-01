@@ -3,14 +3,16 @@
 import Image from 'next/image';
 import clsx from 'clsx';
 import { useState, memo } from 'react';
+import { FiMaximize2 } from 'react-icons/fi';
 
 const STYLES = {
-  container: 'w-64 flex-shrink-0',
-  posterWrapper: 'relative group cursor-pointer',
-  imageContainer: 'relative w-full aspect-[2/3]',
-  image: 'rounded-lg shadow-2xl shadow-black/50 transition duration-300 group-hover:scale-105',
-  hoverOverlay: 'absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center',
-  hoverText: 'text-white text-sm font-medium',
+  container: 'flex-shrink-0',
+  button:
+    'group relative block w-full cursor-zoom-in rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-4 focus-visible:ring-offset-[#0F0F0F]',
+  imageContainer: 'relative w-full aspect-[2/3] overflow-hidden rounded-lg shadow-2xl shadow-black/50',
+  image: 'object-cover transition duration-300 group-hover:scale-105',
+  hoverOverlay:
+    'absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-black/50 text-sm font-medium text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100',
   placeholderContainer: 'absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black flex flex-col items-center justify-center p-4 text-center rounded-lg',
   placeholderEmoji: 'text-4xl mb-3 opacity-50',
   placeholderTitle: 'text-white text-sm font-medium leading-tight mb-2 line-clamp-3',
@@ -21,7 +23,8 @@ const STYLES = {
 interface MediaPosterProps {
   posterUrl: string;
   title: string;
-  onClick: () => void;
+  /** Sin handler el póster se pinta como imagen decorativa, no como control. */
+  onClick?: () => void;
   className?: string;
   type?: 'movie' | 'series' | 'person';
 }
@@ -31,12 +34,10 @@ interface MediaPosterProps {
  */
 const PlaceholderPoster = memo(({ title, type = 'movie' }: { title: string, type?: 'movie' | 'series' | 'person' }) => (
   <div className={STYLES.placeholderContainer}>
-    <div className={STYLES.placeholderEmoji}>
+    <div className={STYLES.placeholderEmoji} aria-hidden="true">
       {type === 'movie' ? '🎬' : type === 'series' ? '📺' : '👤'}
     </div>
-    <h3 className={STYLES.placeholderTitle}>
-      {title}
-    </h3>
+    <p className={STYLES.placeholderTitle}>{title}</p>
     <div className={STYLES.placeholderNoImage}>
       Sin imagen disponible
     </div>
@@ -46,35 +47,59 @@ const PlaceholderPoster = memo(({ title, type = 'movie' }: { title: string, type
 
 PlaceholderPoster.displayName = 'PlaceholderPoster';
 
+/**
+ * Póster de la ficha, ampliable en un modal.
+ *
+ * El disparador era un `<div onClick>`: no aparecía en el orden de tabulación,
+ * no respondía a Enter ni Espacio y no anunciaba nada a un lector de pantalla,
+ * de modo que ampliar el póster era imposible sin ratón. Ahora es un `<button>`
+ * real con etiqueta accesible y anillo de foco.
+ */
 export const MediaPoster = ({ posterUrl, title, onClick, className, type = 'movie' }: MediaPosterProps) => {
   const [imageError, setImageError] = useState(false);
+  const hasImage = Boolean(posterUrl?.trim()) && !imageError;
+
+  const artwork = (
+    <div className={STYLES.imageContainer}>
+      {hasImage ? (
+        <Image
+          src={posterUrl}
+          alt={onClick ? '' : title}
+          className={STYLES.image}
+          fill
+          sizes="(max-width: 640px) 160px, (max-width: 1024px) 192px, 256px"
+          priority
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <PlaceholderPoster title={title} type={type} />
+      )}
+
+      {onClick && (
+        <span className={STYLES.hoverOverlay} aria-hidden="true">
+          <FiMaximize2 className="h-4 w-4" />
+          Ampliar
+        </span>
+      )}
+    </div>
+  );
+
+  // Sin `onClick` no hay nada que activar: renderizar igualmente un `<button>`
+  // metería en el orden de tabulación un control que no hace nada.
+  if (!onClick) {
+    return <div className={clsx(STYLES.container, className)}>{artwork}</div>;
+  }
 
   return (
     <div className={clsx(STYLES.container, className)}>
-      <div 
-        className={STYLES.posterWrapper}
+      <button
+        type="button"
         onClick={onClick}
+        className={STYLES.button}
+        aria-label={`Ampliar el póster de «${title}»`}
       >
-        <div className={STYLES.imageContainer}>
-          {!posterUrl || posterUrl.trim() === '' || imageError ? (
-            <PlaceholderPoster title={title} type={type} />
-          ) : (
-            <Image 
-              src={posterUrl} 
-              alt={title}
-              className={STYLES.image}
-              fill
-              sizes="(max-width: 768px) 100vw, 256px"
-              priority
-              style={{objectFit: 'cover'}}
-              onError={() => setImageError(true)}
-            />
-          )}
-        </div>
-        <div className={STYLES.hoverOverlay}>
-          <span className={STYLES.hoverText}>Ampliar</span>
-        </div>
-      </div>
+        {artwork}
+      </button>
     </div>
   );
-}; 
+};

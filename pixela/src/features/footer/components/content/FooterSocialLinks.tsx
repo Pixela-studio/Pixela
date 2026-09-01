@@ -10,11 +10,11 @@ const STYLES = {
 
   // Título y decoración
   title: "text-white font-bold text-base md:text-lg relative inline-block ipad:text-base",
-  titleUnderline: "absolute -bottom-1 left-0 w-8 h-0.5 bg-[#ff007f]/50 rounded-full",
+  titleUnderline: "absolute -bottom-1 left-0 w-8 h-0.5 bg-[#EC1B69]/50 rounded-full",
 
   // Enlaces sociales
-  socialLink: "group p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#ff007f]/30 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 backdrop-blur-sm shadow-lg shadow-black/20 hover:shadow-[#ff007f]/10 ipad:p-2.5",
-  socialIcon: "text-white/70 group-hover:text-[#ff007f] transition-colors duration-300 text-lg md:text-xl ipad:text-lg",
+  socialLink: "group p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#EC1B69]/30 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 backdrop-blur-sm shadow-lg shadow-black/20 hover:shadow-[#EC1B69]/10 ipad:p-2.5",
+  socialIcon: "text-white/70 group-hover:text-[#EC1B69] transition-colors duration-300 text-lg md:text-xl ipad:text-lg",
 } as const;
 
 const socialLinks = [

@@ -133,6 +133,7 @@ export const UpdateProfileForm = ({
     // Solo añadir password si el usuario la ha escrito
     if (data.password && data.password.trim()) {
       formData.password = data.password;
+      formData.current_password = data.current_password;
     }
 
     onSubmit(formData as ProfileFormData);
@@ -208,7 +209,7 @@ export const UpdateProfileForm = ({
             <InputField
               type="password"
               name="password"
-              placeholder="Contraseña"
+              placeholder="Nueva contraseña"
               register={register("password", {
                 minLength: {
                   value: 8,
@@ -225,6 +226,29 @@ export const UpdateProfileForm = ({
               error={errors.password}
             />
           </div>
+
+          {/* Solo aparece cuando se está fijando una contraseña nueva: la API
+              exige demostrar que se conoce la actual antes de sustituirla. */}
+          {password && password.trim() !== "" && (
+            <div className={STYLES.fieldGroup}>
+              <InputField
+                type="password"
+                name="current_password"
+                placeholder="Contraseña actual"
+                register={register("current_password", {
+                  validate: (value) => {
+                    if (password?.trim() && !value?.trim()) {
+                      return "Introduce tu contraseña actual para confirmar el cambio";
+                    }
+                    return true;
+                  },
+                })}
+                icon={<IoKeyOutline className={STYLES.inputIcon} />}
+                helperText="Necesaria para confirmar que eres tú."
+                error={errors.current_password}
+              />
+            </div>
+          )}
 
           <div className={STYLES.fieldGroup}>
             <InputField

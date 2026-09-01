@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from '@/api/shared/apiEndpoints';
 import { DEFAULT_FETCH_OPTIONS } from '@/api/shared/apiHelpers';
-import { WallpapersResponse, ApiResponse, ApiImageResponse } from '@/features/media/types/gallery';
+import { WallpapersResponse } from '@/features/media/types/gallery';
 
 
 /**

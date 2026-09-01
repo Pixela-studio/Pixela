@@ -1,5 +1,3 @@
-"use client";
-
 import { CreatorAvatar } from './CreatorAvatar';
 import { CreatorInfoProps } from '@/features/media/types/creators';
 import { Serie } from '@/features/media/types/content';

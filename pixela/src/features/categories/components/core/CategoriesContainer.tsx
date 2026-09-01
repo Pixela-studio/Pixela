@@ -101,7 +101,6 @@ export const CategoriesContainer = () => {
    */
   const handleMediaTypeChange = useCallback(
     async (type: MediaType) => {
-      console.log("[DEBUG] handleMediaTypeChange called with:", type);
       setSelectedMediaType(type);
       setSelectedCategory(null);
       resetContent();
@@ -131,7 +130,6 @@ export const CategoriesContainer = () => {
   useEffect(() => {
     const initializeContent = async () => {
       if (!isInitialized) {
-        console.log("[DEBUG] Initializing content...");
         await handleMediaTypeChange("all");
         setIsInitialized(true);
       }
@@ -142,14 +140,7 @@ export const CategoriesContainer = () => {
 
   // Manejar cambios en el tipo de medio después de la inicialización
   useEffect(() => {
-    console.log(
-      "[DEBUG] MediaType effect - isInitialized:",
-      isInitialized,
-      "selectedMediaType:",
-      selectedMediaType,
-    );
     if (isInitialized) {
-      console.log("[DEBUG] Loading content for mediaType:", selectedMediaType);
       loadContent(null, 1);
     }
   }, [selectedMediaType, isInitialized, loadContent]);

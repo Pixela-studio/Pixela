@@ -1,37 +1,17 @@
-import { useState, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { libraryAPI } from "@/api/library/library";
 import { LibraryItemWithDetails, WatchStatus } from "@/api/library/types";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
+
+const EMPTY_ITEMS: LibraryItemWithDetails[] = [];
 
 export const useLibraryItems = () => {
-  const [items, setItems] = useState<LibraryItemWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchItems = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await libraryAPI.listWithDetails();
-        if (mounted) setItems(data);
-      } catch (err) {
-        if (mounted) {
-          console.error(err);
-          setError("No se pudo cargar la biblioteca");
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    fetchItems();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const fetchItems = useCallback(() => libraryAPI.listWithDetails(), []);
+  const { data: items, loading, error } = useAsyncResource(
+    fetchItems,
+    EMPTY_ITEMS,
+    { errorMessage: "No se pudo cargar la biblioteca", label: "library" },
+  );
 
   const getFilteredItems = (filter: string) => {
     if (filter === "ALL") return items;

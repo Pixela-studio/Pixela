@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { reviewsAPI } from "@/api/reviews/reviews";
 import type { Review } from "@/api/reviews/types";
+import { useAsyncResource } from "@/hooks/useAsyncResource";
 import {
   FiLoader,
   FiAlertCircle,
@@ -14,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { StarEditProps } from "@/features/profile/types/layout";
+import { EmptyState } from "@/shared/components/EmptyState";
 
 /**
  * URL base para las imágenes de TMDB
@@ -88,25 +90,27 @@ interface ProfileReviewsProps {
   onStatsUpdate?: () => void;
 }
 
+const EMPTY_REVIEWS: Review[] = [];
+
 export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const fetchReviews = useCallback(() => reviewsAPI.list(), []);
+  const {
+    data: reviews,
+    loading,
+    error,
+    reload: reloadReviews,
+    setData: setReviews,
+    setError,
+  } = useAsyncResource(fetchReviews, EMPTY_REVIEWS, {
+    errorMessage: ERROR_MESSAGES.LOAD,
+    label: "reviews",
+  });
+
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState<string>("");
   const [editRating, setEditRating] = useState<number>(5);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    reviewsAPI
-      .list()
-      .then(setReviews)
-      .catch(() => setError(ERROR_MESSAGES.LOAD))
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleDelete = async (reviewId: number) => {
     setDeletingId(reviewId);
@@ -141,8 +145,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
         review: editText,
         rating: editRating,
       });
-      const updatedReviews = await reviewsAPI.list();
-      setReviews(updatedReviews);
+      await reloadReviews();
       onStatsUpdate?.();
       setEditingId(null);
       setEditText("");
@@ -173,10 +176,12 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
 
   if (reviews.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-gray-400">
-        <FiAlertCircle className="w-12 h-12 mb-4" />
-        <p className="text-lg font-outfit">No hay reseñas.</p>
-      </div>
+      <EmptyState
+        icon={<FiStar />}
+        title="Aún no has escrito ninguna reseña"
+        description="Puntúa una película o serie desde su ficha y cuenta qué te pareció. Tus reseñas aparecerán aquí."
+        action={{ label: "Buscar algo que reseñar", href: "/categories" }}
+      />
     );
   }
 
@@ -191,6 +196,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
           <Link
             href={`/${review.item_type === "movie" ? "movies" : "series"}/${review.tmdb_id}`}
             className="flex-shrink-0 w-24 h-36 relative rounded-lg overflow-hidden shadow-lg transition-transform group-hover:scale-105"
+            prefetch={false}
           >
             {review.poster_path ? (
               <Image
@@ -218,6 +224,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                 <Link
                   href={`/${review.item_type === "movie" ? "movies" : "series"}/${review.tmdb_id}`}
                   className="text-white font-bold text-lg hover:text-pixela-accent transition-colors line-clamp-1"
+                  prefetch={false}
                 >
                   {review.title ||
                     `${review.item_type === "movie" ? "Película" : "Serie"} #${review.tmdb_id}`}

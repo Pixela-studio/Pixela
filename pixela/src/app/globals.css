@@ -6,6 +6,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Sitewide focus-visible ring. Base rule for anything the browser
+   considers keyboard-focused. Individual components can override with
+   Tailwind focus-visible: utilities if they need a bespoke look. */
+:focus-visible {
+  outline: 2px solid #ec1b69;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -100,24 +109,6 @@ body {
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
-/* Delays para efectos escalonados */
-.delay-200 {
-  animation-delay: 0.2s;
-}
-
-.delay-400 {
-  animation-delay: 0.4s;
-}
-
-.delay-600 {
-  animation-delay: 0.6s;
-}
-
-.delay-800 {
-  animation-delay: 0.8s;
-}
-
-/* Clases de delay para animaciones float */
 .animation-delay-200 {
   animation-delay: 200ms;
 }

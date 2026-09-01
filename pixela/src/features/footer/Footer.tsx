@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { FooterContent } from './components';
+import { FooterContent } from './components/core/FooterContent';
 import FooterScrollTopButton from "./components/ui/FooterScrollTopButton";
 
 const STYLES = {
