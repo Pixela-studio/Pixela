@@ -133,6 +133,50 @@ function hasSessionCookie(request: NextRequest): boolean {
   return SESSION_COOKIES.some((name) => Boolean(request.cookies.get(name)?.value));
 }
 
+/**
+ * Cookie "pista" legible desde JavaScript que refleja si hay sesión.
+ *
+ * Auth.js guarda su token en una cookie `httpOnly`, que el navegador no puede
+ * leer. Por eso `SessionProvider` no tenía más remedio que preguntar a
+ * `/api/auth/session` al montar **en toda carga de página**, también para el
+ * visitante anónimo que nunca va a iniciar sesión: una Edge Request y una
+ * invocación de función por visita, para acabar respondiendo "no hay sesión".
+ *
+ * Esta cookie no es `httpOnly` a propósito: no contiene el token ni nada
+ * sensible, solo un "1". Su único trabajo es que el cliente sepa si merece la
+ * pena preguntar. No sirve como autorización —falsificarla solo consigue que el
+ * navegador haga una petición que devolverá `null`—; la autorización real sigue
+ * en `requireUser` / `requireAdmin` dentro de cada route handler.
+ *
+ * Se mantiene aquí y no en el flujo de login porque el proxy ya ve todas las
+ * peticiones: si la sesión caduca o se cierra desde otra pestaña, la pista se
+ * corrige sola en la siguiente navegación.
+ */
+const SESSION_HINT_COOKIE = "pixela.has-session";
+
+function syncSessionHint(
+  request: NextRequest,
+  response: NextResponse,
+  hasSession: boolean,
+): void {
+  const hintPresent = request.cookies.get(SESSION_HINT_COOKIE)?.value === "1";
+
+  if (hasSession === hintPresent) return;
+
+  if (hasSession) {
+    response.cookies.set(SESSION_HINT_COOKIE, "1", {
+      httpOnly: false,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      // Sin `maxAge`: cookie de sesión de navegador. Si caduca antes que el
+      // token de Auth.js, la siguiente petición la vuelve a poner.
+    });
+  } else {
+    response.cookies.delete(SESSION_HINT_COOKIE);
+  }
+}
+
 export default function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
@@ -144,12 +188,16 @@ export default function proxy(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 
+  const hasSession = hasSessionCookie(request);
+
   const response =
-    needsAuth && !hasSessionCookie(request)
+    needsAuth && !hasSession
       ? NextResponse.redirect(
           new URL(`/login?callbackUrl=${encodeURIComponent(pathname + search)}`, request.url),
         )
       : NextResponse.next();
+
+  syncSessionHint(request, response, hasSession);
 
   for (const [header, value] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(header, value);
