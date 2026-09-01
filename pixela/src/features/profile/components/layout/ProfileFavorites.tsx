@@ -96,6 +96,7 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
           <Link
             href={`/${fav.item_type === "movie" ? "movies" : "series"}/${fav.tmdb_id}`}
             className="block w-full h-full"
+            prefetch={false}
           >
             {fav.poster_path ? (
               <Image

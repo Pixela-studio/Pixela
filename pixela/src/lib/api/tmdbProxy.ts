@@ -2,11 +2,53 @@ import { NextResponse } from "next/server";
 import { fetchFromTmdb } from "@/lib/tmdb";
 import { apiError, handleRouteError } from "@/lib/api/responses";
 import {
+  fetchTmdbDetail,
+  parseTmdbId,
+  toTmdbType,
+  type PixelaMediaType,
+} from "@/lib/api/tmdbDetails";
+import {
   pageSchema,
   pickDiscoverParams,
   searchQuerySchema,
-  tmdbIdSchema,
 } from "@/lib/api/schemas";
+import { enforceRateLimit } from "@/lib/api/rateLimit";
+
+/**
+ * Límite de la búsqueda.
+ *
+ * El resto del proxy se cachea por URL, así que un cliente insistente golpea la
+ * CDN y no la función. La búsqueda no: el espacio de consultas es infinito, cada
+ * término nuevo es un fallo de caché garantizado y por tanto una invocación más
+ * una llamada a TMDB. Es el endpoint que un scraper usaría para vaciar el
+ * catálogo.
+ *
+ * 30 consultas por minuto y por IP dan de sobra para escribir en el buscador
+ * (el formulario ya aplica 500 ms de debounce) y cortan el uso automatizado.
+ */
+const SEARCH_LIMIT = {
+  name: "tmdb-search",
+  limit: 30,
+  windowMs: 60_000,
+} as const;
+
+export { parseTmdbId, toTmdbType } from "@/lib/api/tmdbDetails";
+export type { PixelaMediaType, TmdbMediaType } from "@/lib/api/tmdbDetails";
+
+/**
+ * Caché de las respuestas del proxy en la CDN de Vercel.
+ *
+ * Ninguna de estas rutas llevaba `Cache-Control`, así que cada llamada —de la
+ * app, de un rastreador o de alguien recargando— despertaba la función y salía
+ * a TMDB. El contenido es un catálogo público que cambia a diario: una hora de
+ * frescura sobra.
+ *
+ * `s-maxage` deja que la CDN responda sin invocar nada; `stale-while-revalidate`
+ * evita que la primera petición tras la expiración pague la espera.
+ */
+const CDN_CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+} as const;
 
 /**
  * Handlers compartidos del proxy a TMDB.
@@ -14,15 +56,6 @@ import {
  * `/api/movies/*` y `/api/series/*` eran diez ficheros con el mismo cuerpo
  * copiado, diferenciados solo por `"movie"` vs `"tv"` y el texto del error.
  */
-
-/** Tipo tal y como lo usa la app en las URLs. */
-export type PixelaMediaType = "movies" | "series";
-
-/** Tipo tal y como lo espera TMDB. */
-export type TmdbMediaType = "movie" | "tv";
-
-export const toTmdbType = (type: string): TmdbMediaType =>
-  type === "series" || type === "tv" ? "tv" : "movie";
 
 interface TmdbListResponse {
   results?: unknown[];
@@ -32,27 +65,16 @@ interface TmdbListResponse {
 }
 
 const listResponse = (data: TmdbListResponse) =>
-  NextResponse.json({
-    success: true,
-    data: data.results ?? [],
-    page: data.page,
-    total_pages: data.total_pages,
-    total_results: data.total_results,
-  });
-
-/**
- * Valida un id de TMDB antes de interpolarlo en la ruta del proxy.
- *
- * Las rutas de detalle hacían `fetchFromTmdb(\`/movie/${id}\`)` con el segmento
- * crudo. Como Next decodifica los parámetros, una petición a
- * `/api/movies/%2E%2E%2F%2E%2E%2Faccount` llegaba como `../../account` y el
- * constructor `URL` normalizaba el `..`, convirtiendo el proxy en un puente a
- * endpoints arbitrarios de TMDB con nuestra API key.
- */
-export function parseTmdbId(rawId: string): number | null {
-  const parsed = tmdbIdSchema.safeParse(rawId);
-  return parsed.success ? parsed.data : null;
-}
+  NextResponse.json(
+    {
+      success: true,
+      data: data.results ?? [],
+      page: data.page,
+      total_pages: data.total_pages,
+      total_results: data.total_results,
+    },
+    { headers: CDN_CACHE_HEADERS },
+  );
 
 /** GET /discover/{movie|tv} */
 export async function proxyDiscover(request: Request, type: PixelaMediaType) {
@@ -78,6 +100,9 @@ export async function proxyDiscover(request: Request, type: PixelaMediaType) {
 
 /** GET /search/{movie|tv} */
 export async function proxySearch(request: Request, type: PixelaMediaType) {
+  const limited = enforceRateLimit(request, SEARCH_LIMIT);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
 
   const parsedQuery = searchQuerySchema.safeParse(searchParams.get("query") ?? "");
@@ -110,7 +135,10 @@ export async function proxyTrending(request: Request, type: PixelaMediaType) {
       { page: pageSchema.parse(searchParams.get("page") ?? "1") },
     );
     // Este endpoint devuelve solo `data`: el front de tendencias lee `data.data`.
-    return NextResponse.json({ success: true, data: data.results ?? [] });
+    return NextResponse.json(
+      { success: true, data: data.results ?? [] },
+      { headers: CDN_CACHE_HEADERS },
+    );
   } catch (error) {
     return handleRouteError(`Failed to fetch trending ${type}`, error);
   }
@@ -156,11 +184,13 @@ export async function proxyDetails(type: PixelaMediaType, rawId: string) {
   }
 
   try {
-    const data = await fetchFromTmdb(`/${toTmdbType(type)}/${id}`, {
-      append_to_response: "credits,videos,images,similar,watch/providers",
-      include_image_language: "en,null,es",
-    });
-    return NextResponse.json({ success: true, data });
+    // Misma llamada que usan los Server Components de las fichas, para que la
+    // Data Cache de Next la comparta en vez de duplicarla.
+    const data = await fetchTmdbDetail(toTmdbType(type), id);
+    return NextResponse.json(
+      { success: true, data },
+      { headers: CDN_CACHE_HEADERS },
+    );
   } catch (error) {
     if (error instanceof Error && error.message.includes("404")) {
       return NextResponse.json(
@@ -181,7 +211,7 @@ export async function proxyImages(type: PixelaMediaType, rawId: string) {
 
   try {
     const data = await fetchFromTmdb(`/${toTmdbType(type)}/${id}/images`);
-    return NextResponse.json(data);
+    return NextResponse.json(data, { headers: CDN_CACHE_HEADERS });
   } catch (error) {
     if (error instanceof Error && error.message.includes("404")) {
       return NextResponse.json(

@@ -51,10 +51,20 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      banners: Array.from(uniqueBackdrops.values()),
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        banners: Array.from(uniqueBackdrops.values()),
+      },
+      {
+        /*
+         * `private`: la respuesta depende de la sesión, así que la cachea el
+         * navegador y no una CDN compartida. Basta para que abrir y cerrar el
+         * selector de banner varias veces no repita la petición.
+         */
+        headers: { "Cache-Control": "private, max-age=3600" },
+      },
+    );
   } catch (error) {
     console.error("Error fetching banners:", error);
     return NextResponse.json(

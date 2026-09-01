@@ -196,6 +196,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
           <Link
             href={`/${review.item_type === "movie" ? "movies" : "series"}/${review.tmdb_id}`}
             className="flex-shrink-0 w-24 h-36 relative rounded-lg overflow-hidden shadow-lg transition-transform group-hover:scale-105"
+            prefetch={false}
           >
             {review.poster_path ? (
               <Image
@@ -223,6 +224,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                 <Link
                   href={`/${review.item_type === "movie" ? "movies" : "series"}/${review.tmdb_id}`}
                   className="text-white font-bold text-lg hover:text-pixela-accent transition-colors line-clamp-1"
+                  prefetch={false}
                 >
                   {review.title ||
                     `${review.item_type === "movie" ? "Película" : "Serie"} #${review.tmdb_id}`}

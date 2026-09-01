@@ -1,9 +1,8 @@
 import { Pelicula } from '@/features/media/types/content';
-import { API_ENDPOINTS } from '@/api/shared/apiEndpoints';
-import { fetchWithErrorHandling } from '@/api/shared/apiHelpers';
+import { fetchTmdbDetail, parseTmdbId } from '@/lib/api/tmdbDetails';
 import { mapPeliculaFromApi } from './mapper/mapPelicula'; 
 import type {
-  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor, ApiResponse
+  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor
 } from './types';
 
 interface CrewMember {
@@ -74,15 +73,28 @@ const extractDirector = (crew: CrewMember[]): Creator | undefined => {
  * @returns Objeto Pelicula completo
  */
 export async function getPeliculaById(id: string): Promise<Pelicula> {
-  const response = await fetchWithErrorHandling<ApiResponse<ExtendedPeliculaResponse>>(
-    API_ENDPOINTS.PELICULAS.GET_BY_ID(id)
-  );
-  
-  if (!response?.data?.id) {
+  /*
+   * Se llama a TMDB directamente en vez de a `/api/peliculas/[id]`.
+   *
+   * Esta función la usan el render de la ficha y su `generateMetadata`, ambos en
+   * el servidor. Cuando iba por la API interna, cada vista de una ficha salía a
+   * la red pública para pedirse a sí misma **dos veces**: dos Edge Requests y
+   * dos invocaciones de función que no hacían nada que no se pudiera hacer aquí.
+   *
+   * Al compartir `fetchTmdbDetail` con la route handler, la Data Cache de Next
+   * reconoce la misma URL y sirve las dos llamadas con una sola salida a TMDB.
+   */
+  const tmdbId = parseTmdbId(id);
+
+  if (tmdbId === null) {
     throw new Error('Movie not found or invalid data');
   }
 
-  const rawPelicula = response.data;
+  const rawPelicula = await fetchTmdbDetail<ExtendedPeliculaResponse>('movie', tmdbId);
+
+  if (!rawPelicula?.id) {
+    throw new Error('Movie not found or invalid data');
+  }
   const actores = rawPelicula.credits?.cast || [];
   const trailers = rawPelicula.videos?.results || [];
   

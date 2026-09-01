@@ -107,6 +107,7 @@ export const ActorPage = ({ actor }: ActorPageProps) => {
                       <Link 
                         href={`/${linkType}/${item.id}`}
                         className="group h-full flex flex-col"
+                        prefetch={false}
                       >
                         <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] mb-3 shadow-lg shadow-black/50">
                           <Image

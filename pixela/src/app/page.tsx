@@ -44,8 +44,22 @@ const AboutSection = nextDynamic(
   () => import("@/features/about/components/AboutSection"),
 );
 
-// Fuerza renderizado dinámico para contenido fresco
-export const dynamic = "force-dynamic";
+/**
+ * ISR en lugar de SSR puro.
+ *
+ * Antes había `dynamic = "force-dynamic"`: la portada se renderizaba de cero en
+ * cada visita, así que ninguna respuesta se podía cachear en el edge y cada
+ * carga arrastraba todas las llamadas a TMDB de esta página.
+ *
+ * El contenido son tendencias, cartelera y recomendaciones: cambia como mucho
+ * una vez al día. Con `revalidate` la página se genera una vez, la CDN de Vercel
+ * la sirve al resto de visitantes sin invocar la función, y se regenera en
+ * segundo plano al expirar.
+ *
+ * Efecto colateral aceptado: la cita y el titular aleatorios de las secciones se
+ * sortean al regenerar, no en cada visita, así que se mantienen durante la hora.
+ */
+export const revalidate = 3600;
 
 // Constantes de configuración centralizadas
 const CONFIG = {

@@ -133,12 +133,19 @@ export const Navbar = () => {
     }
   }, [session, status, syncWithSession]);
   
-  // Prefetch de rutas críticas al montar el componente
-  useEffect(() => {
-    router.prefetch('/');
-    router.prefetch('/profile');
-    router.prefetch('/categories');
-  }, [router]);
+  /*
+   * Aquí había un `router.prefetch()` de '/', '/profile' y '/categories' al
+   * montar el navbar. El navbar está en todas las páginas, así que eran tres
+   * descargas de payload RSC en cada carga del sitio —tres Edge Requests y, con
+   * las rutas dinámicas, tres invocaciones de función— para navegaciones que la
+   * mayoría de visitas no llega a hacer. Y `/profile` es un área privada: para
+   * un visitante anónimo el prefetch nunca servía de nada.
+   *
+   * Los `<Link>` llevan ahora `prefetch={false}`, que en App Router **no**
+   * desactiva el prefetch: solo lo mueve del "entrar en viewport" al "pasar el
+   * ratón / empezar a tocar". La navegación sigue siendo instantánea para quien
+   * de verdad va a navegar, y no se paga por quien no.
+   */
 
   // Sincroniza el estado docked con la ruta / scroll:
   // - Fuera del landing: siempre docked.
@@ -257,7 +264,7 @@ export const Navbar = () => {
           <Link
             href="/"
             className={STYLES.logo}
-            prefetch={true}
+            prefetch={false}
             aria-label="Pixela — ir al inicio"
           >
             <span className={STYLES.logoText}>Pixela</span>
@@ -275,7 +282,7 @@ export const Navbar = () => {
                     aria-label={link.label}
                     aria-current={active ? "page" : undefined}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    prefetch={true}
+                    prefetch={false}
                   >
                     {link.label}
                     <span
@@ -358,7 +365,7 @@ export const Navbar = () => {
                 style={{ transitionDelay: mobileMenuOpen ? `${100 + index * 100}ms` : "0ms" }}
                 onClick={(e) => handleNavClick(e, link.href)}
                 aria-current={active ? "page" : undefined}
-                prefetch={true}
+                prefetch={false}
               >
                 <div className={STYLES.mobileNavLinkHoverBg} />
                 <span className={STYLES.mobileNavLinkText}>{link.label}</span>

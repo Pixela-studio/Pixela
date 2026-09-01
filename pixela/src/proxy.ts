@@ -16,6 +16,86 @@ import { NextResponse, type NextRequest } from "next/server";
 /** Rutas que requieren sesión para renderizarse. */
 const PROTECTED_PREFIXES = ["/profile"];
 
+/**
+ * User-agents rechazados con 403 antes de tocar nada.
+ *
+ * `robots.txt` es una petición cortés y estos agentes no la atienden. Bloquear
+ * aquí no evita la petición que ya llegó —eso solo lo haría un WAF por delante—
+ * pero sí corta la cascada que venía detrás: por cada página rastreada se
+ * ahorran el payload RSC, las llamadas a `/api` y las decenas de imágenes.
+ *
+ * La lista es deliberadamente corta y de agentes que se autoidentifican: nadie
+ * que traiga visitas reales está aquí. Se compara en minúsculas por subcadena.
+ */
+const BLOCKED_USER_AGENTS = [
+  // SEO / backlinks
+  "ahrefsbot",
+  "semrushbot",
+  "mj12bot",
+  "dotbot",
+  "dataforseobot",
+  "blexbot",
+  "barkrowler",
+  "serpstatbot",
+  "zoominfobot",
+  "seekportbot",
+  "screaming frog",
+  // Agregadores, archivadores y scrapers genéricos
+  "ccbot",
+  "imagesiftbot",
+  "timpibot",
+  "scrapy",
+  "python-requests",
+  "python-urllib",
+  "go-http-client",
+  "libwww-perl",
+  "curl/",
+  "wget/",
+  // Buscadores fuera del mercado objetivo (es-ES)
+  "bytespider",
+  "petalbot",
+  "sogou",
+  "yisouspider",
+  "megaindex",
+  // Entrenamiento de modelos
+  "gptbot",
+  "chatgpt-user",
+  "oai-searchbot",
+  "claudebot",
+  "claude-web",
+  "anthropic-ai",
+  "google-extended",
+  "facebookbot",
+  "meta-externalagent",
+  "amazonbot",
+  "diffbot",
+  "cohere-ai",
+  "omgilibot",
+  "perplexitybot",
+];
+
+/**
+ * Respuesta para un agente bloqueado.
+ *
+ * Cuerpo vacío y `Cache-Control` largo: si el bot vuelve a pedir lo mismo, la
+ * CDN puede responder sin despertar la función.
+ */
+function blockedResponse(): NextResponse {
+  return new NextResponse(null, {
+    status: 403,
+    headers: {
+      "Cache-Control": "public, max-age=86400, s-maxage=86400",
+      "X-Robots-Tag": "noindex, nofollow",
+    },
+  });
+}
+
+function isBlockedAgent(userAgent: string | null): boolean {
+  if (!userAgent) return false;
+  const normalized = userAgent.toLowerCase();
+  return BLOCKED_USER_AGENTS.some((agent) => normalized.includes(agent));
+}
+
 /** Cookies de sesión de Auth.js v5 (con y sin prefijo seguro). */
 const SESSION_COOKIES = [
   "authjs.session-token",
@@ -56,6 +136,10 @@ function hasSessionCookie(request: NextRequest): boolean {
 export default function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  if (isBlockedAgent(request.headers.get("user-agent"))) {
+    return blockedResponse();
+  }
+
   const needsAuth = PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -79,7 +163,12 @@ export const config = {
     /*
      * Todas las rutas salvo assets estáticos y el endpoint de imágenes de Next,
      * que no se benefician de estas cabeceras y sí pagarían el coste del proxy.
+     *
+     * Se excluyen además los ficheros de metadatos (`robots.txt`,
+     * `sitemap.xml`, `manifest.webmanifest`): Next los genera en build y los
+     * sirve estáticos, así que hacerlos pasar por aquí solo añadía una
+     * ejecución del proxy a cada visita de un rastreador.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|woff|woff2|ttf)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|woff|woff2|ttf)$).*)",
   ],
 };

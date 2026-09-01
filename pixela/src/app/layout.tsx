@@ -18,22 +18,25 @@ export const metadata: Metadata = {
     "Pixela",
   ],
   authors: [{ name: "Pixela" }],
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
-  manifest: "/manifest.json",
+  /*
+   * Ni `manifest` ni `icons` se declaran a mano:
+   *
+   * - El manifiesto lo genera `app/manifest.ts` y Next inyecta el `<link>`.
+   * - El icono lo resuelve `app/favicon.ico` por convención.
+   *
+   * Antes se apuntaba a `/manifest.json` y `/apple-touch-icon.png`, dos ficheros
+   * que no existen en `public/`. El navegador los pedía en cada visita y cada
+   * 404 acababa renderizando `not-found` en el servidor: dos invocaciones de
+   * función regaladas por carga de página.
+   */
   openGraph: {
     title: "Pixela - Pasión por el cine y las series",
     description:
       "Descubre, colecciona y comparte experiencias audiovisuales en una comunidad de apasionados del cine y las series.",
     url: "https://pixela.io",
     siteName: "Pixela",
-    images: [
-      {
-        url: "/images/pixela-og-image.jpg",
-      },
-    ],
+    // Sin `images`: la que se declaraba (`/images/pixela-og-image.jpg`) tampoco
+    // existe, y cada validador de enlaces la pedía para encontrarse un 404.
     locale: "es_ES",
     type: "website",
   },

@@ -146,6 +146,7 @@ export const ProfileLibrary = () => {
                 <Link
                   href={`/${item.item_type === "movie" ? "movies" : "series"}/${item.tmdb_id}`}
                   className="block w-full h-full relative"
+                  prefetch={false}
                 >
                   {item.poster_path ? (
                     <Image
