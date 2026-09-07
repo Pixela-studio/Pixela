@@ -14,14 +14,21 @@
 #      Node). Lo que las une es que comparten libc y OpenSSL 3, que es la unica
 #      cosa que le importa al engine nativo de Prisma.
 #
-#   2. El engine de Prisma se copia a mano. `schema.prisma` declara el
+#   2. Las dos etapas comparten libc por Prisma. `schema.prisma` declara el
 #      generator sin `binaryTargets`, asi que Prisma compila el engine para la
 #      plataforma que detecta durante `prisma generate`. Si se generase en
 #      Alpine (musl) y se ejecutase en Debian (glibc) —o al reves— reventaria
-#      con "Query engine binary for current platform could not be found", y
-#      reventaria al primer acceso a la base de datos, no al arrancar.
-#      Ademas `next build --output standalone` no traza de forma fiable el
-#      `.node` de Prisma, asi que copiarlo es obligatorio, no una precaucion.
+#      con "Query engine binary for current platform could not be found", y lo
+#      haria al primer acceso a la base de datos, no al arrancar: un contenedor
+#      que parece sano hasta que alguien inicia sesion.
+#
+#      El COPY explicito de `.prisma` mas abajo es redundante, no obligatorio.
+#      Se comprobo en el trazado real (`page.js.nft.json` lista 27 entradas de
+#      Prisma, incluidos el `.node` del engine, `schema.prisma` y
+#      `@prisma/client`), asi que standalone si lo incluye. Se mantiene porque
+#      cuesta unos megas y cubre el dia que una version de Next cambie el
+#      trazado, pero no se apoye nadie en ese COPY para dar por hecho que el
+#      engine correcto esta ahi: eso lo garantiza la libc compartida.
 #
 #   3. Hay variables que se necesitan en BUILD, no solo en runtime. Ver el
 #      bloque de ARG de la etapa builder.
@@ -125,8 +132,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # `static/` y `public/` quedan fuera del trazado y hay que copiarlos aparte.
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-# El cliente de Prisma con su engine nativo. Ver la decision 2 de la cabecera:
-# el trazado de standalone no lo incluye de forma fiable.
+# El cliente de Prisma con su engine nativo. Redundante a proposito: el trazado
+# de standalone ya lo incluye (verificado en el .nft.json). Ver la decision 2.
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
 # Carpeta de cache de ISR. Next la crea al primer render, pero si el directorio
