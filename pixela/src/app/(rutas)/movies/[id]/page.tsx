@@ -2,6 +2,11 @@ import { MediaPage } from '@/features/media/pages/MediaPage';
 import { notFound } from 'next/navigation';
 import { getMovieData } from '@/features/media/services/movieService';
 import { getMediaReviewsSafe } from '@/lib/api/reviewsQuery';
+import {
+  getAllowedMovieIds,
+  isAllowedMovie,
+  markLinkableCast,
+} from '@/lib/api/tmdbAllowlist';
 
 export { generateMetadata } from '@/features/media/services/movieMetadata';
 
@@ -20,20 +25,25 @@ export { generateMetadata } from '@/features/media/services/movieMetadata';
 export const revalidate = 3600;
 
 /**
- * Opt-in explícito al modo ISR para una ruta con parámetro dinámico.
+ * Prerenderiza en build las películas de la allowlist.
  *
- * Con solo `revalidate` no basta: si una ruta `[id]` no declara
- * `generateStaticParams`, Next la trata como totalmente dinámica y la renderiza
- * en cada petición (se comprueba en `prerender-manifest.json`, donde no aparece
- * ninguna `dynamicRoute`).
+ * Antes esto devolvía `[]`. Era el opt-in mínimo para que Next tratase la ruta
+ * como ISR en lugar de dinámica —sin `generateStaticParams` no aparece en
+ * `dynamicRoutes` de `prerender-manifest.json` y se renderiza en cada
+ * petición—, pero dejaba que la primera visita a **cualquiera** de los millones
+ * de ids de TMDB pagase un render y se quedase cacheada.
  *
- * Devolviendo una lista vacía no se prerenderiza nada en build —serían cientos
- * de miles de fichas— pero la ruta entra en el modo "genera a la primera visita
- * y cachea": la primera persona que abre una ficha paga el render, el resto la
- * recibe desde la CDN hasta que expire el `revalidate`.
+ * Ahora se devuelven los ids que la portada enlaza de verdad
+ * (`src/lib/api/tmdbAllowlist.ts`), que son unas decenas: se generan en build,
+ * llegan calientes a la primera visita y ya no hay render en frío que pagar.
+ *
+ * `dynamicParams` sigue en `true`, así que el resto del catálogo se sirve igual
+ * —el buscador de `/categories` y los favoritos guardados apuntan a fichas que
+ * nunca estarán en esta lista—: se generan a la primera visita, como antes.
  */
 export async function generateStaticParams() {
-  return [];
+  const ids = await getAllowedMovieIds();
+  return ids.map((id) => ({ id: String(id) }));
 }
 
 /** Cualquier id no generado en build se resuelve bajo demanda. */
@@ -43,6 +53,20 @@ export default async function MoviePage(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  /*
+   * Estar o no en la allowlist no cambia lo que ve quien entra: la ficha se
+   * renderiza igual, con todo su contenido. Cambia dos cosas: el `noindex` que
+   * pone `movieMetadata.ts`, y —la importante— que el reparto de abajo deje de
+   * emitir enlaces.
+   *
+   * Que además no escribiese en la caché ISR era el plan, y no se puede: Next 16
+   * sin PPR prohíbe que una ruta con `generateStaticParams` se vuelva dinámica
+   * en runtime. El postmortem completo, con el mensaje de error y la línea de
+   * Next que lo impone, está en `src/lib/api/tmdbAllowlist.ts`. No se intente
+   * otra vez con `connection()` ni con `unstable_noStore()`.
+   */
+  const isAllowed = await isAllowedMovie(id);
 
   try {
     /*
@@ -56,7 +80,21 @@ export default async function MoviePage(
       getMediaReviewsSafe(Number(id), 'movie'),
     ]);
 
-    return <MediaPage media={pelicula} initialReviews={initialReviews} />;
+    /*
+     * El reparto baja marcado con quién puede emitir `<Link>`.
+     *
+     * `ActorCard` es el primer eslabón del ciclo que se rastreaba: ficha →
+     * reparto → persona → filmografía → más fichas. Como es un componente de
+     * cliente y cuelga de otro (`CastSection`), no puede consultar la allowlist
+     * por sí mismo; la decisión se toma aquí, que es el único sitio que sabe si
+     * esta ficha está permitida, y viaja pegada a cada actor.
+     */
+    const media = {
+      ...pelicula,
+      actores: markLinkableCast(pelicula.actores, isAllowed),
+    };
+
+    return <MediaPage media={media} initialReviews={initialReviews} />;
   } catch (error) {
     console.error('Error al obtener los datos de la película:', error);
     notFound();
