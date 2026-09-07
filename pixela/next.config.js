@@ -13,6 +13,23 @@ const ONE_DAY_SWR = 'public, max-age=86400, s-maxage=86400, stale-while-revalida
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     /*
+     * Servidor autonomo, para la imagen de produccion (`Dockerfile.prod`).
+     *
+     * Sin esto, contenerizar obliga a copiar `node_modules` entero a la imagen
+     * final: cientos de megas de dependencias de las que en runtime se usan unas
+     * pocas. Con `standalone`, Next traza que ficheros necesita de verdad y emite
+     * un `server.js` junto a un `node_modules` minimo.
+     *
+     * No cambia nada en local: `next dev` lo ignora y `next start` sigue usando
+     * el build normal. Es una carpeta mas dentro de `.next/`.
+     *
+     * Salvedad que el Dockerfile tiene que compensar a mano: el trazado no
+     * incluye `.next/static`, ni `public/`, ni —esto es lo que rompe en runtime y
+     * no en build— el engine nativo de Prisma.
+     */
+    output: 'standalone',
+
+    /*
      * Ancla la raíz del workspace a esta carpeta.
      *
      * Next deduce la raíz buscando lockfiles hacia arriba. Si existe un

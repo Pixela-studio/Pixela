@@ -1,5 +1,44 @@
+# Contexto de build de la imagen de produccion.
+#
+# Se escribe con finales de linea LF a proposito: el fichero anterior tenia
+# CRLF, y el \r queda dentro del patron, asi que "node_modules" no casaba con
+# nada. Un .dockerignore que no ignora es peor que no tenerlo, porque da la
+# falsa sensacion de estar controlando lo que entra en la imagen.
+
+# Dependencias: se reinstalan en la etapa deps desde el lockfile.
 node_modules
+
+# Artefactos de build locales. Si entraran, un .next de desarrollo pisaria el
+# que genera la imagen.
 .next
+out
+build
+*.tsbuildinfo
+
+# Historia y metadatos que no aportan nada en runtime y si engordan el contexto.
 .git
-.env*
-! .env.production
+.gitignore
+.github
+.claude
+.vercel
+
+# Secretos. Sin excepciones: la variante anterior intentaba readmitir
+# .env.production con "! .env.production", pero el espacio tras el ! hacia que
+# el patron fuese " .env.production" y no casara con nada. Aunque hubiera
+# funcionado, cocer un fichero de entorno dentro de la imagen es justo lo que
+# no se quiere: las variables se pasan en `docker run`, no se hornean.
+.env
+.env.*
+*.pem
+*.key
+
+# Documentacion interna y datos de siembra: no se ejecutan en produccion.
+CLAUDE.md
+POST_MORTEM.md
+README.md
+prisma/seeds
+
+# Docker mismo.
+Dockerfile
+Dockerfile.*
+.dockerignore
