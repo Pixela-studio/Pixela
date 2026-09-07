@@ -4,7 +4,6 @@ import { getMovieData } from '@/features/media/services/movieService';
 import { getMediaReviewsSafe } from '@/lib/api/reviewsQuery';
 import {
   getAllowedMovieIds,
-  isAllowedMovie,
   markLinkableCast,
 } from '@/lib/api/tmdbAllowlist';
 
@@ -54,19 +53,6 @@ export default async function MoviePage(
 ) {
   const { id } = await params;
 
-  /*
-   * Estar o no en la allowlist no cambia lo que ve quien entra: la ficha se
-   * renderiza igual, con todo su contenido. Cambia dos cosas: el `noindex` que
-   * pone `movieMetadata.ts`, y —la importante— que el reparto de abajo deje de
-   * emitir enlaces.
-   *
-   * Que además no escribiese en la caché ISR era el plan, y no se puede: Next 16
-   * sin PPR prohíbe que una ruta con `generateStaticParams` se vuelva dinámica
-   * en runtime. El postmortem completo, con el mensaje de error y la línea de
-   * Next que lo impone, está en `src/lib/api/tmdbAllowlist.ts`. No se intente
-   * otra vez con `connection()` ni con `unstable_noStore()`.
-   */
-  const isAllowed = await isAllowedMovie(id);
 
   try {
     /*
@@ -86,12 +72,14 @@ export default async function MoviePage(
      * `ActorCard` es el primer eslabón del ciclo que se rastreaba: ficha →
      * reparto → persona → filmografía → más fichas. Como es un componente de
      * cliente y cuelga de otro (`CastSection`), no puede consultar la allowlist
-     * por sí mismo; la decisión se toma aquí, que es el único sitio que sabe si
-     * esta ficha está permitida, y viaja pegada a cada actor.
+     * por sí mismo; la decisión se toma aquí, en el servidor, y viaja pegada a
+     * cada actor. Se enlazan los `LINKABLE_CAST_LIMIT` primeros por facturación,
+     * y el porqué de no atarlo también al estado de esta ficha está en
+     * `markLinkableCast`.
      */
     const media = {
       ...pelicula,
-      actores: markLinkableCast(pelicula.actores, isAllowed),
+      actores: markLinkableCast(pelicula.actores),
     };
 
     return <MediaPage media={media} initialReviews={initialReviews} />;

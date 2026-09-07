@@ -5,11 +5,12 @@ import { isAllowedMovie } from '@/lib/api/tmdbAllowlist';
 /**
  * `noindex` para lo que no está en la allowlist del catálogo.
  *
- * Es la otra mitad de la medida: el `connection()` de la ruta evita que la
- * ficha ocupe caché ISR, y esto evita que ocupe índice. Sin lo segundo, un
- * buscador que ya conozca la URL la seguiría reclamando cada pocos días y cada
- * revisita sería una invocación dinámica —caro y sin ninguna visita a cambio,
- * porque una ficha que nadie busca no posiciona para nada—.
+ * Es la mitad del freno que sí se pudo aplicar. La otra —que la ficha tampoco
+ * ocupase caché ISR— resultó imposible en Next 16 sin PPR; el postmortem está
+ * en `src/lib/api/tmdbAllowlist.ts`. Así que lo que queda es esto: sacarla del
+ * índice para que un buscador que ya conozca la URL deje de reclamarla cada
+ * pocos días. Cada revisita era una invocación, caro y sin ninguna visita a
+ * cambio, porque una ficha que nadie busca no posiciona para nada.
  *
  * `follow: false` además de `index: false` porque lo que se corta es el
  * recorrido, no solo la aparición en resultados.

@@ -4,9 +4,11 @@ import { isAllowedSeries } from '@/lib/api/tmdbAllowlist';
 
 /**
  * `noindex` para lo que no está en la allowlist del catálogo.
- * Mismo razonamiento que en `movieMetadata.ts`: el `connection()` de la ruta
- * quita la caché ISR y esto quita el índice, para que un buscador que ya conozca
- * la URL no la reclame periódicamente a cambio de nada.
+ * Mismo razonamiento que en `movieMetadata.ts`: quitar el índice es la mitad
+ * del freno que sí se pudo aplicar, para que un buscador que ya conozca la URL
+ * no la reclame periódicamente a cambio de nada. Quitar además la caché ISR
+ * resultó imposible en Next 16 sin PPR; el postmortem está en
+ * `src/lib/api/tmdbAllowlist.ts`.
  */
 const NOINDEX = { index: false, follow: false } as const;
 

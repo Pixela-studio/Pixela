@@ -203,13 +203,47 @@ const buildAllowlist = cache(async (): Promise<Allowlist> => {
   return { movies, series };
 });
 
+/**
+ * La allowlist, exigiendo que no esté vacía.
+ *
+ * Los ocho servicios de los que se deriva capturan sus propios errores y
+ * devuelven `[]`. En runtime eso es lo correcto: que TMDB falle degrada la
+ * portada en lugar de tumbarla. En build el efecto colateral es peligroso, y
+ * silencioso: si TMDB está caído o la clave es inválida, `generateStaticParams`
+ * devuelve una lista vacía, el build acaba con código 0, y se publica un sitio
+ * con cero fichas prerenderizadas y `dynamicParams = true` — es decir, vuelve
+ * exactamente la fuga que este módulo existe para cerrar, sin que nada lo diga.
+ *
+ * Se mira el total y no cada lista por separado a propósito: que falle una de
+ * las ocho llamadas recorta la cobertura y es tolerable, pero que fallen todas
+ * significa que no se pudo hablar con TMDB, y eso tiene que doler.
+ *
+ * Solo lo usan los `generateStaticParams`, que corren en build. Los chequeos de
+ * runtime (`isAllowedMovie` y compañía) siguen llamando a `buildAllowlist`
+ * directamente y no lanzan nunca.
+ */
+const requireAllowlist = async (): Promise<Allowlist> => {
+  const allowlist = await buildAllowlist();
+
+  if (allowlist.movies.size === 0 && allowlist.series.size === 0) {
+    throw new Error(
+      "La allowlist de TMDB salió vacía. Se aborta el build en vez de publicar " +
+        "un sitio sin nada prerenderizado y con la superficie ISR otra vez " +
+        "abierta. Comprueba TMDB_API_KEY, TMDB_BASE_URL y la conectividad con " +
+        "TMDB.",
+    );
+  }
+
+  return allowlist;
+};
+
 /** Ids de película que la portada enlaza hoy. Ver `buildAllowlist`. */
 export const getAllowedMovieIds = async (): Promise<number[]> =>
-  [...(await buildAllowlist()).movies];
+  [...(await requireAllowlist()).movies];
 
 /** Ids de serie que la portada enlaza hoy. Ver `buildAllowlist`. */
 export const getAllowedSeriesIds = async (): Promise<number[]> =>
-  [...(await buildAllowlist()).series];
+  [...(await requireAllowlist()).series];
 
 /** ¿Está esta película en el catálogo curado? Decide `noindex` y enlaces. */
 export async function isAllowedMovie(id: string | number): Promise<boolean> {
@@ -364,14 +398,26 @@ export type Linkable<T> = T & { enlazable: boolean };
  * El orden del array es el `order` de facturación de TMDB, que `credits.cast`
  * respeta y ningún mapper reordena, así que el índice sirve de tope sin tener
  * que leer el campo.
+ *
+ * Lo que NO gobierna esto es si la ficha de origen está en la allowlist, y es
+ * deliberado. Una primera versión desactivaba el reparto **entero** en las
+ * fichas de fuera, y eso rompía a la persona que llega desde el buscador de
+ * `/categories` o desde sus favoritos: se encontraba 60 tarjetas de reparto
+ * muertas sin ninguna señal de por qué. El encargo era explícito en no romper
+ * la navegación existente.
+ *
+ * Y no hacía falta para cerrar el ciclo. Una ficha de fuera de la allowlist no
+ * es alcanzable por ningún `<Link>` desde `/` (los carruseles navegan con
+ * `router.push` sobre un `<div>`), así que sus enlaces de salida no pueden
+ * alargar un rastreo que empiece en la portada. Y el ciclo se corta igual un
+ * paso después: `/actor/[id]` solo enlaza títulos permitidos, así que desde una
+ * persona no se puede volver a salir al espacio abierto de TMDB. El tope de
+ * `LINKABLE_CAST_LIMIT` sigue acotando el abanico en cada salto.
  */
-export function markLinkableCast<T>(
-  cast: readonly T[],
-  isTitleAllowed: boolean,
-): Linkable<T>[] {
+export function markLinkableCast<T>(cast: readonly T[]): Linkable<T>[] {
   return cast.map((actor, index) => ({
     ...actor,
-    enlazable: isTitleAllowed && index < LINKABLE_CAST_LIMIT,
+    enlazable: index < LINKABLE_CAST_LIMIT,
   }));
 }
 

@@ -4,7 +4,6 @@ import { getSeriesData } from '@/features/media/services/seriesService';
 import { getMediaReviewsSafe } from '@/lib/api/reviewsQuery';
 import {
   getAllowedSeriesIds,
-  isAllowedSeries,
   markLinkableCast,
 } from '@/lib/api/tmdbAllowlist';
 
@@ -54,14 +53,6 @@ export default async function SeriePage(
 ) {
   const { id } = await params;
 
-  /*
-   * Fuera de la allowlist la ficha se renderiza igual; lo que pierde es el
-   * índice (`seriesMetadata.ts`) y los enlaces del reparto. Ver el comentario
-   * de `movies/[id]/page.tsx`, y el postmortem de por qué no se puede además
-   * negar la escritura de ISR, en `src/lib/api/tmdbAllowlist.ts`.
-   */
-  const isAllowed = await isAllowedSeries(id);
-
   try {
     /*
      * Las reseñas se resuelven aquí, en el servidor, y viajan como prop.
@@ -82,7 +73,7 @@ export default async function SeriePage(
      */
     const media = {
       ...serie,
-      actores: markLinkableCast(serie.actores, isAllowed),
+      actores: markLinkableCast(serie.actores),
     };
 
     return <MediaPage media={media} initialReviews={initialReviews} />;
