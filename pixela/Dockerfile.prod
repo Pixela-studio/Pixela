@@ -5,33 +5,31 @@
 # `CMD ["bun", "run", "dev"]`, asi que servia para levantar el proyecto en
 # local pero no para publicarlo.
 #
-# Tres decisiones gobiernan este fichero, y las tres vienen de un problema
-# concreto que da la cara en runtime, no en build:
+# Tres decisiones gobiernan este fichero, y las tres salieron de intentar
+# construirlo, no de razonarlo sobre el papel:
 #
-#   1. Dos imagenes base, ambas Debian bookworm. Se construye con bun (es el
-#      gestor del proyecto, `packageManager: bun@1.3.8`) y se ejecuta con Node
-#      (`engines.node >= 20`, y el `server.js` de standalone esta pensado para
-#      Node). Lo que las une es que comparten libc y OpenSSL 3, que es la unica
-#      cosa que le importa al engine nativo de Prisma.
+#   1. Las dos etapas usan Debian 13 (trixie). Se construye con bun (es el
+#      gestor del proyecto) y se ejecuta con Node (el `server.js` de standalone
+#      esta escrito contra Node, y `engines` pide node >= 20). La primera
+#      version usaba `node:22-bookworm-slim` de runtime y ESTABA MAL:
+#      `oven/bun:1.3.8-debian` es trixie con glibc 2.41 y bookworm trae glibc
+#      2.36. glibc es compatible hacia atras, no hacia delante, asi que el
+#      engine nativo de Prisma compilado en el builder no habria arrancado en el
+#      runner. Y no habria fallado al construir ni al arrancar el contenedor,
+#      sino al primer acceso a la base de datos.
 #
-#   2. Las dos etapas comparten libc por Prisma. `schema.prisma` declara el
-#      generator sin `binaryTargets`, asi que Prisma compila el engine para la
-#      plataforma que detecta durante `prisma generate`. Si se generase en
-#      Alpine (musl) y se ejecutase en Debian (glibc) —o al reves— reventaria
-#      con "Query engine binary for current platform could not be found", y lo
-#      haria al primer acceso a la base de datos, no al arrancar: un contenedor
-#      que parece sano hasta que alguien inicia sesion.
+#   2. La version de bun va clavada, no en el flotante `1.3`. `package.json`
+#      declara `packageManager: bun@1.3.8`, y el tag `1.3` resolvia a 1.3.14,
+#      que ademas fallaba al extraer el tarball de `next`. Un build reproducible
+#      no depende de que hoy el tag flotante apunte a una version sana.
 #
-#      El COPY explicito de `.prisma` mas abajo es redundante, no obligatorio.
-#      Se comprobo en el trazado real (`page.js.nft.json` lista 27 entradas de
-#      Prisma, incluidos el `.node` del engine, `schema.prisma` y
-#      `@prisma/client`), asi que standalone si lo incluye. Se mantiene porque
-#      cuesta unos megas y cubre el dia que una version de Next cambie el
-#      trazado, pero no se apoye nadie en ese COPY para dar por hecho que el
-#      engine correcto esta ahi: eso lo garantiza la libc compartida.
-#
-#   3. Hay variables que se necesitan en BUILD, no solo en runtime. Ver el
-#      bloque de ARG de la etapa builder.
+#   3. Las claves entran por secretos de BuildKit, no por ARG. Docker avisa de
+#      esto explicitamente ("SecretsUsedInArgOrEnv") y tiene razon: un ARG queda
+#      en los metadatos del build y un ENV se queda en la configuracion de la
+#      capa. Con `--mount=type=secret` el valor existe solo mientras corre ese
+#      RUN y no toca ninguna capa. Las `NEXT_PUBLIC_*` si van como ARG: se
+#      inlinean en el bundle del navegador por definicion, o sea que son
+#      publicas de todas formas.
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +40,7 @@
 # proyecto antes de instalar, cualquier cambio en un componente invalidaria la
 # instalacion completa.
 # ---------------------------------------------------------------------------
-FROM oven/bun:1.3-debian AS deps
+FROM oven/bun:1.3.8-debian AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
@@ -51,67 +49,55 @@ RUN bun install --frozen-lockfile
 # ---------------------------------------------------------------------------
 # builder: `prisma generate` + `next build` de verdad.
 # ---------------------------------------------------------------------------
-FROM oven/bun:1.3-debian AS builder
+FROM oven/bun:1.3.8-debian AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Variables necesarias EN BUILD. No es una lista defensiva; cada una falla de
-# una forma distinta si se omite:
-#
-#   TMDB_API_KEY          `src/lib/tmdb.ts` lanza en carga de modulo si falta.
-#                         Como ese modulo lo importan los server components de
-#                         la portada y de las fichas, el build no falla "en una
-#                         ruta": falla entero.
-#   TMDB_BASE_URL         no esta protegida por ese throw, asi que si falta el
-#                         build PASA y las URLs se construyen como
-#                         "undefined/movie/...". Peor que fallar: se publica
-#                         una imagen rota que parece correcta.
-#   NEXT_PUBLIC_SITE_URL  al llevar prefijo NEXT_PUBLIC_ se inlinea en el
-#                         bundle durante el build. Si no se pasa, la imagen
-#                         queda cocida para siempre con el fallback
-#                         `pixela-seven.vercel.app`, que es justamente el
-#                         despliegue del que se esta huyendo. La consumen
-#                         `layout.tsx`, `robots.ts` y `sitemap.ts`.
-#   NEXT_PUBLIC_API_URL   mismo mecanismo de inlinado.
-#   DATABASE_URL          `prisma generate` no la necesita, y las fichas usan
-#                         `getMediaReviewsSafe`, que tolera la base de datos
-#                         caida. Se pasa igual para no depender de esa suerte
-#                         si algun dia una pagina prerenderizada consulta
-#                         Prisma.
-#
-# Se declaran como ARG y no como ENV en la imagen final: un ARG vive solo
-# durante el build y no queda en el historial de capas de la imagen que se
+# Valores publicos. Van como ARG porque no son secretos: las dos primeras se
+# inlinean en el bundle que descarga el navegador, y la URL base de TMDB es
 # publica.
-ARG TMDB_API_KEY
+#
+# NEXT_PUBLIC_SITE_URL merece un aviso: si no se pasa, la imagen queda cocida
+# para siempre con el fallback `pixela-seven.vercel.app`, que es justo el
+# despliegue del que se esta huyendo. La leen `layout.tsx`, `robots.ts` y
+# `sitemap.ts`, las tres en build.
 ARG TMDB_BASE_URL="https://api.themoviedb.org/3"
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_API_URL
-ARG DATABASE_URL
 
-ENV TMDB_API_KEY=${TMDB_API_KEY} \
-    TMDB_BASE_URL=${TMDB_BASE_URL} \
+ENV TMDB_BASE_URL=${TMDB_BASE_URL} \
     NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL} \
     NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
-    DATABASE_URL=${DATABASE_URL} \
     NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
 # `bun run build` ya es `prisma generate && next build` (ver package.json), asi
 # que no se invoca `prisma generate` por separado: hacerlo lo ejecutaria dos
 # veces.
-RUN bun run build
+#
+# Las dos claves entran como secretos y viven solo durante esta orden:
+#
+#   TMDB_API_KEY  `src/lib/tmdb.ts` lanza en carga de modulo si falta, y ese
+#                 modulo lo importan los server components de la portada y de
+#                 las fichas. Sin ella el build no falla "en una ruta": falla
+#                 entero.
+#   DATABASE_URL  `prisma generate` no la necesita y las fichas usan
+#                 `getMediaReviewsSafe`, que tolera la base de datos caida. Se
+#                 pasa igual para no depender de esa suerte si algun dia una
+#                 pagina prerenderizada consulta Prisma.
+RUN --mount=type=secret,id=tmdb_api_key \
+    --mount=type=secret,id=database_url \
+    TMDB_API_KEY="$(cat /run/secrets/tmdb_api_key)" \
+    DATABASE_URL="$(cat /run/secrets/database_url)" \
+    bun run build
 
 
 # ---------------------------------------------------------------------------
 # runner: lo minimo para servir.
-#
-# Node y no bun porque el `server.js` que emite `output: 'standalone'` esta
-# escrito contra Node, y porque `engines` del proyecto pide node >= 20.
-# `bookworm-slim` para casar con la libc de la etapa de build.
 # ---------------------------------------------------------------------------
-FROM node:22-bookworm-slim AS runner
+FROM node:22-trixie-slim AS runner
 WORKDIR /app
 
 # HOSTNAME=0.0.0.0 no es decorativo: el server.js de standalone escucha en
@@ -132,9 +118,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # `static/` y `public/` quedan fuera del trazado y hay que copiarlos aparte.
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-# El cliente de Prisma con su engine nativo. Redundante a proposito: el trazado
-# de standalone ya lo incluye (verificado en el .nft.json). Ver la decision 2.
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 
 # Carpeta de cache de ISR. Next la crea al primer render, pero si el directorio
 # de trabajo pertenece a root el proceso no puede escribir y las paginas
