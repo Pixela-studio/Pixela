@@ -1,0 +1,14 @@
+# Ficheros que consume Linux y que se rompen con finales de linea CRLF.
+#
+# En esta maquina core.autocrlf esta activo, asi que sin estas reglas git
+# reescribe LF -> CRLF en cada checkout. En un .dockerignore eso mete el \r
+# dentro del patron y "node_modules" deja de casar; en un script con shebang
+# da un "bad interpreter" que no dice nada de la causa real.
+#
+# Se limita a estas rutas a proposito: un "* text=auto" renormalizaria todo el
+# repo y ensuciaria el historial de 283 ficheros TS/TSX por un problema que
+# solo tienen estos.
+.dockerignore    text eol=lf
+Dockerfile       text eol=lf
+Dockerfile.*     text eol=lf
+*.sh             text eol=lf
