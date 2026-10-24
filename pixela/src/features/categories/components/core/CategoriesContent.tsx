@@ -89,23 +89,15 @@ const STYLES = {
     "grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[70vh]",
   textContainer: "max-w-2xl space-y-8 lg:ml-12",
   textContent: "space-y-6",
-  mainTitle:
-    "text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.1] sm:leading-tight tracking-tight text-pixela-light",
-  accentText: "text-pixela-accent",
+  mainTitle: "title-card text-5xl sm:text-6xl lg:text-7xl [text-wrap:balance]",
   descriptionContainer:
     "space-y-4 text-base leading-relaxed md:space-y-6 md:text-lg lg:text-xl text-pixela-light/80",
   descriptionText: "text-balance",
-  highlightText: "font-semibold text-pixela-accent",
-  highlightTextWhite: "font-semibold text-white",
-  decorativeLine: "flex items-center gap-4",
-  lineBar: "w-16 h-1 rounded-full bg-pixela-accent",
-  lineText: "text-sm font-medium tracking-wider uppercase text-pixela-light/70",
 
   // Contenedor de Tarjetas Aleatorias y Botón
   cardsContainer: "flex justify-center w-full",
   cardsWrapper: "relative w-full max-w-lg text-center",
-  randomButton:
-    "flex items-center justify-center w-full max-w-lg gap-3 px-6 py-3 mb-4 text-white transition duration-300 border group bg-gradient-to-r from-pixela-accent/20 to-pixela-accent/30 border-pixela-accent/30 rounded-xl hover:from-pixela-accent/30 hover:to-pixela-accent/40 hover:scale-105",
+  randomButton: "btn btn-primary w-full max-w-lg mb-6",
   buttonIcon:
     "w-5 h-5 transition-transform duration-500 group-hover:rotate-180",
   buttonText: "font-medium",
@@ -113,10 +105,10 @@ const STYLES = {
   // Tarjetas (Misteriosa y Recomendación)
   cardsGrid: "grid grid-cols-1 sm:grid-cols-2 gap-6",
   mysteryCard:
-    "w-full aspect-[2/3] rounded-lg border-2 border-dashed border-pixela-accent/30 bg-pixela-dark/20 flex flex-col items-center justify-center p-6 transition duration-300 hover:border-pixela-accent/50 hover:bg-pixela-dark/30",
+    "w-full aspect-[2/3] rounded-sm bg-pixela-surface flex flex-col items-center justify-center p-6",
   mysteryEmoji: "h-10 w-10 mb-4 text-white/40",
-  mysteryTitle: "text-pixela-light/60 text-sm font-medium mb-2",
-  mysteryDescription: "text-pixela-light/40 text-xs text-center",
+  mysteryTitle: "text-white/80 text-sm font-medium mb-2",
+  mysteryDescription: "text-gray-400 text-sm text-center",
   recommendationOverlay: "pt-3 text-left",
   recommendationTitle: "text-base md:text-lg font-semibold leading-snug text-white line-clamp-2",
   recommendationInfo: "mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-400 tabular-nums",
@@ -663,38 +655,17 @@ const RandomRecommendations = memo(
           <div className={STYLES.textContainer}>
             <div className={STYLES.textContent}>
               <h2 className={STYLES.mainTitle}>
-                ¿No sabes qué ver<br className="sm:hidden" />{" "}
-                <span className={STYLES.accentText}>ahora mismo?</span>
+                ¿No sabes qué ver ahora mismo?
               </h2>
 
               <div className={STYLES.descriptionContainer}>
                 <p className={STYLES.descriptionText}>
-                  No te preocupes, tenemos la solución perfecta para los
-                  momentos de indecisión. Con un simple clic, te mostraremos{" "}
-                  <span className={STYLES.highlightText}>
-                    recomendaciones aleatorias
-                  </span>{" "}
-                  que harán que tu elección sea más fácil.
-                </p>
-                <p className={STYLES.descriptionText}>
-                  Una selección al azar del catálogo: una película y una serie
-                  cada vez. Es la herramienta perfecta para{" "}
-                  <span className={STYLES.highlightTextWhite}>
-                    auténticos cinéfilos y seriéfilos
-                  </span>{" "}
-                  que buscan ampliar sus horizontes audiovisuales.
+                  Pulsa «Sorpréndeme» y te enseñamos una película y una serie al
+                  azar del catálogo. Si no te convencen, pide otras.
                 </p>
               </div>
             </div>
 
-            <div className={STYLES.decorativeLine}>
-              <div className={STYLES.lineBar} />
-              <span className={STYLES.lineText}>
-                {hasSearched
-                  ? "Tu selección al azar"
-                  : "Descubre algo nuevo"}
-              </span>
-            </div>
           </div>
 
           {/* Cards de recomendación a la derecha */}
