@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { reviewsAPI } from "@/api/reviews/reviews";
 import type { Review } from "@/api/reviews/types";
 import { useAsyncResource } from "@/hooks/useAsyncResource";
@@ -13,9 +13,9 @@ import {
 import { FaTrash } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
-import clsx from "clsx";
-import { StarEditProps } from "@/features/profile/types/layout";
 import { EmptyState } from "@/shared/components/EmptyState";
+import { StarRatingInput } from "@/shared/components/StarRatingInput";
+import { toast } from "@/lib/toast";
 
 /**
  * URL base para las imágenes de TMDB
@@ -31,60 +31,42 @@ const ERROR_MESSAGES = {
   UPDATE: "No se pudo actualizar la reseña",
 } as const;
 
-// ... imports remain the same
-
 /**
- * Componente para mostrar y editar medias estrellas
- * @param {StarEditProps} props - Props del componente
- * @returns {JSX.Element} Componente StarEdit
+ * A partir de esta longitud la reseña se recorta a tres líneas con "Leer más".
+ * Heurística: unas tres líneas de la tarjeta, o menos si trae saltos de línea.
  */
-const StarEdit = ({ value, onChange, disabled }: StarEditProps) => (
-  <div className="flex items-center gap-1">
-    {[1, 2, 3, 4, 5].map((star) => {
-      const starValue = star * 2;
-      const isFull = value >= starValue;
-      const isHalf = value === starValue - 1;
-      return (
-        <span key={star} className="relative w-6 h-6 group">
-          <button
-            type="button"
-            aria-label={`Puntuar con ${star - 0.5} estrellas`}
-            className={clsx(
-              "absolute top-0 left-0 z-10 w-1/2 h-full",
-              disabled ? "cursor-not-allowed" : "cursor-pointer",
-            )}
-            onClick={() => !disabled && onChange(star * 2 - 1)}
-            disabled={disabled}
-          />
-          <button
-            type="button"
-            aria-label={`Puntuar con ${star} estrellas`}
-            className={clsx(
-              "absolute top-0 right-0 z-10 w-1/2 h-full",
-              disabled ? "cursor-not-allowed" : "cursor-pointer",
-            )}
-            onClick={() => !disabled && onChange(star * 2)}
-            disabled={disabled}
-          />
-          <span className="relative inline-block w-6 h-6">
-            <FiStar
-              className={`w-6 h-6 absolute top-0 left-0 ${isFull ? "text-yellow-400" : "text-gray-400"}`}
-            />
-            {isHalf && (
-              <FiStar
-                className="absolute top-0 left-0 w-6 h-6 text-yellow-400"
-                style={{ clipPath: "inset(0 50% 0 0)" }}
-              />
-            )}
-          </span>
-        </span>
-      );
-    })}
-    <span className="ml-2 text-xs text-yellow-400">
-      {(value / 2) % 1 === 0 ? value / 2 : (value / 2).toFixed(1)}/5
-    </span>
-  </div>
-);
+const LONG_REVIEW_CHARS = 220;
+const isLongReview = (text: string) =>
+  text.length > LONG_REVIEW_CHARS || text.split("\n").length > 3;
+
+/** Texto de una reseña con saltos de párrafo y "Leer más" si es largo. */
+const ReviewText = ({ text }: { text: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const textId = useId();
+  const long = isLongReview(text);
+
+  return (
+    <div>
+      <p
+        id={textId}
+        className={`text-gray-300 text-sm leading-relaxed whitespace-pre-line ${long && !expanded ? "line-clamp-3" : ""}`}
+      >
+        {text}
+      </p>
+      {long && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-controls={textId}
+          className="mt-1 rounded-sm text-sm font-medium text-pixela-accent underline-offset-4 hover:underline"
+        >
+          {expanded ? "Leer menos" : "Leer más"}
+        </button>
+      )}
+    </div>
+  );
+};
 
 interface ProfileReviewsProps {
   onStatsUpdate?: () => void;
@@ -108,21 +90,48 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editText, setEditText] = useState<string>("");
-  const [editRating, setEditRating] = useState<number>(5);
+  const [editRating, setEditRating] = useState<number | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const handleDelete = async (reviewId: number) => {
-    setDeletingId(reviewId);
-    try {
-      await reviewsAPI.delete(reviewId);
-      setReviews((prev) => prev.filter((r) => r.id !== reviewId));
-      onStatsUpdate?.();
-    } catch {
-      setError(ERROR_MESSAGES.DELETE);
-    } finally {
-      setDeletingId(null);
-    }
+  /**
+   * Borra con margen para deshacer: la tarjeta sale de la lista al instante y
+   * el DELETE solo se envía cuando el aviso se cierra sin pulsar "Deshacer".
+   */
+  const handleDelete = (review: Review) => {
+    let removedIndex = -1;
+    setReviews((prev) => {
+      removedIndex = prev.findIndex((r) => r.id === review.id);
+      return prev.filter((r) => r.id !== review.id);
+    });
+
+    // Devuelve la reseña a su sitio (deshacer o fallo del DELETE).
+    const restore = () =>
+      setReviews((prev) => {
+        if (prev.some((r) => r.id === review.id)) return prev;
+        const next = [...prev];
+        next.splice(removedIndex < 0 ? next.length : Math.min(removedIndex, next.length), 0, review);
+        return next;
+      });
+
+    const reviewTitle = review.title ? ` de «${review.title}»` : "";
+    toast.undoable({
+      title: "Reseña borrada",
+      message: `Tu reseña${reviewTitle} se ha borrado.`,
+      onUndo: restore,
+      onCommit: async () => {
+        setDeletingId(review.id);
+        try {
+          await reviewsAPI.delete(review.id);
+          onStatsUpdate?.();
+        } catch {
+          restore();
+          toast.error(ERROR_MESSAGES.DELETE, { title: "Error" });
+        } finally {
+          setDeletingId(null);
+        }
+      },
+    });
   };
 
   const handleEdit = (review: Review) => {
@@ -134,10 +143,11 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditText("");
-    setEditRating(5);
+    setEditRating(null);
   };
 
   const handleSaveEdit = async (review: Review) => {
+    if (editRating === null) return;
     setSavingId(review.id);
     try {
       await reviewsAPI.update({
@@ -149,7 +159,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
       onStatsUpdate?.();
       setEditingId(null);
       setEditText("");
-      setEditRating(5);
+      setEditRating(null);
     } catch {
       setError(ERROR_MESSAGES.UPDATE);
     } finally {
@@ -167,7 +177,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center p-8 text-red-500">
+      <div role="alert" className="flex items-center justify-center p-8 text-red-400">
         <FiAlertCircle className="w-6 h-6 mr-2" />
         <span>{error}</span>
       </div>
@@ -190,7 +200,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
       {reviews.map((review) => (
         <div
           key={review.id}
-          className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/5 flex gap-4 transition-all hover:bg-white/10 hover:border-white/10 group"
+          className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/5 flex gap-4 transition-colors duration-200 hover:bg-white/10 hover:border-white/10 group"
         >
           {/* Poster Image */}
           <Link
@@ -236,26 +246,31 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                 </p>
               </div>
 
-              {/* Actions */}
+              {/* Actions: visibles al pasar el ratón, al tabular hasta ellas
+                  y siempre en pantallas táctiles, donde no hay hover. */}
               {editingId !== review.id && (
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100">
                   <button
-                    className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors"
+                    type="button"
+                    className="rounded-full p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-200"
+                    aria-label={`Editar tu reseña${review.title ? ` de «${review.title}»` : ""}`}
                     title="Editar reseña"
                     onClick={() => handleEdit(review)}
                   >
-                    <FiEdit className="w-4 h-4" />
+                    <FiEdit className="w-4 h-4" aria-hidden="true" />
                   </button>
                   <button
-                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors"
-                    title="Eliminar reseña"
-                    onClick={() => handleDelete(review.id)}
+                    type="button"
+                    className="rounded-full p-2 text-white/70 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200"
+                    aria-label={`Borrar tu reseña${review.title ? ` de «${review.title}»` : ""}`}
+                    title="Borrar reseña"
+                    onClick={() => handleDelete(review)}
                     disabled={deletingId === review.id}
                   >
                     {deletingId === review.id ? (
-                      <FiLoader className="w-4 h-4 animate-spin" />
+                      <FiLoader className="w-4 h-4 animate-spin" aria-hidden="true" />
                     ) : (
-                      <FaTrash className="w-4 h-4" />
+                      <FaTrash className="w-4 h-4" aria-hidden="true" />
                     )}
                   </button>
                 </div>
@@ -265,9 +280,11 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
             {/* Rating */}
             <div className="mb-3">
               {editingId === review.id ? (
-                <StarEdit
+                <StarRatingInput
                   value={editRating}
                   onChange={setEditRating}
+                  label="Puntuación"
+                  size="sm"
                   disabled={savingId === review.id}
                 />
               ) : (
@@ -287,8 +304,12 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
             <div className="flex-grow">
               {editingId === review.id ? (
                 <div className="flex flex-col gap-2">
+                  <label htmlFor={`review-${review.id}-text`} className="sr-only">
+                    Texto de la reseña
+                  </label>
                   <textarea
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white resize-none focus:border-pixela-accent focus:outline-none"
+                    id={`review-${review.id}-text`}
+                    className="w-full bg-pixela-surface border border-white/10 rounded-2xl p-3 text-sm text-white placeholder:text-white/40 resize-none hover:border-white/20 focus:border-pixela-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent/30 transition-[border-color,box-shadow] duration-200 ease-out-expo"
                     rows={3}
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
@@ -297,30 +318,30 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                   />
                   <div className="flex justify-end gap-2">
                     <button
-                      className="px-3 py-1.5 bg-red-500/10 text-red-500 text-xs rounded hover:bg-red-500/20 transition-colors flex items-center gap-1"
+                      type="button"
+                      className="btn btn-ghost btn-sm"
                       onClick={handleCancelEdit}
                       disabled={savingId === review.id}
                     >
-                      <FiX className="w-3 h-3" /> Cancelar
+                      <FiX className="w-4 h-4" aria-hidden="true" /> Cancelar
                     </button>
                     <button
-                      className="px-3 py-1.5 bg-green-500/10 text-green-500 text-xs rounded hover:bg-green-500/20 transition-colors flex items-center gap-1"
+                      type="button"
+                      className="btn btn-primary btn-sm"
                       onClick={() => handleSaveEdit(review)}
-                      disabled={savingId === review.id}
+                      disabled={savingId === review.id || editRating === null}
                     >
                       {savingId === review.id ? (
-                        <FiLoader className="w-3 h-3 animate-spin" />
+                        <FiLoader className="w-4 h-4 animate-spin" aria-hidden="true" />
                       ) : (
-                        <FiCheck className="w-3 h-3" />
-                      )}{" "}
+                        <FiCheck className="w-4 h-4" aria-hidden="true" />
+                      )}
                       Guardar
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-300 text-sm line-clamp-3 leading-relaxed">
-                  {review.review}
-                </p>
+                review.review && <ReviewText text={review.review} />
               )}
             </div>
           </div>
