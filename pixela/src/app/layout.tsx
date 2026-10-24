@@ -1,6 +1,6 @@
 import { Metadata, Viewport } from "next";
 import "./globals.css";
-import { outfit, roboto } from "./ui/fonts";
+import { outfit } from "./ui/fonts";
 import { Providers } from "./providers";
 import ClientLayout from "./ClientLayout";
 import { SITE_URL } from "@/lib/site";
@@ -63,12 +63,12 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#000000",
+  themeColor: "#181818",
 };
 
 const STYLES = {
-  html: `${roboto.variable} ${outfit.variable}`,
-  body: "antialiased bg-pixela-dark",
+  html: outfit.variable,
+  body: "antialiased bg-pixela-dark font-sans text-pixela-light",
 } as const;
 
 export default function RootLayout({

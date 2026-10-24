@@ -80,7 +80,7 @@ export default function RegisterPage() {
   return (
     <form onSubmit={handleSubmit} className="py-4 space-y-6 w-full max-w-xs mx-auto px-4">
       {/* Title */}
-      <h2 className="text-[24px] font-['Outfit'] text-white font-bold mb-8">
+      <h2 className="text-[24px] text-white font-bold mb-8">
         Bienvenido a Pixela | <span className="text-gray-500">Registrarse</span>
       </h2>
 
@@ -139,7 +139,7 @@ export default function RegisterPage() {
 
       {/* Mensaje de error */}
       {error && (
-        <div className="text-[#ec1b69] text-[14px] font-['Outfit']">
+        <div className="text-[#ec1b69] text-[14px]">
           {error}
         </div>
       )}
@@ -154,7 +154,7 @@ export default function RegisterPage() {
         
         <Link 
             href="/login"
-            className="text-[14px] font-['Outfit'] text-[#ec1b69] hover:text-[#ec1b69]/80 transition-colors duration-300"
+            className="text-[14px] text-[#ec1b69] hover:text-[#ec1b69]/80 transition-colors duration-300"
         >
             ¿Ya tienes cuenta?
         </Link>

@@ -2,47 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Pixela solo tiene tema oscuro: la "sala de proyección" de DESIGN.md.
+ * Antes había variables de modo claro que, en un sistema en modo claro,
+ * dejaban el color de texto heredado en #171717 sobre fondo oscuro, y un
+ * bloque `@theme inline` de Tailwind 4 que Tailwind 3 ignoraba.
+ */
+:root {
+  color-scheme: dark;
+  --pixela-accent: #ec1b69;
+  --pixela-screen: #181818;
+  --pixela-raised: #2a2a2a;
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 html {
   scroll-behavior: smooth;
+  background: var(--pixela-screen);
+  scrollbar-color: var(--pixela-raised) var(--pixela-screen);
+}
+
+body {
+  caret-color: var(--pixela-accent);
+}
+
+::selection {
+  background: rgb(236 27 105 / 0.4);
+  color: #fff;
 }
 
 /* Sitewide focus-visible ring. Base rule for anything the browser
    considers keyboard-focused. Individual components can override with
    Tailwind focus-visible: utilities if they need a bespoke look. */
 :focus-visible {
-  outline: 2px solid #ec1b69;
+  outline: 2px solid var(--pixela-accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Botones. Única fuente de verdad para cualquier botón o enlace con forma de
+ * botón (ver DESIGN.md › Components › Buttons). Había once variantes de
+ * primario escritas a mano, con radios de 4 px a 49 px.
+ */
+@layer components {
+  .btn {
+    @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-base font-semibold;
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-out-expo);
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-outfit: var(--font-outfit);
-  --font-roboto: var(--font-roboto);
-}
+  .btn-sm {
+    @apply h-10 px-5 text-sm;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    @apply pointer-events-none opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-pixela-accent text-white shadow-lg shadow-pixela-accent/25 hover:-translate-y-0.5 hover:bg-pixela-accent/90 active:translate-y-0;
+  }
+
+  .btn-ghost {
+    @apply border border-white/10 bg-white/5 text-white backdrop-blur-md hover:border-pixela-accent/50 hover:bg-pixela-accent/10;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    var(--font-sans),
-    system-ui,
-    -apple-system,
-    sans-serif;
+/*
+ * Movimiento reducido. Se acorta en vez de anular: varias entradas parten de
+ * `opacity-0` con `animation-fill-mode: forwards`, y `animation: none` las
+ * dejaría invisibles para siempre.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Clase para añadir efecto de ruido de película */
@@ -109,22 +155,6 @@ body {
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
-.animation-delay-200 {
-  animation-delay: 200ms;
-}
-
-.animation-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animation-delay-600 {
-  animation-delay: 600ms;
-}
-
-.animation-delay-800 {
-  animation-delay: 800ms;
-}
-
 /* Toast Animations */
 @keyframes slide-in-right {
   from {
@@ -163,21 +193,4 @@ body {
   -webkit-touch-callout: none;
   -khtml-user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-/* Animación de pulso para los botones de embla carrusel */
-@keyframes embla-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(236, 27, 105, 0.5);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(236, 27, 105, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(236, 27, 105, 0);
-  }
-}
-
-.embla-btn-pulse {
-  animation: embla-pulse 2s infinite;
 }

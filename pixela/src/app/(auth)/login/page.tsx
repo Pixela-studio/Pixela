@@ -55,14 +55,14 @@ function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="py-4 space-y-6 w-full max-w-xs mx-auto px-4">
-      <h2 className="text-[24px] font-['Outfit'] text-white font-bold mb-8">
+      <h2 className="text-[24px] text-white font-bold mb-8">
         Bienvenido a Pixela | <span className="text-gray-500">Iniciar sesión</span>
       </h2>
 
       {justRegistered && (
         <p
           role="status"
-          className="text-[14px] font-['Outfit'] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2"
+          className="text-[14px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2"
         >
           Cuenta creada. Inicia sesión para continuar.
         </p>
@@ -95,7 +95,7 @@ function LoginForm() {
 
       {/* `role="alert"` para que un lector de pantalla anuncie el fallo. */}
       {error && (
-        <div role="alert" className="text-[#ec1b69] text-[14px] font-['Outfit']">
+        <div role="alert" className="text-[#ec1b69] text-[14px]">
           {error}
         </div>
       )}
@@ -111,13 +111,13 @@ function LoginForm() {
             clic llevaba a un 404. Hasta que haya recuperación por email se
             muestra como texto deshabilitado en vez de prometer algo que falla. */}
         <span
-          className="text-[15px] font-['Outfit'] text-gray-600 cursor-not-allowed select-none"
+          className="text-[15px] text-gray-600 cursor-not-allowed select-none"
           title="Disponible próximamente"
         >
           ¿Olvidaste tu contraseña?
         </span>
 
-        <div className="text-[15px] font-['Outfit'] text-gray-400">
+        <div className="text-[15px] text-gray-400">
           ¿No tienes cuenta?
           <Link
             href="/register"

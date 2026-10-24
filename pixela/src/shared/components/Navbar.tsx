@@ -45,13 +45,13 @@ const STYLES = {
   navLinksContainer: 'flex space-x-8 lg:space-x-6 xl:space-x-8',
   // Inactivo atenuado a 65% para que el activo (magenta) destaque; hover
   // devuelve al 100% mientras el underline crece.
-  navLink: 'font-pixela-outfit-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
+  navLink: 'font-outfit text-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
   navLinkActive: 'text-pixela-accent hover:text-pixela-accent',
   navLinkUnderline: 'absolute -bottom-1 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
   navLinkUnderlineActive: 'w-full',
   userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
   userContainer: 'flex items-center gap-2',
-  userName: 'text-pixela-light font-pixela-outfit-sm',
+  userName: 'text-pixela-light font-outfit text-sm',
   button: 'text-pixela-light/80 hover:text-pixela-accent transition-colors duration-300 p-2 rounded-full hover:bg-pixela-dark/30',
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
 

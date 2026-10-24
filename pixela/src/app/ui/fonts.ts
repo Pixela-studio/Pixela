@@ -1,15 +1,14 @@
-import { Roboto, Outfit } from "next/font/google";
+import { Outfit } from "next/font/google";
 
-export const roboto = Roboto({
-    subsets: ["latin", "latin-ext"],
-    weight:  ["400"],
-    variable: "--font-roboto",
-    fallback: ['system-ui', 'Arial', 'sans-serif'],
-  });
-
+/*
+ * Outfit es la única familia de Pixela (ver DESIGN.md). Se expone como
+ * `--font-outfit`, que es lo que leen `font-sans` y `font-outfit` en Tailwind.
+ *
+ * Roboto se descargaba en cada visita sin que ningún componente la usara.
+ */
 export const outfit = Outfit({
-    subsets: ["latin", "latin-ext"],
-    weight: ["400", "500", "700", "900"],
-    variable: "--font-sans",
-    fallback: ['system-ui', 'Arial', 'sans-serif'],
-  });
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "900"],
+  variable: "--font-outfit",
+  fallback: ["system-ui", "Arial", "sans-serif"],
+});
