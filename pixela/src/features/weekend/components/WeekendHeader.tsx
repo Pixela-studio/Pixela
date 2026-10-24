@@ -16,9 +16,8 @@ import {
 // Estilos similares a TheatricalHeader pero alineados a la izquierda
 const STYLES = {
   ...HEADER_LAYOUT_STYLES,
-  title: `${HEADER_TYPOGRAPHY_STYLES.titleBase} text-left`,
-  titleMobile: `${HEADER_TYPOGRAPHY_STYLES.titleMobileBase} text-left pl-4`,
-  titleDesktop: `${HEADER_TYPOGRAPHY_STYLES.titleDesktopBase} text-left sm:pl-0`,
+  title: `${HEADER_TYPOGRAPHY_STYLES.title} text-left`,
+  subtitle: `${HEADER_LAYOUT_STYLES.subtitle}`,
   headerLeft: "flex flex-col items-start gap-2",
   ...HEADER_TOGGLE_STYLES,
 } as const;
@@ -75,14 +74,8 @@ export const WeekendHeader = ({
         {/* Header con Título a la izquierda y Toggle a la derecha */}
         <div className={STYLES.headerWrapper}>
           <div className={STYLES.headerLeft} ref={titleRef}>
-            <h2 className={STYLES.title}>
-              <span className={STYLES.titleMobile}>
-                FINDE
-                <br />
-                CASA
-              </span>
-              <span className={STYLES.titleDesktop}>FINDE EN CASA</span>
-            </h2>
+            <h2 className={STYLES.title}>Finde en casa</h2>
+            <p className={STYLES.subtitle}>Para ver este fin de semana sin salir del sofá, en las plataformas de España.</p>
           </div>
 
           <div className={STYLES.toggleContainer} ref={toggleRef}>

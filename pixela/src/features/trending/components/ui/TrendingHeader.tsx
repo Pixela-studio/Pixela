@@ -19,9 +19,8 @@ import {
 // (`shared/styles/headerStyles`); Tendencias solo ocupa la pantalla entera.
 const STYLES = {
   ...HEADER_TOGGLE_STYLES,
-  title: `${HEADER_TYPOGRAPHY_STYLES.titleBase} text-left`,
-  titleMobile: `${HEADER_TYPOGRAPHY_STYLES.titleMobileBase} text-left pl-4`,
-  titleDesktop: `${HEADER_TYPOGRAPHY_STYLES.titleDesktopBase} text-left sm:pl-0`,
+  title: `${HEADER_TYPOGRAPHY_STYLES.title} text-left`,
+  subtitle: `${HEADER_LAYOUT_STYLES.subtitle}`,
   container: HEADER_LAYOUT_STYLES.containerFullScreen,
   content: HEADER_LAYOUT_STYLES.content,
   contentWrapper: "w-[90%] md:w-[85%] lg:w-[80%] 2k:w-[70%] mx-auto",
@@ -29,7 +28,7 @@ const STYLES = {
   loadingContainer:
     "relative w-full h-screen bg-pixela-dark flex flex-col justify-center",
   loadingCard:
-    "w-[280px] md:w-[375px] h-[395px] md:h-[528px] bg-pixela-raised flex items-center justify-center",
+    "w-[160px] sm:w-[190px] md:w-[210px] xl:w-[230px] aspect-[2/3] bg-pixela-surface animate-pulse",
   loadingText: "text-pixela-light",
 } as const;
 
@@ -43,14 +42,10 @@ const BUTTON_OPTIONS = [
  * @returns {JSX.Element} Título estilizado
  */
 const TrendingTitle = memo(() => (
-  <h2 className={STYLES.title}>
-    <span className={STYLES.titleMobile}>
-      TEN-
-      <br />
-      DENCIAS
-    </span>
-    <span className={STYLES.titleDesktop}>TENDENCIAS</span>
-  </h2>
+  <div>
+    <h2 className={STYLES.title}>Tendencias</h2>
+    <p className={STYLES.subtitle}>Lo que más se está viendo esta semana.</p>
+  </div>
 ));
 
 TrendingTitle.displayName = "TrendingTitle";

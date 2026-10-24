@@ -320,7 +320,7 @@ const MediaCard = memo(
               <OverlayContent media={media} type={type} />
 
               {isTopPixela(media) && (
-                <Badge label="TOP PIXELA" position="top-left" variant="primary" />
+                <Badge label="Top Pixela" position="top-left" variant="primary" />
               )}
             </div>
           </div>
@@ -616,7 +616,7 @@ const RecommendationCard = memo(
               </div>
 
               {isTopPixela(recommendation) && (
-                <Badge label="TOP PIXELA" position="top-left" variant="primary" />
+                <Badge label="Top Pixela" position="top-left" variant="primary" />
               )}
             </div>
           </div>

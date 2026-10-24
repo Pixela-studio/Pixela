@@ -21,14 +21,15 @@ interface SliderNavButtonProps {
 }
 
 const STYLES = {
-  base: 'absolute z-20 top-1/2 -translate-y-1/2 w-[50px] h-[50px] rounded-full flex items-center justify-center',
-  background: 'bg-pixela-dark/40 text-pixela-light border-2 border-pixela-accent/50 backdrop-blur-md shadow-lg',
-  transitions: 'transition-[opacity,transform,background-color,border-color] duration-300 ease-out-expo opacity-70 hover:opacity-100 hover:scale-110 active:scale-95',
-  hover: 'hover:bg-pixela-accent/80 hover:border-white/70',
-  focus: 'focus:outline-none focus:ring-2 focus:ring-pixela-accent/40',
+  base: 'absolute z-20 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center',
+  // Círculo marfil translúcido, sin vidrio ni borde rosa: el rosa es de las acciones.
+  background: 'bg-pixela-dark/80 text-white',
+  transitions: 'transition-[background-color,transform] duration-200 ease-out-expo active:scale-[0.97]',
+  hover: 'hover:bg-pixela-raised',
+  focus: '',
   position: {
-    prev: 'left-5',
-    next: 'right-5',
+    prev: 'left-3 lg:left-5',
+    next: 'right-3 lg:right-5',
   },
 } as const;
 

@@ -14,9 +14,8 @@ import {
 // Estilos adaptados de TrendingHeader
 const STYLES = {
   ...HEADER_LAYOUT_STYLES,
-  title: `${HEADER_TYPOGRAPHY_STYLES.titleBase} text-left sm:text-right sm:ml-auto`,
-  titleMobile: `${HEADER_TYPOGRAPHY_STYLES.titleMobileBase} text-left pl-4`,
-  titleDesktop: `${HEADER_TYPOGRAPHY_STYLES.titleDesktopBase} text-right sm:pr-0`,
+  title: `${HEADER_TYPOGRAPHY_STYLES.title} text-left sm:text-right`,
+  subtitle: `${HEADER_LAYOUT_STYLES.subtitle} sm:text-right sm:ml-auto`,
 } as const;
 
 export const TheatricalHeader = ({
@@ -58,14 +57,8 @@ export const TheatricalHeader = ({
           <div className="flex-grow hidden lg:block" />
 
           <div ref={titleRef} className="w-full sm:w-auto sm:ml-auto">
-            <h2 className={STYLES.title}>
-              <span className={STYLES.titleMobile}>
-                TOP
-                <br />
-                CINE
-              </span>
-              <span className={STYLES.titleDesktop}>TOP CARTELERA</span>
-            </h2>
+            <h2 className={STYLES.title}>Top cartelera</h2>
+            <p className={STYLES.subtitle}>Lo que llena las salas de España ahora mismo.</p>
           </div>
         </div>
 
