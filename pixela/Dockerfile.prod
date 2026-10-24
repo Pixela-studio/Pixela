@@ -60,8 +60,8 @@ COPY . .
 # publica.
 #
 # NEXT_PUBLIC_SITE_URL merece un aviso: si no se pasa, la imagen queda cocida
-# para siempre con el fallback `pixela-seven.vercel.app`, que es justo el
-# despliegue del que se esta huyendo. La leen `layout.tsx`, `robots.ts` y
+# para siempre con el fallback `http://localhost:3000`, y el sitemap y las
+# tarjetas sociales anunciarian esa URL. La leen `layout.tsx`, `robots.ts` y
 # `sitemap.ts`, las tres en build.
 ARG TMDB_BASE_URL="https://api.themoviedb.org/3"
 ARG NEXT_PUBLIC_SITE_URL

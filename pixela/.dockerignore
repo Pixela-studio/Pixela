@@ -20,7 +20,6 @@ build
 .gitignore
 .github
 .claude
-.vercel
 
 # Secretos. Sin excepciones: la variante anterior intentaba readmitir
 # .env.production con "! .env.production", pero el espacio tras el ! hacia que

@@ -43,7 +43,7 @@ export interface RateLimitResult {
 
 /**
  * Extrae la IP del cliente de las cabeceras de proxy habituales.
- * Vercel siempre envía `x-forwarded-for`.
+ * El proxy inverso (Traefik en Coolify) envía `x-forwarded-for`.
  */
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");

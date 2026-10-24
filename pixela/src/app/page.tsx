@@ -52,7 +52,7 @@ const AboutSection = nextDynamic(
  * carga arrastraba todas las llamadas a TMDB de esta página.
  *
  * El contenido son tendencias, cartelera y recomendaciones: cambia como mucho
- * una vez al día. Con `revalidate` la página se genera una vez, la CDN de Vercel
+ * una vez al día. Con `revalidate` la página se genera una vez, la caché de Next
  * la sirve al resto de visitantes sin invocar la función, y se regenera en
  * segundo plano al expirar.
  *
