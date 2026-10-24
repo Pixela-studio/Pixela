@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import Image from 'next/image';
 import { Wallpaper } from '@/features/media/types/gallery';
 import { GallerySectionProps } from '@/features/media/types/gallery';
@@ -66,6 +67,13 @@ export function GallerySection({ media }: GallerySectionProps) {
     selectedGalleryImage,
     setSelectedGalleryImage
   } = useMediaStore();
+
+  // Vista ampliada como diálogo: foco atrapado, Escape cierra y el foco vuelve
+  // a la miniatura que la abrió.
+  const previewRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(previewRef, Boolean(selectedGalleryImage), {
+    onEscape: () => setSelectedGalleryImage(null),
+  });
 
   // Renderizar el componente solo en el cliente
   useEffect(() => {
@@ -148,20 +156,30 @@ export function GallerySection({ media }: GallerySectionProps) {
           className={STYLES.modal.overlay}
           onClick={() => setSelectedGalleryImage(null)}
         >
-          <div className={STYLES.modal.container} onClick={e => e.stopPropagation()}>
+          <div
+            ref={previewRef}
+            className={STYLES.modal.container}
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Vista ampliada"
+          >
             <Image 
               src={selectedGalleryImage} 
-              alt="Preview"
+              alt=""
               className={STYLES.modal.image}
               width={1920}
               height={1080}
               priority
             />
             <button
+              type="button"
               className={STYLES.modal.closeButton}
               onClick={() => setSelectedGalleryImage(null)}
+              aria-label="Cerrar vista ampliada"
             >
               <svg
+                aria-hidden="true"
                 className={STYLES.modal.closeIcon}
                 fill="none"
                 stroke="currentColor"

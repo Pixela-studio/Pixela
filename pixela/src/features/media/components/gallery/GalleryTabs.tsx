@@ -4,8 +4,8 @@ import { GalleryTabsProps } from '@/features/media/types/gallery';
 
 const STYLES = {
   container: "flex border-b border-white/10 mb-6",
-  tab: "py-3 px-6 text-sm font-medium rounded-t-lg focus:outline-none transition-colors duration-200",
-  activeTab: "bg-pixela-accent text-gray-900 border-b-2 border-pixela-accent",
+  tab: "py-3 px-6 text-sm font-medium rounded-t-lg transition-colors duration-200",
+  activeTab: "bg-pixela-accent text-white border-b-2 border-pixela-accent",
   inactiveTab: "text-gray-400 hover:text-white hover:bg-pixela-raised/50"
 } as const;
 
@@ -13,14 +13,18 @@ export const GalleryTabs = ({ activeTab, onTabChange, backdropsCount, postersCou
   return (
     <div className={STYLES.container}>
       <button
+        type="button"
         className={`${STYLES.tab} ${activeTab === 'backdrops' ? STYLES.activeTab : STYLES.inactiveTab}`}
         onClick={() => onTabChange('backdrops')}
+        aria-pressed={activeTab === 'backdrops'}
       >
         Fondos ({backdropsCount})
       </button>
       <button
+        type="button"
         className={`${STYLES.tab} ${activeTab === 'posters' ? STYLES.activeTab : STYLES.inactiveTab}`}
         onClick={() => onTabChange('posters')}
+        aria-pressed={activeTab === 'posters'}
       >
         Pósters ({postersCount})
       </button>

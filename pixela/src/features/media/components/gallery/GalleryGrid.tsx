@@ -16,7 +16,7 @@ const STYLES = {
 
   // Contenedor de cada imagen
   imageContainer: {
-    base: "relative overflow-hidden rounded-lg group cursor-pointer",
+    base: "relative block w-full overflow-hidden rounded-xl group",
     aspectRatio: {
       backdrops: "aspect-video",
       posters: "aspect-[2/3]"
@@ -31,7 +31,7 @@ const STYLES = {
 
   // Overlay de información
   overlay: {
-    base: "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+    base: "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300",
     content: "absolute bottom-0 left-0 right-0 p-4 text-white"
   }
 } as const;
@@ -76,11 +76,13 @@ export const GalleryGrid = ({
 
   return (
     <div className={`${STYLES.container.base} ${STYLES.container[type]}`}>
-      {displayImages.map((image) => (
-        <div
+      {displayImages.map((image, index) => (
+        <button
+          type="button"
           key={image.file_path}
           className={`${STYLES.imageContainer.base} ${STYLES.imageContainer.aspectRatio[type]}`}
           onClick={() => onImageClick(image)}
+          aria-label={`Ampliar imagen ${index + 1} de ${displayImages.length}`}
         >
           {!imageErrors[image.file_path] ? (
             <Image
@@ -105,7 +107,7 @@ export const GalleryGrid = ({
               </p>
             </div>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );
