@@ -246,7 +246,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                   <h3 className="text-xl font-bold text-white mb-4 font-outfit">
                     Actividad Reciente
                   </h3>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-400 text-sm">
                     No hay actividad reciente para mostrar.
                   </p>
                 </div>

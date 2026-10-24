@@ -13,9 +13,11 @@ const STYLES = {
 
 export const CloseButton = ({ onClick }: CloseButtonProps) => (
   <button 
+    type="button"
     className={STYLES.button}
     onClick={onClick}
+    aria-label="Cerrar"
   >
-    <FaTimes className={STYLES.icon} />
+    <FaTimes className={STYLES.icon} aria-hidden="true" />
   </button>
 ); 

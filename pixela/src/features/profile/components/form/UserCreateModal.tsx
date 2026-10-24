@@ -184,8 +184,9 @@ export const UserCreateModal = ({
           </div>
           <button
             onClick={onClose}
+            type="button"
             className={STYLES.closeButton}
-            title="Cerrar"
+            aria-label="Cerrar"
           >
             <FiX className={STYLES.closeIcon} />
           </button>

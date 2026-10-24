@@ -7,7 +7,7 @@ const STYLES = {
     "flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-300",
   rating:
     "inline-flex items-center gap-1 rounded-md bg-pixela-accent/15 px-2 py-0.5 font-semibold text-pixela-accent",
-  separator: "text-gray-600",
+  separator: "text-gray-400",
   top: "inline-flex items-center rounded-md border border-pixela-accent/30 bg-pixela-accent/10 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider text-pixela-accent",
 } as const;
 

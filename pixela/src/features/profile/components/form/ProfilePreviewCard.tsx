@@ -112,7 +112,7 @@ export const ProfilePreviewCard = ({
       />
       {imageError && <p className={STYLES.error}>{imageError}</p>}
 
-      <p className="text-xs text-gray-500 text-center px-4 font-outfit">
+      <p className="text-xs text-gray-400 text-center px-4 font-outfit">
         Haz clic en la portada o en tu avatar para actualizarlos.
       </p>
     </div>

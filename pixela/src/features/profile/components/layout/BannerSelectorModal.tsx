@@ -60,7 +60,9 @@ export const BannerSelectorModal = ({
             Cambiar Portada
           </h2>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar"
             className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
           >
             <FiX className="w-5 h-5" />

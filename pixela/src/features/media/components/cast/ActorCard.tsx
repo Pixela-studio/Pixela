@@ -68,12 +68,12 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
       </div>
       <div className="p-3">
         <div className="flex flex-col">
-          <span className="text-xs text-gray-500">Nombre:</span>
+          <span className="text-xs text-gray-400">Nombre:</span>
           <h3 className="text-sm font-medium text-white truncate">{actor.nombre}</h3>
         </div>
         {actor.personaje && (
           <div className="flex flex-col mt-1">
-            <span className="text-xs text-gray-500">Personaje:</span>
+            <span className="text-xs text-gray-400">Personaje:</span>
             <p className="text-xs font-medium text-gray-300 truncate">{actor.personaje}</p>
           </div>
         )}

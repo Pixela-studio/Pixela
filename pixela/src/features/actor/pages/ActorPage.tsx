@@ -150,7 +150,7 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
                       <h4 className="text-sm font-bold text-white truncate group-hover:text-pixela-accent transition-colors">
                         {item.title || item.name}
                       </h4>
-                      <p className="text-xs text-gray-500 truncate mt-1">
+                      <p className="text-xs text-gray-400 truncate mt-1">
                         {item.character}
                       </p>
                     </>

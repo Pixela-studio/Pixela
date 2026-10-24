@@ -157,7 +157,7 @@ export const ProfileLibrary = () => {
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-500 text-xs text-center p-2">
+                    <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-400 text-xs text-center p-2">
                       Sin imagen
                     </div>
                   )}

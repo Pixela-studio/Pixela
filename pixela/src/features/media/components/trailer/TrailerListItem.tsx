@@ -67,7 +67,7 @@ const TrailerListItem = ({
         }`}>
           {trailer.nombre || `Trailer ${index !== undefined ? index + 1 : ''}`}
         </p>
-        <p className={`${isLarge ? 'text-sm mt-1.5' : 'text-xs mt-1'} text-gray-500 truncate`}>
+        <p className={`${isLarge ? 'text-sm mt-1.5' : 'text-xs mt-1'} text-gray-400 truncate`}>
           {trailer.tipo || 'Video'}
         </p>
       </div>

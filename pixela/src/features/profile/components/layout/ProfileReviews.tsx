@@ -210,7 +210,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                 sizes="100px"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-500 text-xs text-center p-2">
+              <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-400 text-xs text-center p-2">
                 Sin imagen
               </div>
             )}
@@ -278,7 +278,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                       ? Number(review.rating) / 2
                       : (Number(review.rating) / 2).toFixed(1)}
                   </span>
-                  <span className="text-xs text-gray-500">/ 5</span>
+                  <span className="text-xs text-gray-400">/ 5</span>
                 </div>
               )}
             </div>
