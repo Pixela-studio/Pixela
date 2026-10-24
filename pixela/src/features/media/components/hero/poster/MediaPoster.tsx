@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import clsx from 'clsx';
 import { useState, memo } from 'react';
-import { FiMaximize2 } from 'react-icons/fi';
+import { FiMaximize2, FiFilm, FiTv, FiUser } from 'react-icons/fi';
 
 const STYLES = {
   container: 'flex-shrink-0',
@@ -35,7 +35,7 @@ interface MediaPosterProps {
 const PlaceholderPoster = memo(({ title, type = 'movie' }: { title: string, type?: 'movie' | 'series' | 'person' }) => (
   <div className={STYLES.placeholderContainer}>
     <div className={STYLES.placeholderEmoji} aria-hidden="true">
-      {type === 'movie' ? '🎬' : type === 'series' ? '📺' : '👤'}
+      {type === 'movie' ? <FiFilm /> : type === 'series' ? <FiTv /> : <FiUser />}
     </div>
     <p className={STYLES.placeholderTitle}>{title}</p>
     <div className={STYLES.placeholderNoImage}>

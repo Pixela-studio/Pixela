@@ -8,7 +8,7 @@ import { Badge } from "@/shared/components/Badge";
 import { ActionButtons } from "@/shared/components/ActionButtons";
 import { useState, memo, useMemo, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { FiSearch, FiX, FiRefreshCw } from "react-icons/fi";
+import { FiSearch, FiX, FiRefreshCw, FiFilm, FiTv, FiAlertCircle } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { ContentSkeleton } from "@/app/components/skeletons";
 import { ItemCounter } from "@/features/categories/components/ui/ItemCounter";
@@ -46,7 +46,6 @@ const STYLES = {
   searchIconInner: "h-5 w-5 text-pixela-light/40",
 
   // Categorías en Móvil
-  mobileCategoriesList: "lg:hidden mb-6",
 
   // Tarjeta de Contenido (Película/Serie) - Con efecto de borde interactivo.
   // El `group` va en el contenedor que envuelve al enlace y al botón de
@@ -110,7 +109,7 @@ const STYLES = {
   cardsContainer: "flex justify-center w-full",
   cardsWrapper: "relative w-full max-w-lg text-center",
   randomButton:
-    "flex items-center justify-center w-full max-w-lg gap-3 px-6 py-3 mb-4 text-white transition-all duration-300 border group bg-gradient-to-r from-pixela-accent/20 to-pixela-accent/30 border-pixela-accent/30 rounded-xl hover:from-pixela-accent/30 hover:to-pixela-accent/40 hover:scale-105",
+    "flex items-center justify-center w-full max-w-lg gap-3 px-6 py-3 mb-4 text-white transition duration-300 border group bg-gradient-to-r from-pixela-accent/20 to-pixela-accent/30 border-pixela-accent/30 rounded-xl hover:from-pixela-accent/30 hover:to-pixela-accent/40 hover:scale-105",
   buttonIcon:
     "w-5 h-5 transition-transform duration-500 group-hover:rotate-180",
   buttonText: "font-medium",
@@ -118,16 +117,10 @@ const STYLES = {
   // Tarjetas (Misteriosa y Recomendación)
   cardsGrid: "grid grid-cols-1 sm:grid-cols-2 gap-6",
   mysteryCard:
-    "w-full aspect-[2/3] rounded-lg border-2 border-dashed border-pixela-accent/30 bg-pixela-dark/20 flex flex-col items-center justify-center p-6 transition-all duration-300 hover:border-pixela-accent/50 hover:bg-pixela-dark/30",
-  mysteryEmoji: "text-4xl mb-4 opacity-50",
+    "w-full aspect-[2/3] rounded-lg border-2 border-dashed border-pixela-accent/30 bg-pixela-dark/20 flex flex-col items-center justify-center p-6 transition duration-300 hover:border-pixela-accent/50 hover:bg-pixela-dark/30",
+  mysteryEmoji: "h-10 w-10 mb-4 text-white/40",
   mysteryTitle: "text-pixela-light/60 text-sm font-medium mb-2",
   mysteryDescription: "text-pixela-light/40 text-xs text-center",
-  recommendationCard:
-    "relative w-full aspect-[2/3] overflow-hidden rounded-2xl p-px group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300",
-  recommendationCardBorder:
-    "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-  recommendationCardContent:
-    "relative z-10 w-full h-full overflow-hidden rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
   recommendationOverlay:
     "absolute inset-0 flex flex-col justify-end p-4 transition-opacity duration-500 ease-out-expo opacity-0 bg-gradient-to-t from-pixela-dark via-pixela-dark/70 to-transparent group-hover:opacity-100 group-hover:delay-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
   recommendationTitle:
@@ -149,7 +142,7 @@ const PlaceholderPoster = memo(
     return (
       <div className={STYLES.placeholderContainer}>
         <div className={STYLES.placeholderEmoji}>
-          {type === "movies" ? "🎬" : "📺"}
+          {type === "movies" ? <FiFilm aria-hidden="true" /> : <FiTv aria-hidden="true" />}
         </div>
         <h3 className={STYLES.placeholderTitle}>{title}</h3>
         <div className={STYLES.placeholderNoImage}>Sin imagen disponible</div>
@@ -744,11 +737,11 @@ const RandomRecommendations = memo(
               {!hasSearched ? (
                 <div className={STYLES.cardsGrid}>
                   {[
-                    { type: "Película", emoji: "🎬" },
-                    { type: "Serie", emoji: "📺" },
-                  ].map(({ type, emoji }) => (
+                    { type: "Película", Icon: FiFilm },
+                    { type: "Serie", Icon: FiTv },
+                  ].map(({ type, Icon }) => (
                     <div key={type} className={STYLES.mysteryCard}>
-                      <div className={STYLES.mysteryEmoji}>{emoji}</div>
+                      <Icon className={STYLES.mysteryEmoji} aria-hidden="true" />
                       <h3 className={STYLES.mysteryTitle}>{type} misteriosa</h3>
                       <p className={STYLES.mysteryDescription}>
                         Haz clic en &quot;Sorpréndeme&quot; para descubrirla
@@ -763,7 +756,7 @@ const RandomRecommendations = memo(
                     <RecommendationCard recommendation={currentMovie} />
                   ) : movies.length > 0 ? (
                     <div className={STYLES.mysteryCard}>
-                      <div className={STYLES.mysteryEmoji}>🎬</div>
+                      <FiFilm className={STYLES.mysteryEmoji} aria-hidden="true" />
                       <h3 className={STYLES.mysteryTitle}>
                         Cargando película...
                       </h3>
@@ -773,7 +766,7 @@ const RandomRecommendations = memo(
                     </div>
                   ) : (
                     <div className={STYLES.mysteryCard}>
-                      <div className={STYLES.mysteryEmoji}>❌</div>
+                      <FiAlertCircle className={STYLES.mysteryEmoji} aria-hidden="true" />
                       <h3 className={STYLES.mysteryTitle}>Sin películas</h3>
                       <p className={STYLES.mysteryDescription}>
                         No hay películas disponibles
@@ -786,7 +779,7 @@ const RandomRecommendations = memo(
                     <RecommendationCard recommendation={currentSerie} />
                   ) : series.length > 0 ? (
                     <div className={STYLES.mysteryCard}>
-                      <div className={STYLES.mysteryEmoji}>📺</div>
+                      <FiTv className={STYLES.mysteryEmoji} aria-hidden="true" />
                       <h3 className={STYLES.mysteryTitle}>Cargando serie...</h3>
                       <p className={STYLES.mysteryDescription}>
                         Seleccionando una serie aleatoria
@@ -794,7 +787,7 @@ const RandomRecommendations = memo(
                     </div>
                   ) : (
                     <div className={STYLES.mysteryCard}>
-                      <div className={STYLES.mysteryEmoji}>❌</div>
+                      <FiAlertCircle className={STYLES.mysteryEmoji} aria-hidden="true" />
                       <h3 className={STYLES.mysteryTitle}>Sin series</h3>
                       <p className={STYLES.mysteryDescription}>
                         No hay series disponibles
