@@ -13,7 +13,6 @@ import { FaStar } from "react-icons/fa";
 import { ContentSkeleton } from "@/app/components/skeletons";
 import { ItemCounter } from "@/features/categories/components/ui/ItemCounter";
 import { CategoriesContentProps } from "@/features/categories/types/content";
-import { useInteractiveBorder } from "@/hooks/useInteractiveBorder";
 import { tmdbImageHelpers } from "@/lib/constants/tmdb";
 import { isTopPixela } from "@/lib/topPixela";
 
@@ -38,12 +37,12 @@ const STYLES = {
   // Barra de Búsqueda
   searchContainer: "relative mb-8",
   searchIcon:
-    "absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none",
+    "absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none",
   searchInput:
-    "w-full pl-10 pr-10 py-3 bg-pixela-dark/30 border border-pixela-accent/20 rounded-xl text-pixela-light placeholder-pixela-light/40 hover:border-pixela-accent/30 focus:border-pixela-accent/60 transition-colors duration-300",
+    "w-full h-12 pl-11 pr-11 bg-pixela-surface border border-white/10 rounded-full text-white placeholder:text-white/40 hover:border-white/20 focus:border-pixela-accent/60 transition-colors duration-200",
   clearButton:
-    "absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-pixela-light/40 hover:text-pixela-light transition-colors duration-300",
-  searchIconInner: "h-5 w-5 text-pixela-light/40",
+    "absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-white/50 hover:text-white transition-colors duration-200",
+  searchIconInner: "h-5 w-5 text-white/50",
 
   // Categorías en Móvil
 
@@ -52,30 +51,27 @@ const STYLES = {
   // favoritos (hermanos: un <button> no puede ir dentro de un <a>), para que
   // pasar por encima del botón no apague el hover de la tarjeta.
   cardWrapper: "relative group w-full",
-  card: "w-full flex flex-col relative overflow-hidden rounded-2xl p-px",
-  cardBorder:
-    "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-  cardContent:
-    "relative z-10 h-full rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5",
+  // Mismo póster que las filas de la home: 2:3, esquinas casi rectas y el
+  // pie de foto debajo, siempre visible. Fuera el borde que seguía al ratón.
+  card: "w-full flex flex-col relative rounded-sm",
+  cardContent: "relative",
   posterContainer:
-    "relative w-full aspect-[2/3] overflow-hidden rounded-[15px]",
-  poster: "object-cover",
-  noiseEffect: "noise-effect opacity-5",
-  overlay:
-    "absolute inset-0 bg-gradient-to-t from-pixela-dark/95 via-pixela-dark/80 to-transparent flex flex-col justify-end p-3 md:p-4 transition-opacity duration-500 ease-out-expo opacity-0 group-hover:opacity-100 group-hover:delay-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100 rounded-lg",
+    "relative w-full aspect-[2/3] overflow-hidden rounded-sm bg-pixela-surface after:pointer-events-none after:absolute after:inset-0 after:z-30 after:content-[''] group-has-[a:focus-visible]:after:ring-2 group-has-[a:focus-visible]:after:ring-inset group-has-[a:focus-visible]:after:ring-pixela-accent",
+  poster:
+    "object-cover transition-transform duration-700 ease-out-expo [@media(hover:hover)]:group-hover:scale-[1.04]",
+  noiseEffect: "noise-effect",
+  overlay: "pt-3",
   // Favoritos: al hover en ratón; siempre visible en táctil y con el foco dentro.
   favorite:
     "opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
-  overlayContent: "mb-2 md:mb-3",
-  title:
-    "text-pixela-light font-bold text-sm md:text-base lg:text-lg mb-1 md:mb-2 overflow-hidden text-ellipsis whitespace-nowrap",
-  mediaInfo: "flex items-center gap-2 mb-2 md:mb-3 flex-wrap",
-  rating: "flex items-center",
-  ratingIcon: "text-yellow-400 mr-1 text-xs md:text-sm",
-  ratingText: "text-pixela-light font-semibold text-xs md:text-sm",
-  year: "text-pixela-light/80 text-xs md:text-sm",
-  mediaType:
-    "text-pixela-light/90 bg-pixela-dark/60 px-1.5 py-0.5 rounded-sm text-xs",
+  overlayContent: "",
+  title: "text-[15px] md:text-base font-semibold leading-snug text-white line-clamp-2",
+  mediaInfo: "mt-1 flex items-center gap-3 flex-wrap text-sm text-gray-400 tabular-nums",
+  rating: "flex items-center text-white/85",
+  ratingIcon: "mr-1 text-[11px]",
+  ratingText: "",
+  year: "",
+  mediaType: "",
 
   // Placeholder para Tarjetas sin Imagen
   placeholderContainer:
@@ -121,17 +117,14 @@ const STYLES = {
   mysteryEmoji: "h-10 w-10 mb-4 text-white/40",
   mysteryTitle: "text-pixela-light/60 text-sm font-medium mb-2",
   mysteryDescription: "text-pixela-light/40 text-xs text-center",
-  recommendationOverlay:
-    "absolute inset-0 flex flex-col justify-end p-4 transition-opacity duration-500 ease-out-expo opacity-0 bg-gradient-to-t from-pixela-dark via-pixela-dark/70 to-transparent group-hover:opacity-100 group-hover:delay-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
-  recommendationTitle:
-    "mb-2 text-base font-bold leading-tight text-pixela-light md:text-lg line-clamp-2 text-left",
-  recommendationInfo: "flex flex-wrap items-center gap-2 mb-2",
-  recommendationRating: "flex items-center",
-  recommendationRatingIcon: "mr-1 text-xs text-yellow-400",
-  recommendationRatingText: "text-xs font-semibold text-pixela-light",
-  recommendationYear: "text-xs text-pixela-light/80",
-  recommendationMediaType:
-    "text-pixela-light/90 bg-pixela-dark/60 px-1.5 py-0.5 rounded text-xs",
+  recommendationOverlay: "pt-3 text-left",
+  recommendationTitle: "text-base md:text-lg font-semibold leading-snug text-white line-clamp-2",
+  recommendationInfo: "mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-400 tabular-nums",
+  recommendationRating: "flex items-center text-white/85",
+  recommendationRatingIcon: "mr-1 text-[11px]",
+  recommendationRatingText: "",
+  recommendationYear: "",
+  recommendationMediaType: "",
 } as const;
 
 /**
@@ -186,7 +179,7 @@ const PosterImage = memo(
     return (
       <Image
         src={tmdbImageHelpers.poster(posterPath)}
-        alt={title || "Imagen no disponible"}
+        alt=""
         fill
         className={STYLES.poster}
         priority={isInitiallyVisible}
@@ -240,7 +233,7 @@ const OverlayContent = ({
           <div className={STYLES.rating}>
             <FaStar className={STYLES.ratingIcon} />
             <span className={STYLES.ratingText}>
-              {media.vote_average?.toFixed(1) || "N/A"}
+              {media.vote_average ? media.vote_average.toFixed(1).replace(".", ",") : "Sin nota"}
             </span>
           </div>
 
@@ -275,7 +268,6 @@ const MediaCard = memo(
     type: "series" | "movies";
     index: number;
   }) => {
-    const cardRef = useInteractiveBorder<HTMLDivElement>();
     const isInitiallyVisible = index < INITIAL_VISIBLE_ITEMS;
 
     const title =
@@ -291,11 +283,10 @@ const MediaCard = memo(
       // puede quedarse en `opacity-0`. El `!` hace falta porque
       // `.animate-fade-in-up` se declara en globals.css después de las utilidades.
       <div
-        ref={cardRef}
         className={`${STYLES.cardWrapper} opacity-0 animate-fade-in-up motion-reduce:opacity-100 motion-reduce:!animate-none`}
         style={{
-          animationDelay: `${Math.min(index * 80, 800)}ms`,
-          animationDuration: "0.6s",
+          animationDelay: `${Math.min(index * 40, 400)}ms`,
+          animationDuration: "0.5s",
           animationFillMode: "forwards",
         }}
       >
@@ -305,7 +296,6 @@ const MediaCard = memo(
           aria-label={title}
           className={STYLES.card}
         >
-          <div className={STYLES.cardBorder} />
           <div className={STYLES.cardContent}>
             <div className={STYLES.posterContainer}>
               <PosterImage
@@ -317,12 +307,11 @@ const MediaCard = memo(
 
               <div className={STYLES.noiseEffect} />
 
-              <OverlayContent media={media} type={type} />
-
               {isTopPixela(media) && (
                 <Badge label="Top Pixela" position="top-left" variant="primary" />
               )}
             </div>
+            <OverlayContent media={media} type={type} />
           </div>
         </Link>
 
@@ -545,7 +534,6 @@ const RecommendationCard = memo(
   }: {
     recommendation: (Pelicula | Serie) & { mediaType: "movie" | "series" };
   }) => {
-    const cardRef = useInteractiveBorder<HTMLDivElement>();
 
     const title =
       recommendation.mediaType === "movie"
@@ -565,7 +553,6 @@ const RecommendationCard = memo(
 
     return (
       <div
-        ref={cardRef}
         className={`${STYLES.cardWrapper} animate-fade-in motion-reduce:!animate-none`}
       >
         <Link
@@ -574,7 +561,6 @@ const RecommendationCard = memo(
           aria-label={title}
           className={STYLES.card}
         >
-          <div className={STYLES.cardBorder} />
           <div className={STYLES.cardContent}>
             <div className={STYLES.posterContainer}>
               <PosterImage
@@ -588,36 +574,35 @@ const RecommendationCard = memo(
 
               <div className={STYLES.noiseEffect} />
 
-              <div className={STYLES.recommendationOverlay}>
-                <div className="mb-2 md:mb-3">
-                  <h3 className={STYLES.recommendationTitle}>{title}</h3>
-
-                  <div className={STYLES.recommendationInfo}>
-                    <div className={STYLES.recommendationRating}>
-                      <FaStar className={STYLES.recommendationRatingIcon} />
-                      <span className={STYLES.recommendationRatingText}>
-                        {recommendation.vote_average?.toFixed(1) || "N/A"}
-                      </span>
-                    </div>
-
-                    {releaseYear && (
-                      <span className={STYLES.recommendationYear}>
-                        {releaseYear}
-                      </span>
-                    )}
-
-                    <span className={STYLES.recommendationMediaType}>
-                      {recommendation.mediaType === "series"
-                        ? "Serie"
-                        : "Película"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
               {isTopPixela(recommendation) && (
                 <Badge label="Top Pixela" position="top-left" variant="primary" />
               )}
+            </div>
+            <div className={STYLES.recommendationOverlay}>
+              <div className="mb-2 md:mb-3">
+                <h3 className={STYLES.recommendationTitle}>{title}</h3>
+
+                <div className={STYLES.recommendationInfo}>
+                  <div className={STYLES.recommendationRating}>
+                    <FaStar className={STYLES.recommendationRatingIcon} />
+                    <span className={STYLES.recommendationRatingText}>
+                      {recommendation.vote_average ? recommendation.vote_average.toFixed(1).replace(".", ",") : "Sin nota"}
+                    </span>
+                  </div>
+
+                  {releaseYear && (
+                    <span className={STYLES.recommendationYear}>
+                      {releaseYear}
+                    </span>
+                  )}
+
+                  <span className={STYLES.recommendationMediaType}>
+                    {recommendation.mediaType === "series"
+                      ? "Serie"
+                      : "Película"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </Link>

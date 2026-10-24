@@ -10,15 +10,15 @@ const STYLES = {
     buttonsContainer: 'grid grid-cols-3 sm:flex sm:flex-row sm:flex-wrap gap-2 w-full',
 
     // Botones de tipo de media
-    button: 'px-2 sm:px-5 py-2.5 rounded-lg transition duration-200 font-medium text-[13px] sm:text-sm md:text-base flex items-center justify-center flex-1 sm:flex-none',
-    buttonActive: 'bg-pixela-accent/10 text-pixela-accent border border-pixela-accent/30',
-    buttonInactive: 'bg-pixela-dark/20 text-pixela-light/60 border border-pixela-accent/10 hover:bg-pixela-accent/5 hover:text-pixela-accent/80',
+    button: 'px-3 sm:px-5 h-10 rounded-full transition-colors duration-200 font-semibold text-sm flex items-center justify-center flex-1 sm:flex-none active:scale-[0.97]',
+    buttonActive: 'bg-white text-pixela-dark',
+    buttonInactive: 'bg-pixela-surface text-white/75 hover:bg-pixela-raised hover:text-white',
 
     // Botón de recomendación aleatoria
-    randomButton: 'col-span-3 sm:col-auto px-5 py-2.5 rounded-lg transition duration-200 font-medium text-sm md:text-base flex items-center justify-center gap-2',
-    randomButtonActive: 'bg-gradient-to-r from-pixela-accent/20 to-pixela-accent/30 text-pixela-accent border border-pixela-accent/30',
-    randomButtonInactive: 'bg-pixela-dark/20 text-pixela-light/60 border border-pixela-accent/10 hover:bg-gradient-to-r hover:from-pixela-accent/10 hover:to-pixela-accent/20 hover:text-pixela-accent',
-    randomDescription: 'max-w-md text-sm text-pixela-light/70 leading-relaxed px-2'
+    randomButton: 'col-span-3 sm:col-auto px-5 h-10 rounded-full transition-colors duration-200 font-semibold text-sm flex items-center justify-center gap-2 active:scale-[0.97]',
+    randomButtonActive: 'bg-pixela-accent text-pixela-dark',
+    randomButtonInactive: 'bg-pixela-surface text-white/75 hover:bg-pixela-raised hover:text-white',
+    randomDescription: 'max-w-md text-sm text-gray-400 leading-relaxed'
 } as const;
 
 /**

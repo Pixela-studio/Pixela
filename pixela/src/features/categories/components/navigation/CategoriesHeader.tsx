@@ -3,8 +3,8 @@ import { MediaType } from '@/features/categories/types/media';
 import { CategoriesHeaderProps } from '@/features/categories/types/components';
 
 const STYLES = {
-    container: 'flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 sm:gap-6 mb-8 w-full',
-    title: 'text-5xl md:text-6xl font-bold text-pixela-accent ls:text-4xl',
+    container: 'flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-10 w-full',
+    title: 'title-card text-[52px] sm:text-7xl md:text-[88px] xl:text-[104px] ls:text-5xl',
     controls: 'flex flex-col sm:flex-row gap-4 w-full xl:w-auto justify-end',
 } as const;
     
