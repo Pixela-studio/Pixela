@@ -13,11 +13,11 @@ const STYLES = {
 
   content:
     "relative z-20 w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 flex flex-col items-start justify-center text-left",
-  leftSection: "w-full max-w-3xl",
+  leftSection: "w-full max-w-4xl",
 
   // El titular entero en Bodoni marfil: sin la última línea en rosa.
   mainHeading:
-    "title-card text-[52px] sm:text-7xl lg:text-[88px] 2k:text-[104px] mb-8 flex flex-col [text-wrap:balance]",
+    "title-card text-[44px] sm:text-6xl lg:text-[72px] 2k:text-[88px] mb-8 flex flex-col [text-wrap:balance]",
 
   description:
     "text-lg lg:text-xl leading-relaxed text-white/80 max-w-xl mb-10 [text-wrap:pretty]",

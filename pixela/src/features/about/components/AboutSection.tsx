@@ -35,7 +35,7 @@ const AboutSection = () => {
     elements: [
       { ref: titleRef, duration: 0.8 },
       { ref: statementRef, duration: 0.6, delay: "-=0.5" },
-      { ref: pointsRef, duration: 0.6, delay: "-=0.3", stagger: 0.08 },
+      { ref: pointsRef, duration: 0.6, delay: "-=0.3" },
     ],
   });
 
