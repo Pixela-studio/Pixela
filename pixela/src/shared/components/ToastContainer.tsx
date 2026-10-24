@@ -7,7 +7,7 @@ import { FiX } from 'react-icons/fi';
 const TOAST_STYLES = {
   container: 'fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none',
   toast: {
-    base: 'pointer-events-auto max-w-md w-full rounded-lg shadow-2xl p-4 backdrop-blur-md border border-white/10 transition-[opacity,transform] duration-300 ease-out-expo',
+    base: 'pointer-events-auto max-w-md w-full rounded-2xl shadow-2xl shadow-black/60 p-4 backdrop-blur-md border transition-[opacity,transform] duration-300 ease-out-expo',
     entering: 'animate-slide-in-right',
     exiting: 'animate-slide-out-right opacity-0',
   },
@@ -23,24 +23,24 @@ const TOAST_STYLES = {
 
 const TOAST_VARIANTS: Record<ToastType, { bg: string; text: string; border: string }> = {
   success: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-green-500' 
+    border: 'border-emerald-400/40' 
   },
   error: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-pixela-accent' 
+    border: 'border-red-500/50' 
   },
   warning: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-yellow-500' 
+    border: 'border-yellow-400/40' 
   },
   info: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-pixela-accent' 
+    border: 'border-white/10' 
   },
 };
 
