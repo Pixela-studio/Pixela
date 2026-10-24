@@ -78,19 +78,19 @@ export default function RegisterPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="py-4 space-y-6 w-full max-w-xs mx-auto px-4">
-      {/* Title */}
-      <h2 className="text-[24px] text-white font-bold mb-8">
-        Bienvenido a Pixela | <span className="text-gray-500">Registrarse</span>
-      </h2>
+    <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto space-y-5">
+      <header className="mb-8">
+        <h1 className="text-4xl font-black tracking-tight text-white">Crear cuenta</h1>
+        <p className="mt-2 text-white/70">Bienvenido a Pixela.</p>
+      </header>
 
       {/* Name */}
-      <div className="relative mb-5">
+      <div>
         <TextInput 
           id="name" 
           name="name"
           type="text"
-          placeholder="Username"
+          placeholder="Nombre de usuario"
           icon={<VscAccount />}
           required 
           autoFocus 
@@ -99,7 +99,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Email */}
-      <div className="relative mb-5">
+      <div>
         <TextInput 
           id="email" 
           name="email"
@@ -112,7 +112,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Password */}
-      <div className="relative mb-5">
+      <div>
         <TextInput 
           id="password"
           name="password"
@@ -125,7 +125,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Confirm Password */}
-      <div className="relative mb-5">
+      <div>
         <TextInput 
           id="password_confirmation"
           name="password_confirmation"
@@ -139,26 +139,26 @@ export default function RegisterPage() {
 
       {/* Mensaje de error */}
       {error && (
-        <div className="text-pixela-accent text-[14px]">
+        <div role="alert" className="text-sm text-red-400">
           {error}
         </div>
       )}
 
-      {/* Botones */}
-      <div className="flex items-center gap-10 mt-8">
-        <div className="w-1/2">
-            <RoundedButton type="submit" disabled={loading}>
-              {loading ? '...' : 'Registrar'}
-            </RoundedButton>
-        </div>
-        
-        <Link 
-            href="/login"
-            className="text-[14px] text-pixela-accent hover:text-pixela-accent/80 transition-colors duration-300"
-        >
-            ¿Ya tienes cuenta?
-        </Link>
+      <div className="pt-2">
+        <RoundedButton type="submit" disabled={loading}>
+          {loading ? 'Creando cuenta…' : 'Crear cuenta'}
+        </RoundedButton>
       </div>
+
+      <p className="pt-2 text-center text-sm text-white/70">
+        ¿Ya tienes cuenta?
+        <Link
+          href="/login"
+          className="ml-1.5 font-semibold text-pixela-accent underline-offset-4 transition-colors duration-200 hover:underline"
+        >
+          Inicia sesión
+        </Link>
+      </p>
     </form>
   );
 }

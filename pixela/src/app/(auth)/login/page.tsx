@@ -54,21 +54,22 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="py-4 space-y-6 w-full max-w-xs mx-auto px-4">
-      <h2 className="text-[24px] text-white font-bold mb-8">
-        Bienvenido a Pixela | <span className="text-gray-500">Iniciar sesión</span>
-      </h2>
+    <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto space-y-5">
+      <header className="mb-8">
+        <h1 className="text-4xl font-black tracking-tight text-white">Iniciar sesión</h1>
+        <p className="mt-2 text-white/70">Bienvenido a Pixela.</p>
+      </header>
 
       {justRegistered && (
         <p
           role="status"
-          className="text-[14px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2"
+          className="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2"
         >
           Cuenta creada. Inicia sesión para continuar.
         </p>
       )}
 
-      <div className="relative mb-5">
+      <div>
         <TextInput
           id="email"
           name="email"
@@ -81,7 +82,7 @@ function LoginForm() {
         />
       </div>
 
-      <div className="relative mb-5">
+      <div>
         <TextInput
           id="password"
           name="password"
@@ -95,33 +96,33 @@ function LoginForm() {
 
       {/* `role="alert"` para que un lector de pantalla anuncie el fallo. */}
       {error && (
-        <div role="alert" className="text-pixela-accent text-[14px]">
+        <div role="alert" className="text-sm text-red-400">
           {error}
         </div>
       )}
 
-      <div className="mb-6">
+      <div className="pt-2">
         <RoundedButton type="submit" disabled={loading}>
-          {loading ? 'Iniciando...' : 'Iniciar'}
+          {loading ? 'Entrando…' : 'Entrar'}
         </RoundedButton>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col items-center gap-3 pt-2 text-sm">
         {/* El enlace apuntaba a /forgot-password, una ruta que no existe: cada
             clic llevaba a un 404. Hasta que haya recuperación por email se
             muestra como texto deshabilitado en vez de prometer algo que falla. */}
         <span
-          className="text-[15px] text-gray-600 cursor-not-allowed select-none"
+          className="text-white/45 cursor-not-allowed select-none"
           title="Disponible próximamente"
         >
           ¿Olvidaste tu contraseña?
         </span>
 
-        <div className="text-[15px] text-gray-400">
+        <div className="text-white/70">
           ¿No tienes cuenta?
           <Link
             href="/register"
-            className="ml-2 text-pixela-accent hover:text-pixela-accent/80 transition-colors duration-300"
+            className="ml-1.5 font-semibold text-pixela-accent underline-offset-4 transition-colors duration-200 hover:underline"
           >
             Registrarse
           </Link>
