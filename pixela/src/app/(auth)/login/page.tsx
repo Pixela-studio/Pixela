@@ -74,7 +74,8 @@ function LoginForm() {
           id="email"
           name="email"
           type="email"
-          placeholder="Email"
+          label="Email"
+          placeholder="tu@email.com"
           icon={<VscMail />}
           required
           autoFocus
@@ -87,7 +88,7 @@ function LoginForm() {
           id="password"
           name="password"
           type="password"
-          placeholder="Contraseña"
+          label="Contraseña"
           icon={<VscLock />}
           required
           autoComplete="current-password"
@@ -108,16 +109,9 @@ function LoginForm() {
       </div>
 
       <div className="flex flex-col items-center gap-3 pt-2 text-sm">
-        {/* El enlace apuntaba a /forgot-password, una ruta que no existe: cada
-            clic llevaba a un 404. Hasta que haya recuperación por email se
-            muestra como texto deshabilitado en vez de prometer algo que falla. */}
-        <span
-          className="text-white/45 cursor-not-allowed select-none"
-          title="Disponible próximamente"
-        >
-          ¿Olvidaste tu contraseña?
-        </span>
-
+        {/* "¿Olvidaste tu contraseña?" se quitó: no hay recuperación por email y
+            un texto deshabilitado que parece enlace no ayuda a nadie (además
+            explicaba el motivo solo en `title`). Volverá con la ruta real. */}
         <div className="text-white/70">
           ¿No tienes cuenta?
           <Link
