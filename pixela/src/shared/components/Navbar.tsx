@@ -47,8 +47,9 @@ const STYLES = {
   // devuelve al 100% mientras el underline crece.
   navLink: 'font-outfit text-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
   navLinkActive: 'text-pixela-accent hover:text-pixela-accent',
-  navLinkUnderline: 'absolute -bottom-1 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
-  navLinkUnderlineActive: 'w-full',
+  // Se escala en vez de animar `width`: así no fuerza layout en cada frame.
+  navLinkUnderline: 'absolute -bottom-1 left-0 w-full h-0.5 bg-pixela-accent origin-left scale-x-0 transition-transform duration-300 ease-out-expo group-hover:scale-x-100',
+  navLinkUnderlineActive: 'scale-x-100',
   userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
   userContainer: 'flex items-center gap-2',
   userName: 'text-pixela-light font-outfit text-sm',
@@ -56,19 +57,19 @@ const STYLES = {
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
 
   // Estilos para el menú hamburguesa
-  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 transition-all duration-300 mr-1 ml-auto',
-  mobileMenu: 'fixed inset-0 bg-pixela-dark z-[100] flex flex-col justify-start overflow-y-auto p-6 sm:p-12 pt-24 pb-8 transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 transition-colors duration-300 mr-1 ml-auto',
+  mobileMenu: 'fixed inset-0 bg-pixela-dark z-[100] flex flex-col justify-start overflow-y-auto p-6 sm:p-12 pt-24 pb-8 transform transition-transform duration-500 ease-out-expo',
   mobileMenuVisible: 'translate-y-0',
   mobileMenuHidden: '-translate-y-full',
   mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2 transition-transform hover:rotate-90 duration-300',
   mobileNavContainer: 'flex flex-col flex-1 w-full mt-4 sm:mt-8',
-  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-white/10 flex items-center justify-between w-full overflow-hidden transition-all duration-500 ease-out',
+  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-white/10 flex items-center justify-between w-full overflow-hidden',
   mobileNavLinkText: 'relative z-10 transition-transform duration-300 group-hover:translate-x-4',
-  mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0',
+  mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-[opacity,transform] duration-300 ease-out-expo group-hover:opacity-100 group-hover:translate-x-0',
   mobileNavLinkHoverBg: 'absolute inset-0 bg-pixela-accent/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out',
   mobileUserSection: 'mt-auto pt-8 w-full',
   mobileUserContainer: 'flex flex-col gap-4 w-full',
-  mobileActionButton: 'group relative flex w-full items-center justify-between px-6 py-5 border-2 border-pixela-light/20 hover:border-pixela-accent bg-transparent transition-all duration-300 overflow-hidden',
+  mobileActionButton: 'group relative flex w-full items-center justify-between px-6 py-5 border-2 border-pixela-light/20 hover:border-pixela-accent bg-transparent transition-colors duration-300 overflow-hidden',
   mobileActionText: 'font-outfit font-bold text-xl text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
   mobileActionIcon: 'w-6 h-6 text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
   mobileActionHoverBg: 'absolute inset-0 bg-pixela-accent translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out',
@@ -377,7 +378,7 @@ export const Navbar = () => {
 
         {/* Sección de usuario para móvil */}
         <div 
-          className={`${STYLES.mobileUserSection} transition-all duration-700 delay-500 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          className={`${STYLES.mobileUserSection} transition-[opacity,transform] duration-700 ease-out-expo delay-500 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
           <div className={STYLES.mobileUserContainer}>
             {isAuthenticated && user && (

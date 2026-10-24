@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { prefersReducedMotion } from '@/lib/motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,6 +35,7 @@ export const useDiscoverAnimation = ({
         const container = containerRef.current;
 
         if (!leftSection || !grid || !container) return;
+        if (prefersReducedMotion()) return;
 
         const leftElements = gsap.utils.toArray(leftSection.children);
 
@@ -63,5 +65,8 @@ export const useDiscoverAnimation = ({
             ease: 'power3.out',
         }, '-=0.8');
 
+        return () => {
+            tl.kill();
+        };
     }, [containerRef, leftSectionRef, gridRef]);
 }; 

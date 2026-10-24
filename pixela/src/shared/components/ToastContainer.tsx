@@ -7,7 +7,7 @@ import { FiX } from 'react-icons/fi';
 const TOAST_STYLES = {
   container: 'fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none',
   toast: {
-    base: 'pointer-events-auto max-w-md w-full rounded-lg shadow-2xl p-4 backdrop-blur-md border border-white/10 transition-all duration-300 ease-out transform',
+    base: 'pointer-events-auto max-w-md w-full rounded-lg shadow-2xl p-4 backdrop-blur-md border border-white/10 transition-[opacity,transform] duration-300 ease-out-expo',
     entering: 'animate-slide-in-right',
     exiting: 'animate-slide-out-right opacity-0',
   },
@@ -18,7 +18,7 @@ const TOAST_STYLES = {
   message: 'text-sm opacity-90',
   closeButton: 'flex-shrink-0 p-1 rounded-md hover:bg-white/10 transition-colors',
   action: 'mt-3 pt-3 border-t border-current/20',
-  actionButton: 'text-sm font-medium underline hover:no-underline transition-all',
+  actionButton: 'text-sm font-medium underline underline-offset-4 hover:no-underline',
 } as const;
 
 const TOAST_VARIANTS: Record<ToastType, { bg: string; text: string; border: string }> = {

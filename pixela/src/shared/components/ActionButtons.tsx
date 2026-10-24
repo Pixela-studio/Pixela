@@ -23,7 +23,7 @@ const STYLES = {
   icon: {
     hero: 'h-3 w-3',
     default: 'w-3.5 h-3.5',
-    favorite: 'w-4 h-4 transition-all duration-300'
+    favorite: 'w-4 h-4 transition-[color,transform] duration-300'
   }
 } as const;
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { prefersReducedMotion } from '@/lib/motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,6 +54,13 @@ export const useScrollAnimation = ({
 
     // Configurar estado inicial de todos los elementos
     const allRefs = validElements.map(element => element.ref.current);
+
+    // Con movimiento reducido el contenido se muestra tal cual, sin entrada.
+    if (prefersReducedMotion()) {
+      gsap.set(allRefs, { clearProps: 'opacity,visibility,transform' });
+      return;
+    }
+
     gsap.set(allRefs, { autoAlpha: 0, y: initialY });
 
     // Crear timeline principal
