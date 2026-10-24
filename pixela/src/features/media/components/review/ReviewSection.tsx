@@ -13,7 +13,7 @@ import { toast } from '@/lib/toast';
 const STYLES = {
   section: {
     container: "mt-12 mb-24",
-    title: "text-2xl font-bold text-white mb-8"
+    title: "title-card text-5xl md:text-6xl mb-10"
   },
   states: {
     loading: "flex items-center justify-center py-12",
@@ -120,7 +120,7 @@ export function ReviewSection({ reviews, mediaTitle, loading, error, refreshRevi
   if (!isAuthenticated) {
     return (
       <div className={STYLES.section.container}>
-        <h2 className={STYLES.section.title}>Reseñas de usuarios</h2>
+        <h2 className={STYLES.section.title}>Reseñas</h2>
         <div className={STYLES.states.empty}>
           <FiAlertCircle className={STYLES.states.emptyIcon} />
           <p className={STYLES.states.emptyText}>Inicia sesión para ver y escribir reseñas.</p>
@@ -146,7 +146,7 @@ export function ReviewSection({ reviews, mediaTitle, loading, error, refreshRevi
 
   return (
     <div className={STYLES.section.container}>
-      <h2 ref={headingRef} tabIndex={-1} className={STYLES.section.title}>Reseñas de usuarios</h2>
+      <h2 ref={headingRef} tabIndex={-1} className={STYLES.section.title}>Reseñas</h2>
       {visibleReviews.length === 0 ? (
         <div className={STYLES.states.empty}>
           <FiAlertCircle className={STYLES.states.emptyIcon} />

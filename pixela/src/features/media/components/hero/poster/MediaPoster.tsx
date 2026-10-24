@@ -9,8 +9,8 @@ const STYLES = {
   container: 'flex-shrink-0',
   button:
     'group relative block w-full cursor-zoom-in rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-4 focus-visible:ring-offset-pixela-ink',
-  imageContainer: 'relative w-full aspect-[2/3] overflow-hidden rounded-lg shadow-2xl shadow-black/50',
-  image: 'object-cover transition duration-300 group-hover:scale-105',
+  imageContainer: 'relative w-full aspect-[2/3] overflow-hidden rounded-sm shadow-2xl shadow-black/60',
+  image: 'object-cover transition-transform duration-700 ease-out-expo [@media(hover:hover)]:group-hover:scale-[1.03]',
   hoverOverlay:
     'absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-black/50 text-sm font-medium text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100',
   placeholderContainer: 'absolute inset-0 bg-gradient-to-br from-pixela-raised via-pixela-surface to-black flex flex-col items-center justify-center p-4 text-center rounded-lg',

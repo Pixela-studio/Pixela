@@ -113,8 +113,8 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
       />
 
       {/* Content Sections */}
-      <div className="relative z-10 pb-40 -mt-20">
-        <div className="container px-4 pt-8 mx-auto md:pt-0">
+      <div className="relative z-10 pb-40">
+        <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 flex flex-col gap-16 md:gap-24">
           {/* Proveedores de Streaming */}
           <StreamingProviders providers={media.proveedores || []} />
           {/* Reparto */}

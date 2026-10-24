@@ -4,8 +4,8 @@ import { Serie } from '@/features/media/types/content';
 
 
 const STYLES = {
-  container: "mb-4",
-  title: "text-gray-300 text-sm font-medium mb-2",
+  container: "",
+  title: "text-sm text-gray-400 mb-2",
   creatorsWrapper: "flex flex-wrap gap-4"
 } as const;
 
@@ -28,8 +28,8 @@ export const CreatorInfo = ({ media }: CreatorInfoProps) => {
     <div className={STYLES.container}>
       <h3 className={STYLES.title}>
         {isSerie 
-          ? ((serie.creadores?.length ?? 0) > 1 ? 'Creadores' : 'Creador')
-          : 'Director'
+          ? 'Creada por'
+          : 'Dirección'
         }
       </h3>
       <div className={STYLES.creatorsWrapper}>

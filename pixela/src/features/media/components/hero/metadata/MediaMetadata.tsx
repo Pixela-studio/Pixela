@@ -4,15 +4,9 @@ import { formatRuntime, formatYear } from "@/lib/date";
 
 const STYLES = {
   container:
-    "flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-300",
-  rating:
-    "inline-flex items-center gap-1 rounded-md bg-pixela-accent/15 px-2 py-0.5 font-semibold text-pixela-accent",
-  separator: "text-gray-400",
-  top: "inline-flex items-center rounded-md border border-pixela-accent/30 bg-pixela-accent/10 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider text-pixela-accent",
+    "flex flex-wrap items-center gap-x-5 gap-y-1 text-[15px] [font-stretch:112%] text-gray-400 tabular-nums",
+  rating: "inline-flex items-center gap-1.5 font-semibold text-white",
 } as const;
-
-/** Puntuación a partir de la cual se destaca un título. */
-const TOP_SCORE_THRESHOLD = 8;
 
 /**
  * Fila de metadatos de la ficha: puntuación, año y duración o temporadas.
@@ -55,18 +49,11 @@ export const MediaMetadata = ({ media }: MediaMetadataProps) => {
       <span className={STYLES.rating}>
         <span aria-hidden="true">★</span>
         <span className="sr-only">Puntuación:</span>
-        {media.puntuacion.toFixed(1)}
+        {media.puntuacion.toFixed(1).replace(".", ",")}
       </span>
 
-      {media.puntuacion >= TOP_SCORE_THRESHOLD && (
-        <span className={STYLES.top}>Top Pixela</span>
-      )}
-
       {entries.map((entry, index) => (
-        <span key={entry} className="flex items-center gap-2">
-          <span className={STYLES.separator} aria-hidden="true">
-            •
-          </span>
+        <span key={entry}>
           {entry}
           {index === entries.length - 1 && !isSerie && (
             <span className="sr-only"> de duración</span>

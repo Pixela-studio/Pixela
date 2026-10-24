@@ -21,8 +21,8 @@ export function StreamingProviders({ providers }: StreamingProvidersProps) {
   }
   
   return (
-    <section className="mt-24 mb-12 md:mt-24 lg:mt-0">
-      <h2 className="mb-6 text-2xl font-bold text-white">Disponible en</h2>
+    <section>
+      <h2 className="title-card mb-8 text-5xl md:text-6xl">Dónde verla</h2>
       <div className="flex flex-wrap gap-4">
         {providers.map((provider) => (
           <PlatformCard 

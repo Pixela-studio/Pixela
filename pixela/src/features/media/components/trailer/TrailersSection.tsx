@@ -8,7 +8,7 @@ import { TrailerList } from './TrailerList';
 const STYLES = {
   container: {
     base: "mt-12 mb-24",
-    title: "mb-5 text-2xl font-bold text-white",
+    title: "title-card mb-8 text-5xl md:text-6xl",
     content: "flex flex-col gap-6 lg:flex-row"
   }
 } as const;
@@ -32,7 +32,7 @@ export function TrailersSection({ trailers }: TrailersSectionProps) {
   
   return (
     <div className={STYLES.container.base}>
-      <h2 className={STYLES.container.title}>Trailers y Videos</h2>
+      <h2 className={STYLES.container.title}>Tráilers</h2>
       
       <div className={STYLES.container.content}>
         <TrailerPlayer trailerId={selectedTrailerId || youtubeTrailers[0]?.key || ''} />

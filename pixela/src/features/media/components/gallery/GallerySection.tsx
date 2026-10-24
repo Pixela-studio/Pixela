@@ -14,7 +14,7 @@ import { GallerySkeleton } from '@/app/components/skeletons';
 const STYLES = {
   // Contenedor principal y título
   container: "mt-12 mb-24",
-  title: "text-2xl font-bold text-white mb-5",
+  title: "title-card text-5xl md:text-6xl mb-8",
 
   // Estados de carga y animaciones
   loadingContainer: "mt-12 mb-12",

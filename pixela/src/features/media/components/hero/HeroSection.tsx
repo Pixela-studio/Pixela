@@ -20,14 +20,16 @@ interface HeroSectionProps {
 }
 
 const STYLES = {
-  container: "relative w-full min-h-[80vh] flex items-end",
-  contentWrapper: "relative container mx-auto px-4 pt-32 pb-12 lg:pt-40 lg:pb-20",
-  layout:
-    "flex flex-col items-center gap-8 text-center lg:flex-row lg:items-end lg:gap-10 lg:text-left",
-  poster: "w-40 flex-shrink-0 sm:w-48 lg:w-64",
-  content: "flex w-full flex-col items-center gap-4 lg:items-start",
+  // La ficha como cartón de apertura: backdrop a sangre, el título en Bodoni
+  // a escala de cartel y los créditos debajo, todo alineado a la izquierda.
+  container: "relative w-full min-h-[88vh] flex items-end",
+  contentWrapper:
+    "relative w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 pt-[34vh] pb-14 lg:pb-20",
+  layout: "flex flex-col items-start gap-8 lg:flex-row lg:items-end lg:gap-14",
+  poster: "w-32 flex-shrink-0 sm:w-44 lg:w-64 xl:w-72",
+  content: "flex w-full min-w-0 flex-col items-start gap-5",
   synopsis:
-    "max-w-3xl text-base leading-relaxed text-gray-300 lg:text-lg [text-wrap:pretty]",
+    "max-w-2xl text-lg leading-relaxed text-white/85 lg:text-xl [text-wrap:pretty]",
 } as const;
 
 /**
