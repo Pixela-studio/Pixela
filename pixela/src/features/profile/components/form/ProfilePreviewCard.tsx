@@ -23,9 +23,9 @@ const STYLES = {
   bannerImage:
     "w-full h-full object-cover transition-transform duration-700 group-hover/banner:scale-105",
   bannerOverlay:
-    "absolute inset-0 bg-black/20 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px]",
+    "absolute inset-0 bg-black/20 transition duration-300 flex items-center justify-center backdrop-blur-[1px]",
   coverButton:
-    "px-4 py-2 bg-black/60 text-white rounded-full text-sm font-medium border border-white/20 flex items-center gap-2 hover:bg-pixela-accent hover:border-pixela-accent transition-all shadow-lg",
+    "px-4 py-2 bg-black/60 text-white rounded-full text-sm font-medium border border-white/20 flex items-center gap-2 hover:bg-pixela-accent hover:border-pixela-accent transition shadow-lg",
 
   // Avatar Area (Overlapping)
   avatarArea: "absolute left-6 bottom-6 cursor-pointer group/avatar",
@@ -33,7 +33,7 @@ const STYLES = {
     "relative w-32 h-32 rounded-full border-4 border-pixela-surface overflow-hidden bg-pixela-raised shadow-xl",
   avatarImage: "w-full h-full object-cover",
   avatarOverlay:
-    "absolute inset-0 bg-black/30 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px]",
+    "absolute inset-0 bg-black/30 transition duration-300 flex items-center justify-center backdrop-blur-[1px]",
   cameraIcon: "text-white w-6 h-6",
 
   // Inputs ocultos
