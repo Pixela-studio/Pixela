@@ -91,7 +91,7 @@ export const BannerSelectorModal = ({
                   key={index}
                   onClick={() => onSelect(url)}
                   className={clsx(
-                    "group relative aspect-video rounded-xl overflow-hidden border-2 transition-all duration-300",
+                    "group relative aspect-video rounded-xl overflow-hidden border-2 transition duration-300",
                     currentBanner === url
                       ? "border-pixela-accent shadow-[0_0_20px_rgba(239,68,68,0.3)]"
                       : "border-transparent hover:border-white/20",

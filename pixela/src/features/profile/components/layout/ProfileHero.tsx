@@ -37,7 +37,7 @@ export const ProfileHero = ({ user }: ProfileHeroProps) => {
       <div className={STYLES.heroBackground}>
         {/* Dynamic Banner */}
         <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-700"
+          className="absolute inset-0 bg-cover bg-center transition duration-700"
           style={{
             backgroundImage: `url('${user.cover_url || "https://images.unsplash.com/photo-1574267432553-4b4628081c31?q=80&w=2831&auto=format&fit=crop"}')`,
             opacity: 0.4,

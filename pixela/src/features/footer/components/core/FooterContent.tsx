@@ -9,7 +9,7 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 const STYLES = {
   // Layout principal
   container: "relative z-10 w-full",
-  mainContainer: "w-[83.33%] max-w-7xl 2k:max-w-6xl 2k:w-[70%] mx-auto transition-all duration-700 ipad:w-[90%]",
+  mainContainer: "w-[83.33%] max-w-7xl 2k:max-w-6xl 2k:w-[70%] mx-auto transition duration-700 ipad:w-[90%]",
   gridMain: "grid grid-cols-1 md:grid-cols-12 gap-x-12 gap-y-8 md:gap-y-16 2k:gap-y-12 py-8 md:py-16 2k:py-12 ipad:gap-x-8 ipad:gap-y-6 ipad:py-12 ipad:grid-cols-3",
 
   // Logo y descripción
@@ -35,13 +35,13 @@ const STYLES = {
   linksList: "space-y-4 ipad:space-y-3",
   linkItem: "transform hover:translate-x-1 transition-transform duration-300",
   linkAnchor: "text-white/70 hover:text-pixela-accent transition flex items-center justify-start group ipad:text-sm",
-  linkIndicator: "w-0 h-0.5 bg-pixela-accent mr-0 opacity-0 group-hover:w-2 group-hover:mr-2 group-hover:opacity-100 transition-all duration-300",
+  linkIndicator: "w-0 h-0.5 bg-pixela-accent mr-0 opacity-0 group-hover:w-2 group-hover:mr-2 group-hover:opacity-100 transition-[width,margin,opacity] duration-300 ease-out-expo",
 
   // Redes sociales
   socialColumn: "flex flex-col space-y-6 md:space-y-8 md:col-span-2 mt-6 md:mt-0 ipad:space-y-5 ipad:mt-0 ipad:col-span-1",
 
   // Footer inferior
-  copyrightSection: "pb-8 md:pb-12 transition-all duration-700 delay-100 ipad:pb-8",
+  copyrightSection: "pb-8 md:pb-12 transition duration-700 delay-100 ipad:pb-8",
   copyrightContainer: "flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 ipad:flex-col ipad:gap-3",
   copyrightText: "text-white/60 text-xs md:text-sm text-center sm:text-left ipad:text-xs ipad:text-center",
   copyrightLinks: "flex flex-wrap justify-center sm:justify-end gap-x-4 gap-y-2 ipad:justify-center",

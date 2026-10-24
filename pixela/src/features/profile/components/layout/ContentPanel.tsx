@@ -3,7 +3,7 @@ import { ContentPanelProps } from "@/features/profile/types/layout";
 
 const STYLES = {
   container:
-    "p-6 bg-pixela-dark/35 rounded-xl border border-white/10 backdrop-blur-[10px] transition-all duration-300 hover:bg-pixela-dark/40 hover:-translate-y-px hover:shadow-lg",
+    "p-6 bg-pixela-dark/35 rounded-xl border border-white/10 backdrop-blur-[10px] transition duration-300 hover:bg-pixela-dark/40 hover:-translate-y-px hover:shadow-lg",
   header: "mb-6 pb-4 border-b border-white/10",
   title: "text-lg font-semibold text-white font-outfit tracking-tight",
   headerAction: "text-pixela-accent",

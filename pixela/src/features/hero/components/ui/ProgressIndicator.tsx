@@ -19,13 +19,13 @@ const STYLES = {
     fill: "h-full bg-pixela-accent",
   },
   dot: {
-    base: "h-2 rounded-full transition-all duration-300",
+    base: "h-2 rounded-full transition-[width,background-color] duration-300 ease-out-expo",
     active: "bg-pixela-accent w-4 sm:w-4 md:w-5 lg:w-6",
     inactive: "bg-pixela-light/50 w-2 hover:bg-pixela-light/70",
   },
   playback: {
     button:
-      "p-1 sm:p-1 md:p-1.5 lg:p-2 rounded-full bg-pixela-dark/40 backdrop-blur-sm text-pixela-light hover:text-pixela-accent hover:bg-pixela-dark/60 transition-all duration-300",
+      "p-1 sm:p-1 md:p-1.5 lg:p-2 rounded-full bg-pixela-dark/40 backdrop-blur-sm text-pixela-light hover:text-pixela-accent hover:bg-pixela-dark/60 transition duration-300",
     icon: "h-3 w-3 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4",
   },
 } as const;

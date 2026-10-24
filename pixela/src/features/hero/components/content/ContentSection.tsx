@@ -42,14 +42,14 @@ const STYLES = {
 
   // CTA "Descubrir más" del welcome (chevron link).
   chevronCta: {
-    base: "group inline-flex items-center transition-all duration-300",
-    text: "font-medium text-pixela-light group-hover:text-white transition-all duration-300 mr-2 text-sm sm:text-base lg:text-base tracking-wide",
-    icon: "h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-pixela-light group-hover:text-pixela-accent opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1",
+    base: "group inline-flex items-center transition duration-300",
+    text: "font-medium text-pixela-light group-hover:text-white transition duration-300 mr-2 text-sm sm:text-base lg:text-base tracking-wide",
+    icon: "h-5 w-5 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-pixela-light group-hover:text-pixela-accent opacity-80 group-hover:opacity-100 transition duration-300 group-hover:translate-x-1",
   },
 
   // CTA "Ver detalles" cuando hay peli/serie activa (píldora accent).
   pillCta: {
-    base: "group inline-flex items-center gap-2.5 px-6 py-3 md:px-7 md:py-3.5 rounded-full font-semibold text-sm md:text-base tracking-wide bg-pixela-accent text-white shadow-lg shadow-pixela-accent/30 hover:shadow-pixela-accent/50 hover:bg-pixela-accent/95 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300",
+    base: "group inline-flex items-center gap-2.5 px-6 py-3 md:px-7 md:py-3.5 rounded-full font-semibold text-sm md:text-base tracking-wide bg-pixela-accent text-white shadow-lg shadow-pixela-accent/30 hover:shadow-pixela-accent/50 hover:bg-pixela-accent/95 hover:-translate-y-0.5 active:translate-y-0 transition duration-300",
     icon: "h-4 w-4 md:h-5 md:w-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5",
   },
 

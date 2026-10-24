@@ -30,7 +30,7 @@ const TrailerListItem = ({
     <button
       onClick={onSelect}
       className={`
-        flex items-stretch rounded-xl overflow-hidden transition-all duration-200
+        flex items-stretch rounded-xl overflow-hidden transition duration-200
         ${isLarge ? 'min-h-[100px] h-24' : 'min-h-[80px] h-20'} flex-shrink-0
         ${isSelected
           ? 'bg-gradient-to-r from-pixela-accent/20 to-pixela-dark/95 border border-pixela-accent/30 shadow-lg shadow-pixela-accent/10'
@@ -43,12 +43,12 @@ const TrailerListItem = ({
           src={`https://img.youtube.com/vi/${trailer.key}/default.jpg`}
           alt={trailer.nombre || 'Video thumbnail'}
           fill
-          className={`object-cover transition-all duration-300 ${
+          className={`object-cover transition duration-300 ${
             isSelected ? 'brightness-110 contrast-110' : 'brightness-90'
           }`}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className={`rounded-full ${isLarge ? 'p-2' : 'p-1.5'} transition-all duration-200 ${
+          <div className={`rounded-full ${isLarge ? 'p-2' : 'p-1.5'} transition duration-200 ${
             isSelected
               ? 'bg-white/20 backdrop-blur-sm scale-110'
               : 'bg-black/40'
