@@ -26,7 +26,7 @@ export function StreamingProviders({ providers }: StreamingProvidersProps) {
       <div className="flex flex-wrap gap-4">
         {providers.map((provider) => (
           <PlatformCard 
-            key={provider.id || Math.random().toString()} 
+            key={provider.id || provider.nombre}
             provider={provider} 
           />
         ))}
