@@ -10,6 +10,29 @@ import Image from "next/image";
 
 interface ActorPageProps {
   actor: ActorDetails;
+  /**
+   * Claves `"movies/<id>"` / `"series/<id>"` de la filmografía que pueden
+   * emitir `<Link>`, resueltas en el Server Component de la ruta.
+   *
+   * Este carrusel era el segundo de los dos `<Link>` que cerraban el ciclo
+   * rastreable: ficha → reparto → persona → **veinte fichas nuevas** → sus
+   * repartos → más personas. Sin salida, y con una entrada de caché ISR y una
+   * invocación por paso, un rastreador recorría TMDB entero. Cortando aquí, el
+   * grafo se cierra sobre el catálogo curado.
+   *
+   * Llega como lista de claves y no como allowlist entera porque la
+   * intersección de los ~126 créditos de un actor con los 88 títulos curados
+   * son cero o un puñado de entradas; mandar la allowlist completa habría
+   * costado ~1 KB de payload RSC en cada ficha de actor.
+   *
+   * Opcional y con `[]` por defecto: aquí el lado seguro del fallo es no
+   * enlazar, porque la garantía de grafo cerrado depende de este gate y perder
+   * un enlace no rompe nada —el póster, el título y el personaje se siguen
+   * viendo—. Es el criterio contrario al de `ActorCard`, donde el reparto sin
+   * marcar sí enlaza; allí lo que está en juego es la navegación normal por una
+   * ficha, no el cierre del ciclo.
+   */
+  linkableCredits?: readonly string[];
 }
 
 const STYLES = {
@@ -27,7 +50,9 @@ const STYLES = {
     "max-w-4xl text-base leading-relaxed text-gray-300 lg:text-lg [text-wrap:pretty]",
 } as const;
 
-export const ActorPage = ({ actor }: ActorPageProps) => {
+export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
+  const enlazables = new Set(linkableCredits);
+
   const actorImage = actor.profile_path
     ? tmdbImageHelpers.profile(actor.profile_path, DEFAULT_IMAGE_SIZES.PROFILE)
     : "";
@@ -102,29 +127,48 @@ export const ActorPage = ({ actor }: ActorPageProps) => {
                 {credits.map((item, index) => {
                   const imageSrc = tmdbImageHelpers.poster(item.poster_path || '', DEFAULT_IMAGE_SIZES.POSTER);
                   const linkType = item.media_type === 'movie' ? 'movies' : 'series';
+                  const enlazable = enlazables.has(`${linkType}/${item.id}`);
+
+                  /*
+                   * Mismo contenido con y sin enlace. La variante no enlazable
+                   * se queda sin la clase `group`, así que tampoco hereda el
+                   * `group-hover:scale-105` del póster ni el acento en el
+                   * título: una tarjeta que reacciona al ratón y no lleva a
+                   * ningún sitio es peor que una tarjeta quieta.
+                   */
+                  const contenido = (
+                    <>
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] mb-3 shadow-lg shadow-black/50">
+                        <Image
+                          src={imageSrc}
+                          alt={item.title || item.name || ""}
+                          fill
+                          sizes="(max-width: 768px) 140px, 160px"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      </div>
+                      <h4 className="text-sm font-bold text-white truncate group-hover:text-pixela-accent transition-colors">
+                        {item.title || item.name}
+                      </h4>
+                      <p className="text-xs text-gray-500 truncate mt-1">
+                        {item.character}
+                      </p>
+                    </>
+                  );
+
                   return (
                     <div key={`${item.id}-${index}`} className="flex-[0_0_140px] md:flex-[0_0_160px] min-w-0 pl-4 h-full">
-                      <Link 
-                        href={`/${linkType}/${item.id}`}
-                        className="group h-full flex flex-col"
-                        prefetch={false}
-                      >
-                        <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] mb-3 shadow-lg shadow-black/50">
-                          <Image
-                            src={imageSrc}
-                            alt={item.title || item.name || ""}
-                            fill
-                            sizes="(max-width: 768px) 140px, 160px"
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                        <h4 className="text-sm font-bold text-white truncate group-hover:text-pixela-accent transition-colors">
-                          {item.title || item.name}
-                        </h4>
-                        <p className="text-xs text-gray-500 truncate mt-1">
-                          {item.character}
-                        </p>
-                      </Link>
+                      {enlazable ? (
+                        <Link
+                          href={`/${linkType}/${item.id}`}
+                          className="group h-full flex flex-col"
+                          prefetch={false}
+                        >
+                          {contenido}
+                        </Link>
+                      ) : (
+                        <div className="h-full flex flex-col">{contenido}</div>
+                      )}
                     </div>
                   );
                 })}

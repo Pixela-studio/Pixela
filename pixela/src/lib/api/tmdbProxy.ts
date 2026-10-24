@@ -36,7 +36,7 @@ export { parseTmdbId, toTmdbType } from "@/lib/api/tmdbDetails";
 export type { PixelaMediaType, TmdbMediaType } from "@/lib/api/tmdbDetails";
 
 /**
- * Caché de las respuestas del proxy en la CDN de Vercel.
+ * Caché de las respuestas del proxy en la CDN o el proxy inverso.
  *
  * Ninguna de estas rutas llevaba `Cache-Control`, así que cada llamada —de la
  * app, de un rastreador o de alguien recargando— despertaba la función y salía

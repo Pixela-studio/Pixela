@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { fetchFromTmdb } from "@/lib/tmdb";
 import { logger } from "@/lib/logger";
@@ -10,6 +11,7 @@ import {
   validationError,
 } from "@/lib/api/responses";
 import { resourceIdSchema, updateReviewSchema } from "@/lib/api/schemas";
+import { mediaPathFor } from "@/lib/api/reviewsQuery";
 
 interface TmdbMediaDetails {
   title?: string;
@@ -55,6 +57,18 @@ export async function PUT(
         user: { select: { name: true, photoUrl: true } },
       },
     });
+
+/**
+ * Invalida el HTML cacheado de la ficha tras tocar sus reseñas.
+ *
+ * Las fichas son ISR con una hora de vida, así que sin esto una reseña nueva
+ * tardaría hasta una hora en verse para el resto de visitantes. `revalidatePath`
+ * marca **solo** esa ficha, no todas: se regenera una página, no el catálogo.
+ *
+ * Quien escribe la reseña no depende de esto — su propia vista se refresca
+ * llamando a la API — pero el resto sí.
+ */
+    revalidatePath(mediaPathFor(updatedReview.tmdbId, updatedReview.itemType));
 
     // El enriquecido con TMDB es cosmético: si falla no debe tumbar el guardado,
     // que ya está confirmado en base de datos.
@@ -109,6 +123,9 @@ export async function DELETE(
     }
 
     await prisma.review.delete({ where: { id } });
+
+    // Misma razón que en POST/PUT: la ficha cacheada aún muestra la reseña.
+    revalidatePath(mediaPathFor(review.tmdbId, review.itemType));
 
     return NextResponse.json({ success: true });
   } catch (error) {

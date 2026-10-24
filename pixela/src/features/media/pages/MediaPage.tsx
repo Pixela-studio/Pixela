@@ -1,8 +1,9 @@
 "use client";
 
 import { Media } from "../types";
-import { useEffect, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { reviewsAPI } from "@/api/reviews/reviews";
+import type { Review } from "@/api/reviews/types";
 import { useMediaStore } from "@/features/media/store/mediaStore";
 
 import { HeroSection } from "@/features/media/components/hero/HeroSection";
@@ -15,6 +16,8 @@ import { ReviewSection } from "@/features/media/components/review/ReviewSection"
 
 interface MediaPageProps {
   media: Media;
+  /** Reseñas ya resueltas en el servidor. Ver el comentario de `reviews` abajo. */
+  initialReviews: Review[];
 }
 
 /**
@@ -22,9 +25,32 @@ interface MediaPageProps {
  * @param {MediaPageProps} props - Propiedades de la página
  * @returns {JSX.Element} Página de media
  */
-export const MediaPage = ({ media }: MediaPageProps) => {
+export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
   const tmdbId = Number(media.id);
   const itemType = media.tipo === "pelicula" ? "movie" : "series";
+
+  /*
+   * Las reseñas llegan como prop desde el Server Component y viven en estado
+   * local, no en `useMediaStore`.
+   *
+   * Antes se pedían en un `useEffect` al montar: una Edge Request y una
+   * invocación de función en **cada** vista de ficha, también para visitantes
+   * anónimos. Con la página ya en ISR, esa llamada era lo único que seguía
+   * despertando al servidor en cada visita.
+   *
+   * Estado local y no store porque `MediaPage` era el único que leía `reviews`
+   * de `useMediaStore`, y un store a nivel de módulo arrastra las reseñas de la
+   * ficha anterior al navegar entre títulos. Sembrar `useState` con la prop
+   * evita además el `setState` en efecto que el store obligaba a hacer.
+   *
+   * Frescura: quien publica, edita o borra ve el cambio al instante porque
+   * `refreshReviews` va contra la API. Para el resto, las rutas de mutación
+   * llaman a `revalidatePath` sobre esta ficha, así que el HTML cacheado se
+   * regenera en cuanto alguien cambia algo.
+   */
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [errorReviews, setErrorReviews] = useState<string | null>(null);
 
   /**
    * Estado y acciones del store
@@ -36,21 +62,12 @@ export const MediaPage = ({ media }: MediaPageProps) => {
    * @property {string | null} errorReviews - Indica si hay un error en las reseñas
    * @property {() => void} setReviews - Función que se ejecuta al actualizar las reseñas
    */
-  const {
-    showPosterModal,
-    setShowPosterModal,
-    reviews,
-    loadingReviews,
-    errorReviews,
-    setReviews,
-    setLoadingReviews,
-    setErrorReviews,
-  } = useMediaStore();
+  const { showPosterModal, setShowPosterModal } = useMediaStore();
 
   /**
-   * Función que actualiza las reseñas
-   * @returns {void}
-   * @description Función que actualiza las reseñas
+   * Recarga las reseñas desde la API.
+   *
+   * Solo se llama tras una mutación (publicar, editar, borrar), nunca al montar.
    */
   const refreshReviews = useCallback(() => {
     setLoadingReviews(true);
@@ -62,15 +79,7 @@ export const MediaPage = ({ media }: MediaPageProps) => {
       })
       .catch(() => setErrorReviews("No se pudieron cargar las reseñas."))
       .finally(() => setLoadingReviews(false));
-  }, [tmdbId, itemType, setReviews, setLoadingReviews, setErrorReviews]);
-
-  /**
-   * Efecto que actualiza las reseñas
-   * @description Efecto que actualiza las reseñas
-   */
-  useEffect(() => {
-    refreshReviews();
-  }, [refreshReviews]);
+  }, [tmdbId, itemType]);
 
   return (
     <div className="min-h-screen bg-[#0F0F0F]">

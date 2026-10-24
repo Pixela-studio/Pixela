@@ -10,12 +10,11 @@
  * Spaceship.com—. Con eso, el sitemap anunciaba a los buscadores las URLs de una
  * página de venta de dominios y las tarjetas de redes sociales apuntaban ahí.
  *
- * El valor por defecto es la URL real de producción del proyecto en Vercel.
- * Cuando haya dominio propio, basta definir `NEXT_PUBLIC_SITE_URL` en el panel
- * de Vercel (Settings → Environment Variables) y apuntarlo también en Domains;
- * no hace falta tocar código.
+ * En producción hay que definir `NEXT_PUBLIC_SITE_URL` con el dominio real
+ * (en Coolify, como build arg: se inlinea en build). El valor por defecto solo
+ * sirve para desarrollo local, para no anunciar ningún dominio ajeno.
  */
-const DEFAULT_SITE_URL = "https://pixela-seven.vercel.app";
+const DEFAULT_SITE_URL = "http://localhost:3000";
 
 /** Sin barra final: el resto del código concatena rutas que ya empiezan por `/`. */
 export const SITE_URL = (

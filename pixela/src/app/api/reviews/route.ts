@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { fetchFromTmdb } from "@/lib/tmdb";
 import { logger } from "@/lib/logger";
@@ -10,6 +11,7 @@ import {
 } from "@/lib/api/responses";
 import { createReviewSchema } from "@/lib/api/schemas";
 import { enforceRateLimit } from "@/lib/api/rateLimit";
+import { mediaPathFor } from "@/lib/api/reviewsQuery";
 
 interface TmdbMediaDetails {
   title?: string;
@@ -119,6 +121,18 @@ export async function POST(request: Request) {
         user: { select: { name: true, photoUrl: true } },
       },
     });
+
+/**
+ * Invalida el HTML cacheado de la ficha tras tocar sus reseñas.
+ *
+ * Las fichas son ISR con una hora de vida, así que sin esto una reseña nueva
+ * tardaría hasta una hora en verse para el resto de visitantes. `revalidatePath`
+ * marca **solo** esa ficha, no todas: se regenera una página, no el catálogo.
+ *
+ * Quien escribe la reseña no depende de esto — su propia vista se refresca
+ * llamando a la API — pero el resto sí.
+ */
+    revalidatePath(mediaPathFor(newReview.tmdbId, newReview.itemType));
 
     return NextResponse.json({
       success: true,
