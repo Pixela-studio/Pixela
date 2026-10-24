@@ -25,7 +25,7 @@ Pixela unifica frontend y backend en una arquitectura eficiente y escalable:
 *   **Estilos:** [Tailwind CSS](https://tailwindcss.com/) (Diseño "Glassmorphism").
 *   **Datos:** API de [TMDB](https://www.themoviedb.org/).
 *   **Package manager & runtime:** [Bun](https://bun.sh/).
-*   **Despliegue:** [Vercel](https://vercel.com/).
+*   **Despliegue:** imagen Docker (`pixela/Dockerfile.prod`) en servidor propio con [Coolify](https://coolify.io/).
 
 ### Requisitos y arranque local
 

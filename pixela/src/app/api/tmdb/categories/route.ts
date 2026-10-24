@@ -13,7 +13,7 @@ interface Genre {
  * visita a `/categories` despertaba la función y hacía dos llamadas a TMDB.
  *
  * - `max-age`: el navegador no vuelve a pedirlo durante la sesión.
- * - `s-maxage`: la CDN de Vercel responde por su cuenta durante una semana.
+ * - `s-maxage`: la CDN o el proxy responden por su cuenta durante una semana.
  */
 const CACHE_HEADERS = {
   'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800',

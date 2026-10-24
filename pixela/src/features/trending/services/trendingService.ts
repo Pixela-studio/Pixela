@@ -11,7 +11,7 @@ import { fetchFromTmdb } from "@/lib/tmdb";
  * Antes hacía `fetch("https://<dominio>/api/series/trending")`, es decir, el
  * servidor se pedía a sí mismo por HTTP público una ruta que a su vez llamaba a
  * TMDB. Cada render de la portada salía del servidor, volvía a entrar por el
- * edge de Vercel y despertaba otra función: dos Edge Requests y dos
+ * edge y despertaba otra función: dos Edge Requests y dos
  * invocaciones por sección, cuatro en total solo para tendencias y descubrir.
  * Y como iba con `cache: "no-store"`, se repetía en cada visita.
  *

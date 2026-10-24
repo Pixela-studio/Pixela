@@ -2,17 +2,17 @@
  * Loader de imágenes de `next/image`.
  *
  * Motivo: cada imagen que pasa por el optimizador de Next (`/_next/image?...`)
- * es una petición al edge de Vercel **y** una invocación del optimizador. La
- * portada renderiza del orden de 60-75 pósters y backdrops, así que una sola
- * visita generaba decenas de Edge Requests solo en imágenes.
+ * es una petición más al servidor **y** un trabajo de sharp en CPU. La portada
+ * renderiza del orden de 60-75 pósters y backdrops, así que una sola visita
+ * generaba decenas de peticiones solo en imágenes.
  *
  * Todas esas imágenes vienen ya de `image.tmdb.org`, que es una CDN global y
  * expone las variantes por tamaño en la propia ruta (`/t/p/w780/...`). Volver a
- * optimizarlas en Vercel no aporta nada: se paga cuota por reempaquetar algo
+ * optimizarlas en nuestro servidor no aporta nada: se gasta CPU en reempaquetar algo
  * que ya venía optimizado desde otra CDN.
  *
  * Este loader deja las URLs de TMDB apuntando directamente a su CDN (0
- * peticiones a Vercel) y mantiene el optimizador nativo para las pocas imágenes
+ * peticiones a nuestro servidor) y mantiene el optimizador nativo para las pocas imágenes
  * locales del proyecto, replicando exactamente la URL que generaba el loader
  * por defecto.
  */
