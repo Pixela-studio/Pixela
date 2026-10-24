@@ -38,12 +38,12 @@ const STATUS_CONFIG = {
   [WatchStatus.PLAN_TO_WATCH]: {
     label: WATCH_STATUS_LABELS[WatchStatus.PLAN_TO_WATCH],
     icon: FiClock,
-    color: "text-blue-400",
+    color: "text-white/80",
   },
   [WatchStatus.WATCHING]: {
     label: WATCH_STATUS_LABELS[WatchStatus.WATCHING],
     icon: FiPlay,
-    color: "text-green-400",
+    color: "text-emerald-400",
   },
   [WatchStatus.COMPLETED]: {
     label: WATCH_STATUS_LABELS[WatchStatus.COMPLETED],

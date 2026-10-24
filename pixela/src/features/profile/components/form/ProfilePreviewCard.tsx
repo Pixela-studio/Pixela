@@ -91,7 +91,7 @@ export const ProfilePreviewCard = ({
                 className={STYLES.avatarImage}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600 text-white text-3xl font-bold">
+              <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-white font-display text-4xl">
                 {name?.charAt(0).toUpperCase() || "?"}
               </div>
             )}

@@ -28,8 +28,8 @@ const STATUS_FILTERS = [
 
 const STATUS_COLORS = {
   [WatchStatus.PLAN_TO_WATCH]:
-    "bg-blue-500/20 text-blue-400 border-blue-500/50",
-  [WatchStatus.WATCHING]: "bg-green-500/20 text-green-400 border-green-500/50",
+    "bg-white/10 text-white/85 border-white/20",
+  [WatchStatus.WATCHING]: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
   [WatchStatus.COMPLETED]:
     "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
   [WatchStatus.DROPPED]: "bg-red-500/20 text-red-400 border-red-500/50",
