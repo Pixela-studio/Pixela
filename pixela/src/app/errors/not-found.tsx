@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import './error-styles.css';
+import { FiHome, FiArrowLeft } from 'react-icons/fi';
 import { STYLES } from './_styles';
 
 export default function NotFound() {
@@ -17,12 +17,8 @@ export default function NotFound() {
 
   return (
     <div className={STYLES.container}>
-      {/* Efectos decorativos de fondo */}
-      <div className={STYLES.decorative.glow}></div>
-      <div className={STYLES.decorative.glow2}></div>
-      
-      {/* Gradiente de fondo */}
-      <div className={STYLES.background.gradient}></div>
+      <div className={STYLES.noise} aria-hidden="true" />
+      <div className={STYLES.vignette} aria-hidden="true" />
       
       <div className={STYLES.content.wrapper}>
         {/* Código de error 404 */}
@@ -32,7 +28,7 @@ export default function NotFound() {
         
         {/* Título */}
         <h2 className={STYLES.content.title}>
-          ¡Página No Encontrada!
+          Página no encontrada
         </h2>
         
         {/* Descripción */}
@@ -47,7 +43,7 @@ export default function NotFound() {
             &ldquo;Este lugar es como el recuerdo de alguien de un pueblo, y el recuerdo se está desvaneciendo&rdquo;
           </p>
           <cite className={STYLES.content.quote.attribution}>
-            - True Detective, página perdida en el tiempo
+            — True Detective, página perdida en el tiempo
           </cite>
         </blockquote>
 
@@ -57,14 +53,16 @@ export default function NotFound() {
             onClick={() => router.push('/')}
             className={STYLES.buttons.primary}
           >
-            🏠 Volver al Inicio
+            <FiHome className={STYLES.buttons.icon} aria-hidden="true" />
+            Volver al inicio
           </button>
           
           <button
             onClick={handleGoBack}
             className={STYLES.buttons.secondary}
           >
-            ← Volver Atrás
+            <FiArrowLeft className={STYLES.buttons.icon} aria-hidden="true" />
+            Volver atrás
           </button>
         </div>
       </div>

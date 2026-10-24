@@ -72,16 +72,8 @@ const STYLES = {
   
   // Acciones y botones
   actions: 'flex justify-end gap-3 pt-6',
-  submitButton: clsx(
-    'px-6 py-2.5 bg-pixela-accent hover:bg-pixela-accent/90',
-    'text-white rounded-xl font-medium transition-all duration-200',
-    'disabled:opacity-50 disabled:cursor-not-allowed',
-    'shadow-lg shadow-pixela-accent/20'
-  ),
-  cancelButton: clsx(
-    'px-6 py-2.5 bg-white/5 hover:bg-white/10',
-    'text-white rounded-xl font-medium transition-all duration-200'
-  ),
+  submitButton: 'btn btn-primary btn-sm',
+  cancelButton: 'btn btn-ghost btn-sm',
   
   // Estilos para el botón del ojo en las contraseñas
   passwordContainer: 'relative',

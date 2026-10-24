@@ -50,7 +50,7 @@ const STYLES = {
     ),
   tabIndicator: (isActive: boolean) =>
     clsx(
-      "absolute bottom-0 left-0 w-full h-0.5 bg-pixela-accent shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-300",
+      "absolute bottom-0 left-0 w-full h-0.5 bg-pixela-accent transition-transform duration-300 ease-out-expo",
       isActive ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0",
     ),
   tabIcon: "text-2xl sm:text-lg relative",
@@ -60,7 +60,7 @@ const STYLES = {
 
   // Botones Generales
   primaryButton:
-    "bg-pixela-accent text-white hover:bg-pixela-accent/90 shadow-lg shadow-pixela-accent/20 px-5 py-2 rounded-lg font-medium transition-all duration-300 transform active:scale-95 flex items-center gap-2",
+    "btn btn-primary btn-sm",
 
   // Notificaciones
   notification:

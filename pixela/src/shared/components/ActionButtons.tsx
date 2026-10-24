@@ -8,11 +8,11 @@ const STYLES = {
   container: 'absolute top-3 right-3 z-50',
   button: {
     primary: {
-      hero: 'flex items-center gap-2 bg-pixela-accent hover:bg-pixela-accent/90 text-white px-4 py-2 rounded-md transition-all duration-300 text-sm font-medium',
-      default: 'flex-1 bg-pixela-accent hover:bg-pixela-accent/90 text-pixela-light py-2.5 rounded flex items-center justify-center gap-2 font-medium transition-colors'
+      hero: 'btn btn-primary btn-sm',
+      default: 'btn btn-primary btn-sm flex-1'
     },
     secondary: {
-      hero: 'flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md backdrop-blur-sm transition-all duration-300 text-sm font-medium',
+      hero: 'btn btn-ghost btn-sm',
       default: 'w-10 h-10 flex items-center justify-center bg-pixela-dark hover:bg-pixela-dark/80 rounded text-pixela-light transition-colors border border-pixela-accent/40'
     },
     favorite: {

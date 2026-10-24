@@ -39,7 +39,7 @@ const STYLES = {
     success: "mb-2 text-sm text-green-400 italic",
     submit: {
       container: "flex justify-end",
-      button: "flex items-center gap-2 px-6 py-2 font-medium text-white transition-colors rounded-lg bg-pixela-accent hover:bg-pixela-accent/90 disabled:opacity-50 disabled:cursor-not-allowed",
+      button: "btn btn-primary btn-sm",
       spinner: "w-5 h-5 border-2 rounded-full border-white/20 border-t-white animate-spin"
     }
   }
