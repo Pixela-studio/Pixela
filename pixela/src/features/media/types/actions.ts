@@ -1,3 +1,5 @@
+import type { Review } from '@/api/reviews/types';
+
 /**
  * Props para el componente ActionButtons
  * @interface ActionButtonsProps
@@ -11,4 +13,6 @@ export interface ActionButtonsProps {
     itemType: 'movie' | 'series';
     title: string;
     refreshReviews?: () => void;
+    /** Reseña del usuario en este título (`null`: no tiene). */
+    userReview?: Review | null;
   }

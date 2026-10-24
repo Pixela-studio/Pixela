@@ -1,6 +1,7 @@
 "use client";
 
 import { Media } from '../../types';
+import type { Review } from '@/api/reviews/types';
 import { BackdropImage } from './backdrop/BackdropImage';
 import { MediaPoster } from './poster/MediaPoster';
 import { MediaTitle } from './title/MediaTitle';
@@ -14,6 +15,8 @@ interface HeroSectionProps {
   onPosterClick: () => void;
   title: string;
   refreshReviews?: () => void;
+  /** Reseña del usuario en este título; ver `ReviewModal`. */
+  userReview?: Review | null;
 }
 
 const STYLES = {
@@ -38,7 +41,7 @@ const STYLES = {
  * dos veces o las dos vistas se desincronizaban. Ahora es un único layout que
  * cambia de dirección con utilidades responsive.
  */
-export function HeroSection({ media, onPosterClick, title, refreshReviews }: HeroSectionProps) {
+export function HeroSection({ media, onPosterClick, title, refreshReviews, userReview }: HeroSectionProps) {
   const itemType = media.tipo === 'pelicula' ? 'movie' : 'series';
 
   return (
@@ -68,6 +71,7 @@ export function HeroSection({ media, onPosterClick, title, refreshReviews }: Her
               itemType={itemType}
               title={title}
               refreshReviews={refreshReviews}
+              userReview={userReview}
             />
           </div>
         </div>

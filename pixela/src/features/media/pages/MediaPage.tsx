@@ -1,7 +1,8 @@
 "use client";
 
 import { Media } from "../types";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { reviewsAPI } from "@/api/reviews/reviews";
 import type { Review } from "@/api/reviews/types";
 import { useMediaStore } from "@/features/media/store/mediaStore";
@@ -64,6 +65,17 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
    */
   const { showPosterModal, setShowPosterModal } = useMediaStore();
 
+  /*
+   * Reseña propia, sacada de las que ya llegaron del servidor. Se la pasamos
+   * al modal para que la precargue sin pedir las reseñas otra vez al abrirse.
+   * `undefined` sin sesión: el modal no se abre sin ella.
+   */
+  const userId = useAuthStore((state) => state.user?.user_id);
+  const userReview = useMemo(
+    () => (userId ? reviews.find((review) => review.user_id === userId) ?? null : undefined),
+    [reviews, userId],
+  );
+
   /**
    * Recarga las reseñas desde la API.
    *
@@ -89,6 +101,7 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
         onPosterClick={() => setShowPosterModal(true)}
         title={media.titulo}
         refreshReviews={refreshReviews}
+        userReview={userReview}
       />
 
       {/* Poster Modal */}
@@ -115,6 +128,7 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
             tmdbId={tmdbId}
             itemType={itemType}
             reviews={reviews}
+            mediaTitle={media.titulo}
             loading={loadingReviews}
             error={errorReviews}
             refreshReviews={refreshReviews}

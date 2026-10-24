@@ -50,6 +50,7 @@ export const ActionButtons = ({
   itemType,
   title,
   refreshReviews,
+  userReview,
 }: ActionButtonsProps) => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -120,6 +121,7 @@ export const ActionButtons = ({
         itemType={itemType}
         title={title}
         refreshReviews={refreshReviews}
+        existingReview={userReview}
       />
     </>
   );

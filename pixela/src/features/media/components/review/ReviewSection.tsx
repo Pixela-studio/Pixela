@@ -34,7 +34,7 @@ const STYLES = {
  * @param {ReviewSectionProps} props - Propiedades del componente
  * @returns {JSX.Element} Componente de sección de reseñas
  */
-export function ReviewSection({ reviews, loading, error, refreshReviews }: ReviewSectionProps) {
+export function ReviewSection({ reviews, mediaTitle, loading, error, refreshReviews }: ReviewSectionProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const userId = useAuthStore((state) => state.user?.user_id);
   const isAdmin = useAuthStore((state) => state.user?.is_admin) ?? false;
@@ -166,7 +166,7 @@ export function ReviewSection({ reviews, loading, error, refreshReviews }: Revie
                 // admin veía "editar" en reseñas ajenas y el PUT fallaba en silencio.
                 isUserReview={isUserReview}
                 canDelete={isUserReview || isAdmin}
-                mediaTitle={review.title}
+                mediaTitle={mediaTitle ?? review.title}
                 isEditing={isEditing}
                 onEditClick={handleEditClick}
                 onSave={handleSaveEdit}
