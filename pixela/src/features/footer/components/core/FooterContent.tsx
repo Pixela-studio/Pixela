@@ -23,8 +23,6 @@ const STYLES = {
   contactContainer: "flex flex-wrap gap-x-6 md:gap-x-8 gap-y-3 md:gap-y-4 mt-2 md:mt-3 ipad:gap-x-4 ipad:gap-y-2",
   contactGroup: "flex flex-col group",
   contactLabel: "text-white/50 text-xs uppercase tracking-widest group-hover:text-pixela-accent/80 transition-colors duration-300",
-  contactLink: "text-white hover:text-pixela-accent transition flex items-center group",
-  contactArrow: "ml-1 transform translate-x-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300",
   contactText: "text-white group-hover:text-pixela-accent/90 transition-colors duration-300",
 
   // Navegación y enlaces
@@ -92,13 +90,6 @@ export const FooterContent = () => {
             </p>
             <div className={STYLES.contactContainer}>
               <div className={STYLES.contactGroup}>
-                <span className={STYLES.contactLabel}>Email</span>
-                <Link href="mailto:pixel@pixela.io" className={STYLES.contactLink}>
-                  pixel@pixela.io
-                  <span className={STYLES.contactArrow}>→</span>
-                </Link>
-              </div>
-              <div className={STYLES.contactGroup}>
                 <span className={STYLES.contactLabel}>Ubicación</span>
                 <span className={STYLES.contactText}>Málaga, España</span>
               </div>
@@ -119,8 +110,9 @@ export const FooterContent = () => {
               <ul className={STYLES.linksList}>
                 {DISCOVER_LINKS.map((item, index) => (
                   <li key={index} className={STYLES.linkItem}>
-                    <Link 
+                    <Link
                       href={item.href}
+                      prefetch={false}
                       className={STYLES.linkAnchor}
                     >
                       <span className={STYLES.linkIndicator}></span>
@@ -140,8 +132,9 @@ export const FooterContent = () => {
               <ul className={STYLES.linksList}>
                 {ACCOUNT_LINKS.map((item, index) => (
                   <li key={index} className={STYLES.linkItem}>
-                    <Link 
+                    <Link
                       href={item.href}
+                      prefetch={false}
                       className={STYLES.linkAnchor}
                     >
                       <span className={STYLES.linkIndicator}></span>
