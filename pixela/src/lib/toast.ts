@@ -15,10 +15,18 @@ export interface ToastOptions {
     label: string;
     onClick: () => void;
   };
+  /**
+   * Se llama una sola vez cuando el aviso desaparece, por cualquier vía: tiempo
+   * agotado, botón de cerrar o tras pulsar la acción. Sirve para el patrón
+   * "borrado · Deshacer": la mutación real se hace aquí, y la acción solo marca
+   * que se ha deshecho.
+   */
+  onDismiss?: () => void;
 }
 
-export interface Toast extends Required<Omit<ToastOptions, 'action'>> {
+export interface Toast extends Required<Omit<ToastOptions, 'action' | 'onDismiss'>> {
   action?: ToastOptions['action'];
+  onDismiss?: ToastOptions['onDismiss'];
 }
 
 type ToastListener = (toasts: Toast[]) => void;
@@ -72,9 +80,11 @@ class ToastManager {
       message: options.message,
       duration: options.duration ?? this.DEFAULT_DURATION,
       action: options.action,
+      onDismiss: options.onDismiss,
     };
 
-    // Evitar duplicados con mismo ID
+    // Evitar duplicados con mismo ID. El aviso sustituido cuenta como cerrado.
+    this.toasts.find((t) => t.id === id)?.onDismiss?.();
     this.toasts = this.toasts.filter((t) => t.id !== id);
     this.toasts.push(toast);
     this.notify();
@@ -89,16 +99,21 @@ class ToastManager {
    * Cierra un toast específico
    */
   dismiss(id: string): void {
+    const dismissed = this.toasts.find((t) => t.id === id);
+    if (!dismissed) return;
     this.toasts = this.toasts.filter((t) => t.id !== id);
     this.notify();
+    dismissed.onDismiss?.();
   }
 
   /**
    * Cierra todos los toasts
    */
   dismissAll(): void {
+    const dismissed = this.toasts;
     this.toasts = [];
     this.notify();
+    dismissed.forEach((t) => t.onDismiss?.());
   }
 
   /**
@@ -132,6 +147,49 @@ class ToastManager {
 
   info(message: string, options?: Omit<ToastOptions, 'message' | 'type'>): string {
     return this.show({ ...options, message, type: 'info' });
+  }
+
+  /**
+   * Acción destructiva con margen para deshacer: el llamador oculta el
+   * elemento al instante y `onCommit` hace la mutación real cuando el aviso se
+   * cierra (por tiempo o con la X). Si se pulsa "Deshacer", solo se llama a
+   * `onUndo` y nada llega al servidor.
+   *
+   * Si se cierra la pestaña antes de que expire, la mutación no se hace: el
+   * fallo es por el lado seguro (el elemento sigue ahí).
+   */
+  undoable({
+    title,
+    message,
+    onCommit,
+    onUndo,
+    actionLabel = 'Deshacer',
+    duration = this.DEFAULT_DURATION,
+  }: {
+    title: string;
+    message: string;
+    onCommit: () => void;
+    onUndo: () => void;
+    actionLabel?: string;
+    duration?: number;
+  }): string {
+    let undone = false;
+    return this.show({
+      type: 'info',
+      title,
+      message,
+      duration,
+      action: {
+        label: actionLabel,
+        onClick: () => {
+          undone = true;
+          onUndo();
+        },
+      },
+      onDismiss: () => {
+        if (!undone) onCommit();
+      },
+    });
   }
 }
 

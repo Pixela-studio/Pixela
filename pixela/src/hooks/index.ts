@@ -5,3 +5,4 @@ export {
 } from './useScrollAnimation';
 export { useInteractiveBorder } from './useInteractiveBorder';
 export { useSectionNavigation } from './useSectionNavigation';
+export { useFocusTrap } from './useFocusTrap';

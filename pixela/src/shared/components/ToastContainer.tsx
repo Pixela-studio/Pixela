@@ -73,12 +73,18 @@ const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
     if (exitTimer.current) clearTimeout(exitTimer.current);
   }, []);
 
+  // El auto-cierre se pausa mientras el puntero o el foco están dentro: un
+  // aviso con "Deshacer" no puede desaparecer mientras alguien va a pulsarlo,
+  // y a quien navega con teclado le da el tiempo que necesite (WCAG 2.2.1).
+  const [isPaused, setIsPaused] = useState(false);
+
   useEffect(() => {
+    if (isPaused) return;
     if (toastData.duration > 0 && ['success', 'info'].includes(toastData.type)) {
       const timer = setTimeout(handleDismiss, toastData.duration);
       return () => clearTimeout(timer);
     }
-  }, [toastData.duration, toastData.type, handleDismiss]);
+  }, [toastData.duration, toastData.type, handleDismiss, isPaused]);
 
   return (
     <div
@@ -92,6 +98,12 @@ const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsPaused(false);
+      }}
     >
       <div className={TOAST_STYLES.content}>
         <div className={TOAST_STYLES.textContainer}>
@@ -106,17 +118,19 @@ const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
         </div>
         
         <button
+          type="button"
           onClick={handleDismiss}
           className={TOAST_STYLES.closeButton}
           aria-label="Cerrar notificación"
         >
-          <FiX className="w-5 h-5" />
+          <FiX className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
 
       {toastData.action && (
         <div className={TOAST_STYLES.action}>
           <button
+            type="button"
             onClick={() => {
               toastData.action?.onClick();
               handleDismiss();
