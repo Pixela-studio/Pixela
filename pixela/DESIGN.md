@@ -152,7 +152,7 @@ Una paleta casi monocroma de negros cálidos, con un rosa neón como única nota
 
 ## Layout
 
-- **Contenedor de sección:** `w-[90%] md:w-[85%] lg:w-[80%] 2k:w-[70%] mx-auto` en la home y el hero; las páginas interiores usan `max-w-7xl px-4 md:px-8`. No introducir un tercer sistema.
+- **Contenedor de sección:** `w-[90%] md:w-[85%] lg:w-[80%] 2k:w-[70%] mx-auto` en la home y el hero; las cabeceras de Tendencias, Top Cartelera y Finde en casa salen todas de `src/shared/styles/headerStyles.ts`. Las páginas interiores usan `max-w-7xl px-4 md:px-8`. No introducir un tercer sistema.
 - **Filas a sangre:** los carruseles de pósters ocupan todo el ancho de la ventana; el título de sección sí respeta el contenedor.
 - **Ritmo vertical:** entre secciones de la home, `py-16` en móvil y `pt-20` en escritorio; dentro de una página, `mt-16`/`mt-24` entre bloques y `mb-6` bajo cada Title. Más aire encima de un título que debajo.
 - **Zigzag:** los títulos de sección alternan izquierda y derecha (Tendencias izquierda, Top Cartelera derecha, Finde en casa izquierda). Es intencionado.
@@ -196,9 +196,19 @@ Clases en `globals.css` (`@layer components`). Son la única fuente de verdad: n
 ### Pósters
 - **Fila a sangre:** sin radio ni hueco entre pósters, overlay al hover con degradado desde `screen`.
 - **Rejilla:** `rounded-xl`, overflow oculto, hover que acerca la imagen (`scale-105`, 500 ms) sin mover la tarjeta.
-- **Insignia "Top Pixela"**: `Badge` primario arriba a la izquierda, solo si la nota ≥ 8.
+- **Tarjeta = enlace.** Toda tarjeta de póster es un `<Link prefetch={false}>` con el título como nombre accesible. El marcador de favoritos es un `<button>` hermano (nunca dentro del `<a>`), con `aria-label` que nombra el título.
+- **Sin hover no hay secretos.** El título, la nota y el marcador se ven siempre en `@media (hover: none)` y con el foco dentro de la tarjeta (`group-focus-within`), no solo con el ratón encima.
+- **Foco:** anillo `accent` hacia dentro (`::after` con `ring-inset`) cuando el contenedor recorta el outline global.
+- **Insignia "Top Pixela"**: `Badge` primario arriba a la izquierda, solo con nota ≥ 8.5 **y** al menos 500 votos (`src/lib/topPixela.ts`, la única fuente de la regla).
+
+### Diálogos, menús y avisos
+- Todo diálogo usa `useFocusTrap` (Tab cicla dentro, Escape cierra y el foco vuelve al disparador) y declara `role="dialog"` o `role="alertdialog"` con `aria-modal`.
+- Lo que se puede deshacer se deshace (`toast.undoable`: "Reseña borrada · Deshacer"); lo que no, se confirma con `ConfirmDialog`. Ninguna acción destructiva es inmediata.
+- Los menús (`role="menu"`) se recorren con flechas, Inicio y Fin; las pestañas son `tablist`/`tab`/`tabpanel` con tabindex itinerante.
+- Valoraciones con `StarRatingInput` (radiogroup de medias estrellas).
 
 ### Inputs
+- Etiqueta siempre: visible encima (Outfit 14 px `white/70`) o `sr-only`, nunca solo placeholder.
 - Píldora `surface`, 48 px, icono en `accent` a la izquierda, placeholder `white/40`.
 - Hover: borde `white/20`. Foco: borde `accent/60` más el anillo global. Error: borde `red-500/60` y mensaje con `role="alert"` debajo.
 
@@ -213,8 +223,9 @@ Clases en `globals.css` (`@layer components`). Son la única fuente de verdad: n
 - **Easing:** `ease-out-expo` = `cubic-bezier(0.22, 1, 0.36, 1)` para entradas y hovers. Nunca `ease-in` en algo que aparece.
 - **Duraciones:** 150 ms para feedback de pulsación, 200–300 ms para hovers y estados, 500–700 ms para entradas de sección y zoom de imagen.
 - **Entradas de sección:** GSAP `useScrollAnimation`, 20 px de recorrido y opacidad, una vez.
-- **Bucles infinitos:** solo indicadores de carga (`animate-pulse`, `animate-spin`, `shimmer`) y la ambientación del footer.
-- **`prefers-reduced-motion`:** obligatorio. `globals.css` neutraliza animaciones y transiciones, y los hooks de GSAP muestran el contenido sin animar.
+- **Bucles infinitos:** solo indicadores de carga (`animate-pulse`, `animate-spin`, `shimmer`) y la marquesina decorativa de Descubre. El footer es estático.
+- **Esqueletos:** bloques `white/6` con `animate-pulse` y un `shimmer` blanco tenue; nada de rosa en la carga.
+- **`prefers-reduced-motion`:** obligatorio. `globals.css` neutraliza animaciones y transiciones, los hooks de GSAP muestran el contenido sin animar y el hero arranca en pausa.
 - No se usa `transition-all`: se nombran las propiedades (`transition-colors`, `transition-transform`, `transition-[color,background-color,box-shadow,transform]`).
 
 ### Superficies del navegador
@@ -271,14 +282,12 @@ Recorrido en escritorio (1440×900) y móvil (375×812): home, categorías, deta
 - [x] `aria-label` en los botones de icono que no lo tenían.
 - [x] Toasts sin `border-l-4` de color: borde completo teñido sobre `surface`.
 
+### Limpieza del front (beta test, octubre de 2026)
+Hecho a partir de `docs/beta-test/INFORME.md`: tarjetas como enlaces, formularios con etiqueta, modal de reseña sin nota por defecto y con edición precargada, borrado con deshacer, pestañas y menús accesibles, plataformas como enlaces, microcopy sin promesas falsas, footer estático sin cuentas ajenas, esqueletos neutros, logo sin dominio, un solo contenedor de cabeceras, cero `transition-all`, `error.tsx` y `global-error.tsx`, y caché `immutable` solo en producción.
+
 ### Pendiente, por prioridad
-1. **P1. Insignia "Top Pixela" en casi todas las tarjetas.** El umbral (nota ≥ 8) lo superan casi todas las obras populares, así que la insignia deja de significar algo. Propuesta: subirlo a 8.5 o mostrarla solo en el top 3 de cada fila. Es una decisión de producto.
-2. **P1. Quitar `transition-all` en lo que queda** (62 apariciones en componentes de feature) y pasar las duraciones a la escala 150/250/500.
-3. **P1. Un solo contenedor.** Unificar `headerStyles.ts` con `TrendingHeader` (duplica las mismas cadenas) y usar la clave `ls:` en vez de la media query a mano.
-4. **P2. Footer.** Ocho animaciones infinitas de partículas y líneas con `rgba(255,0,127)`. Ya se paran con reduced-motion y el color pasa a token, pero sobran la mitad.
-5. **P2. Inputs del perfil** (`profile/InputField`, inputs inline de `ProfileUsers`) con el patrón de input de login.
-6. **P2. Esqueletos de carga** con degradado `accent → pink-400`: pasar a un `shimmer` neutro sobre `surface`.
-7. **P3. Título "Quiénes somos"** en caja normal frente a las marquesinas en mayúsculas de la home: decidir si entra en la regla de la marquesina.
-8. **P3. Tailwind 4.** Al migrar, mover estos tokens a `@theme`.
-9. **P2. Logo de login.** `public/img/Logo-login.svg` lleva el texto "Pixela.io", un dominio que no es del proyecto (ver CLAUDE.md). Hace falta un SVG nuevo sin el dominio.
-10. **P2. Caché en desarrollo.** `next.config.js` sirve `/_next/static` con `immutable` también en `next dev`, donde los nombres de chunk no cambian con el contenido: el navegador se queda con JS antiguo tras editar y hay que forzar la recarga. Limitar esa cabecera a producción.
+1. **P1. Estado de Categorías en la URL** (`?type=&genre=&q=&page=`). Lo pidieron 5 de 6 testers; toca `useContentLoader`, que es lógica de datos.
+2. **P1. Reseñas visibles sin sesión** (modo lectura) y nota media Pixela.
+3. **P2. Buscador global en la navbar** (⌘K contra `search/multi`, con personas).
+4. **P2. Título "Quiénes somos"** en caja normal frente a las marquesinas en mayúsculas de la home. Se mantiene: es la única sección institucional y no compite con las carteleras.
+5. **P3. Tailwind 4.** Al migrar, mover estos tokens a `@theme`.
