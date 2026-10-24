@@ -4,7 +4,7 @@ import { CategoriesHeaderProps } from '@/features/categories/types/components';
 
 const STYLES = {
     container: 'flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 sm:gap-6 mb-8 w-full',
-    title: 'text-5xl md:text-6xl font-bold text-pixela-accent [@media(max-height:500px)_and_(orientation:landscape)]:text-4xl',
+    title: 'text-5xl md:text-6xl font-bold text-pixela-accent ls:text-4xl',
     controls: 'flex flex-col sm:flex-row gap-4 w-full xl:w-auto justify-end',
 } as const;
     

@@ -9,7 +9,7 @@ import { DiscoverBackground } from "@/features/discover/components/layout/Discov
 
 const STYLES = {
   container:
-    "relative w-full bg-pixela-dark flex flex-col justify-center overflow-hidden min-h-[85vh] mt-16 px-4 py-16 lg:px-0 lg:py-0 [@media(max-height:500px)_and_(orientation:landscape)]:py-8",
+    "relative w-full bg-pixela-dark flex flex-col justify-center overflow-hidden min-h-[85vh] mt-16 px-4 py-16 lg:px-0 lg:py-0 ls:py-8",
   backgroundLayer: "absolute inset-0 w-full h-full z-0 pointer-events-none",
 
   content:

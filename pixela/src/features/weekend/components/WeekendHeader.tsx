@@ -9,6 +9,7 @@ import { TrendingButton } from "@/features/trending/components/ui/TrendingButton
 import QuoteSection from "@/features/quotes/components/QuoteSection";
 import {
   HEADER_LAYOUT_STYLES,
+  HEADER_TOGGLE_STYLES,
   HEADER_TYPOGRAPHY_STYLES,
 } from "@/shared/styles/headerStyles";
 
@@ -19,9 +20,7 @@ const STYLES = {
   titleMobile: `${HEADER_TYPOGRAPHY_STYLES.titleMobileBase} text-left pl-4`,
   titleDesktop: `${HEADER_TYPOGRAPHY_STYLES.titleDesktopBase} text-left sm:pl-0`,
   headerLeft: "flex flex-col items-start gap-2",
-  toggleContainer: "mb-12 md:mb-10 px-4 md:px-0",
-  toggleWrapper:
-    "flex bg-white/5 backdrop-blur-sm rounded-full p-1 border border-white/10 relative shadow-lg shadow-black/20 w-full sm:w-auto ipad:w-full",
+  ...HEADER_TOGGLE_STYLES,
 } as const;
 
 type MediaType = "series" | "movies";

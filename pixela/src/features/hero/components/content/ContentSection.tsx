@@ -15,16 +15,16 @@ const STYLES = {
   accentLine: {
     base: "w-16 md:w-24 lg:w-24 h-1 bg-pixela-accent",
     withMargin:
-      "mb-5 md:mb-7 lg:mb-9 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
+      "mb-5 md:mb-7 lg:mb-9 ls:mb-2",
   },
 
   // Tag de tipo (PELÍCULA / SERIE) — reemplaza la accent line en dinámico.
   typeTag:
-    "inline-block text-[11px] sm:text-xs md:text-sm font-bold font-outfit uppercase tracking-[0.28em] text-pixela-accent mb-4 md:mb-5 lg:mb-6 [@media(max-height:500px)_and_(orientation:landscape)]:mb-2 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]",
+    "inline-block text-[11px] sm:text-xs md:text-sm font-bold font-outfit uppercase tracking-[0.28em] text-pixela-accent mb-4 md:mb-5 lg:mb-6 ls:mb-2 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]",
 
   // Título — común
   heroTitleBase:
-    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-black font-outfit text-pixela-light mb-5 md:mb-6 lg:mb-8 2k:mb-6 tracking-tight leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] [text-wrap:balance] [@media(max-height:500px)_and_(orientation:landscape)]:text-3xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2 line-clamp-3",
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-black font-outfit text-pixela-light mb-5 md:mb-6 lg:mb-8 2k:mb-6 tracking-tight leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] [text-wrap:balance] ls:text-3xl ls:mb-2 line-clamp-3",
   // Welcome estático: uppercase (voz de marca).
   heroTitleStatic: "uppercase",
   // Dinámico: title case natural del título de peli/serie.
@@ -33,7 +33,7 @@ const STYLES = {
 
   // Descripción — común
   descriptionBase:
-    "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl max-w-md sm:max-w-lg md:max-w-xl lg:max-w-xl 2k:max-w-2xl drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] leading-relaxed [text-wrap:pretty] line-clamp-3 mt-5 md:mt-6 lg:mt-7 mb-8 md:mb-10 lg:mb-12 [@media(max-height:500px)_and_(orientation:landscape)]:mt-2 [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
+    "text-base sm:text-lg md:text-lg lg:text-xl 2k:text-2xl max-w-md sm:max-w-lg md:max-w-xl lg:max-w-xl 2k:max-w-2xl drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] leading-relaxed [text-wrap:pretty] line-clamp-3 mt-5 md:mt-6 lg:mt-7 mb-8 md:mb-10 lg:mb-12 ls:mt-2 ls:mb-4",
   // Welcome estático: sans, medio peso.
   descriptionStatic: "text-pixela-light/85",
   // Dinámico: itálica + font-light — el overview se lee como reseña, no
@@ -57,7 +57,7 @@ const STYLES = {
   contentSection: {
     base: "absolute inset-x-0 bottom-0 z-10 px-4 sm:px-5 md:px-6 lg:px-0 2k:px-8",
     container:
-      "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24 [@media(max-height:500px)_and_(orientation:landscape)]:pb-8",
+      "w-full max-w-[95%] sm:max-w-xl md:max-w-2xl lg:max-w-[83.333%] 2k:max-w-[60%] mx-auto pb-20 sm:pb-24 md:pb-28 lg:pb-36 2k:pb-24 ls:pb-8",
     textCard:
       "w-fit max-w-full bg-pixela-dark/60 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-0 p-6 sm:p-7 md:p-8 lg:p-0 rounded-[24px] lg:rounded-none border border-white/10 lg:border-transparent shadow-2xl lg:shadow-none mb-6 md:mb-8 lg:mb-12 2k:mb-8",
     buttonsContainer:

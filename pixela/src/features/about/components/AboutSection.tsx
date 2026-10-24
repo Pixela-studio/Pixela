@@ -13,11 +13,11 @@ import { useScrollAnimation, useInteractiveBorder } from '@/hooks';
 const STYLES = {
 
   // Seccion general
-  section: "relative z-0 py-36 2k:py-24 px-4 max-sm:px-2 bg-pixela-dark [@media(max-height:500px)_and_(orientation:landscape)]:py-8",
+  section: "relative z-0 py-36 2k:py-24 px-4 max-sm:px-2 bg-pixela-dark ls:py-8",
   container: "max-w-7xl 2k:max-w-6xl mx-auto max-sm:w-5/6 ipad:w-[90%] 2k:w-[70%]",
 
   // Titulos
-  title: "text-6xl max-sm:text-[clamp(2.5rem,10vw,3rem)] font-black mb-8 text-pixela-accent font-outfit relative inline-block [text-wrap:balance] max-sm:leading-[0.95] [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px] [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
+  title: "text-6xl max-sm:text-[clamp(2.5rem,10vw,3rem)] font-black mb-8 text-pixela-accent font-outfit relative inline-block [text-wrap:balance] max-sm:leading-[0.95] ls:text-[48px] ls:mb-4",
   titleUnderline: "absolute -bottom-2 left-0 w-0 h-1 bg-pixela-accent group-hover:w-full transition-[width] duration-500",
   subtitle: "text-xl max-sm:text-base text-white/80 text-left ipad:text-left lg:text-center xl:text-center",
 
@@ -31,8 +31,8 @@ const STYLES = {
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   cardContent: "relative z-10 h-full rounded-[15px] p-8 max-sm:p-4 ipad:p-6 flex flex-col bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5",
   cardIcon: "text-4xl text-pixela-accent ipad:text-3xl",
-  cardIconContainer: "mb-6 [@media(max-height:500px)_and_(orientation:landscape)]:mb-3",
-  cardTitle: "text-2xl font-semibold text-white mb-4 group-hover:text-pixela-accent transition-colors duration-300 flex items-center ipad:text-xl ipad:mb-3 mt-1 [@media(max-height:500px)_and_(orientation:landscape)]:text-xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
+  cardIconContainer: "mb-6 ls:mb-3",
+  cardTitle: "text-2xl font-semibold text-white mb-4 group-hover:text-pixela-accent transition-colors duration-300 flex items-center ipad:text-xl ipad:mb-3 mt-1 ls:text-xl ls:mb-2",
   cardTitleContainer: "flex items-center gap-3 mb-4 ipad:flex-col ipad:items-start ipad:gap-2",
   cardDescription: "text-white/70 leading-relaxed flex-grow ipad:text-sm ipad:leading-relaxed",
 } as const;
