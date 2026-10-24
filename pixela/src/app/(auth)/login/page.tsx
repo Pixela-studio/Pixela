@@ -56,7 +56,7 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto space-y-5">
       <header className="mb-8">
-        <h1 className="text-4xl font-black tracking-tight text-white">Iniciar sesión</h1>
+        <h1 className="title-card text-5xl md:text-6xl">Iniciar sesión</h1>
         <p className="mt-2 text-white/70">Bienvenido a Pixela.</p>
       </header>
 

@@ -18,17 +18,17 @@ export const STYLES = {
   content: {
     wrapper: "relative z-10 mx-auto max-w-2xl text-center",
     errorCode:
-      "mb-4 text-8xl font-black leading-none tracking-tight text-pixela-accent md:text-9xl",
+      "mb-6 font-display text-[120px] md:text-[176px] font-normal italic leading-none tracking-[-0.04em] text-pixela-accent",
     // Para una palabra en lugar de un código ("Corten" en error.tsx): más
     // pequeña para que no desborde a 375 px.
     errorWord:
-      "mb-4 text-6xl font-black leading-none tracking-tight text-pixela-accent md:text-8xl",
-    title: "mb-4 text-3xl font-bold text-white [text-wrap:balance] md:text-4xl",
+      "mb-6 font-display text-7xl md:text-[128px] font-normal italic leading-none tracking-[-0.04em] text-pixela-accent",
+    title: "mb-5 title-card text-4xl md:text-6xl [text-wrap:balance]",
     description:
       "mx-auto mb-10 max-w-lg text-lg leading-relaxed text-white/70 [text-wrap:pretty]",
     quote: {
       container: "mx-auto mb-10 max-w-md",
-      text: "text-base italic font-light text-white/80 md:text-lg",
+      text: "font-display italic text-xl md:text-2xl leading-snug text-white/85",
       attribution: "mt-2 block text-sm not-italic text-white/55",
     },
   },
