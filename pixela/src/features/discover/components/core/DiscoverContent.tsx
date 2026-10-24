@@ -2,37 +2,28 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { IoIosArrowForward } from "react-icons/io";
 import { useCategoriesStore } from "@/features/categories/store/categoriesStore";
 import { useDiscoverAnimation } from "@/features/discover/hooks/useDiscoverAnimation";
 import { DiscoverBackground } from "@/features/discover/components/layout/DiscoverBackground";
 
 const STYLES = {
   container:
-    "relative w-full bg-pixela-dark flex flex-col justify-center overflow-hidden min-h-[85vh] mt-16 px-4 py-16 lg:px-0 lg:py-0 ls:py-8",
+    "relative w-full bg-pixela-dark flex flex-col justify-center overflow-hidden min-h-[85vh] py-24 lg:py-0 ls:py-8",
   backgroundLayer: "absolute inset-0 w-full h-full z-0 pointer-events-none",
 
   content:
-    "relative z-20 w-[90%] xl:w-[85%] 2k:w-[70%] mx-auto flex flex-col items-start justify-center text-left",
+    "relative z-20 w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 flex flex-col items-start justify-center text-left",
   leftSection: "w-full max-w-3xl",
 
+  // El titular entero en Bodoni marfil: sin la última línea en rosa.
   mainHeading:
-    "text-5xl sm:text-6xl lg:text-7xl 2k:text-8xl font-black text-white leading-[0.9] mb-8 2k:mb-6 flex flex-col gap-0 drop-shadow-2xl tracking-tighter [text-wrap:balance]",
-  accentLine: "text-pixela-accent",
+    "title-card text-[52px] sm:text-7xl lg:text-[88px] 2k:text-[104px] mb-8 flex flex-col [text-wrap:balance]",
 
   description:
-    "text-gray-300 text-lg 2k:text-xl font-light leading-relaxed max-w-xl mb-10 2k:mb-8 [text-wrap:pretty]",
-  accentText: "text-white font-medium italic",
+    "text-lg lg:text-xl leading-relaxed text-white/80 max-w-xl mb-10 [text-wrap:pretty]",
 
   actions: "flex flex-row items-center justify-start gap-8 2k:gap-6",
-  exploreButton:
-    "btn btn-ghost group relative overflow-hidden px-8",
-  buttonContent:
-    "relative z-10 flex items-center justify-center text-white group-hover:text-pixela-accent transition-colors duration-300",
-  buttonIcon:
-    "w-5 h-5 ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5",
-  buttonHoverEffect:
-    "absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-pixela-accent/20 to-transparent transition-transform duration-500 ease-out-expo group-hover:scale-x-100",
+  exploreButton: "btn btn-primary",
 } as const;
 
 interface DiscoverContentProps {
@@ -63,22 +54,15 @@ export const DiscoverContent = ({ heading }: DiscoverContentProps) => {
         <div ref={leftSectionRef} className={STYLES.leftSection}>
           <h2 className={STYLES.mainHeading}>
             {heading.map((line, index) => (
-              <span
-                key={index}
-                className={`block ${
-                  index === heading.length - 1 ? STYLES.accentLine : ""
-                }`}
-              >
+              <span key={index} className="block">
                 {line}
               </span>
             ))}
           </h2>
 
           <p className={STYLES.description}>
-            Explora un catálogo seleccionado para{" "}
-            <span className={STYLES.accentText}>cautivar</span> tus sentidos y
-            sumérgete en narrativas inolvidables que despiertan tu{" "}
-            <span className={STYLES.accentText}>imaginación</span>.
+            Todo el catálogo de películas y series, por género y con buscador.
+            Y si no sabes qué elegir, una selección al azar.
           </p>
 
           <div className={STYLES.actions}>
@@ -88,11 +72,7 @@ export const DiscoverContent = ({ heading }: DiscoverContentProps) => {
               className={STYLES.exploreButton}
               onClick={() => setSelectedMediaType("series")}
             >
-              <span className={STYLES.buttonContent}>
-                Explorar catálogo
-                <IoIosArrowForward className={STYLES.buttonIcon} />
-              </span>
-              <span className={STYLES.buttonHoverEffect} />
+              Explorar catálogo
             </Link>
           </div>
         </div>

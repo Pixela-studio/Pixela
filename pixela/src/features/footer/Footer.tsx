@@ -6,7 +6,8 @@ import { FooterBackdrop } from './components/layout/FooterBackdrop';
 import FooterScrollTopButton from "./components/ui/FooterScrollTopButton";
 
 const STYLES = {
-  footer: "relative w-full bg-pixela-dark overflow-hidden min-h-[420px] flex items-center justify-center"
+  // Un escalón más hondo que la página; el hueco de abajo es para el nombre.
+  footer: "relative w-full bg-pixela-ink overflow-hidden pb-[16vw] lg:pb-[14vw]"
 } as const;
 
 /**

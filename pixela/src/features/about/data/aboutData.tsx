@@ -1,27 +1,20 @@
-import { FaFilm, FaBookmark, FaHeart } from 'react-icons/fa';
-import { FeatureCard } from '@/features/about/types/components';
+import { AboutPoint } from '@/features/about/types/components';
 
 /**
- * Lista de características principales de Pixela
- * @constant
- * @type {FeatureCard[]}
+ * Lo que Pixela hace hoy, sin promesas: "Nuestra pasión" y "Nuestra misión"
+ * decían lo mismo con otras palabras y no contaban nada del producto.
  */
-export const FEATURE_CARDS: FeatureCard[] = [
+export const ABOUT_POINTS: AboutPoint[] = [
   {
-    icon: <FaFilm />,
-    title: "Nuestra Pasión",
-    description: "Nos dedicamos a crear una experiencia única para los amantes del cine y la televisión, ofreciendo una plataforma donde pueden descubrir y compartir sus historias favoritas."
-  },
-  // Antes era "Nuestra Comunidad" con una etiqueta "Próximamente": una promesa
-  // sin fecha. Ahora la tarjeta cuenta lo que Pixela ya hace hoy.
-  {
-    icon: <FaBookmark />,
-    title: "Tu Biblioteca",
-    description: "Guarda lo que quieres ver, marca lo que estás viendo o ya has visto y escribe reseñas con tu nota. Todo queda en tu perfil para cuando vuelvas."
+    title: "Elegimos por ti",
+    description: "Tendencias de la semana, lo que llena los cines y lo mejor para el fin de semana en las plataformas de España, al día.",
   },
   {
-    icon: <FaHeart />,
-    title: "Nuestra Misión",
-    description: "Buscamos inspirar y conectar a las personas a través del poder de las historias, creando un espacio donde la pasión por el cine y la televisión florece."
-  }
-]; 
+    title: "Te decimos dónde verla",
+    description: "Cada ficha reúne dónde está disponible, el reparto, los tráilers y la galería, para decidir sin salir de la página.",
+  },
+  {
+    title: "Tu biblioteca",
+    description: "Guarda lo que quieres ver, marca lo que estás viendo o ya has visto y escribe reseñas con tu nota. Todo queda en tu perfil para cuando vuelvas.",
+  },
+];
