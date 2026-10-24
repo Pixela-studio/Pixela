@@ -144,7 +144,7 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
                           alt={item.title || item.name || ""}
                           fill
                           sizes="(max-width: 768px) 140px, 160px"
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="object-cover transition-transform duration-500 ease-out-expo group-hover:scale-105"
                         />
                       </div>
                       <h4 className="text-sm font-bold text-white truncate group-hover:text-pixela-accent transition-colors">
@@ -157,7 +157,8 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
                   );
 
                   return (
-                    <div key={`${item.id}-${index}`} className="flex-[0_0_140px] md:flex-[0_0_160px] min-w-0 pl-4 h-full">
+                    // `py-1`: hueco para el anillo de foco, que el overflow-hidden del carrusel recortaba.
+                    <div key={`${item.id}-${index}`} className="flex-[0_0_140px] md:flex-[0_0_160px] min-w-0 pl-4 py-1 h-full">
                       {enlazable ? (
                         <Link
                           href={`/${linkType}/${item.id}`}

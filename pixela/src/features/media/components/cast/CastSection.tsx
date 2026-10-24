@@ -110,7 +110,9 @@ export function CastSection({ actors }: CastSectionProps) {
         // Slider en móvil, tablet, y desktop con muchos actores
         <div className="relative">
           <div
-            className={clsx("overflow-hidden w-full cursor-grab touch-pan-y", {
+            // `py-1`: hueco para el anillo de foco y el `-translate-y-1` del hover,
+            // que el overflow-hidden del carrusel recortaba por arriba.
+            className={clsx("overflow-hidden w-full py-1 cursor-grab touch-pan-y", {
               "cursor-grabbing": isDragging,
             })}
             ref={emblaRef}

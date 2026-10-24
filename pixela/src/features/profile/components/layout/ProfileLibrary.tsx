@@ -141,11 +141,14 @@ export const ProfileLibrary = () => {
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-pixela-surface border border-white/5 transition-all hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
+                className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-pixela-surface border border-white/5 transition-[transform,border-color,box-shadow] duration-300 ease-out-expo hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
               >
                 <Link
                   href={`/${item.item_type === "movie" ? "movies" : "series"}/${item.tmdb_id}`}
-                  className="block w-full h-full relative"
+                  aria-label={`${item.title} (${STATUS_FILTERS.find((f) => f.id === item.status)?.label ?? item.status})`}
+                  // El contenedor recorta (overflow-hidden), así que el anillo
+                  // de foco se pinta por dentro en un ::after.
+                  className="relative block w-full h-full rounded-[inherit] after:pointer-events-none after:absolute after:inset-0 after:z-30 after:rounded-[inherit] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-pixela-accent"
                   prefetch={false}
                 >
                   {item.poster_path ? (
@@ -175,7 +178,7 @@ export const ProfileLibrary = () => {
                   </div>
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity duration-300 ease-out-expo flex flex-col justify-end p-3">
                     <h3 className="text-white text-sm font-bold line-clamp-2 leading-tight mb-1">
                       {item.title}
                     </h3>

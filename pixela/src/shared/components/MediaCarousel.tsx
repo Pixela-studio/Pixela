@@ -89,14 +89,23 @@ export const MediaCarousel = ({
       }, autoplayInterval);
     };
 
+    // Con el foco del teclado dentro (las tarjetas son enlaces), el autoplay
+    // se para: si no, la tarjeta enfocada se desplaza sola fuera de la vista.
+    const stopAutoplay = () => clearInterval(intervalId);
+    const root = emblaApi.rootNode();
+
     startAutoplay();
     emblaApi.on("pointerUp", startAutoplay);
     document.addEventListener("visibilitychange", startAutoplay);
+    root.addEventListener("focusin", stopAutoplay);
+    root.addEventListener("focusout", startAutoplay);
 
     return () => {
       clearInterval(intervalId);
       emblaApi.off("pointerUp", startAutoplay);
       document.removeEventListener("visibilitychange", startAutoplay);
+      root.removeEventListener("focusin", stopAutoplay);
+      root.removeEventListener("focusout", startAutoplay);
     };
   }, [emblaApi, autoplay, autoplayInterval]);
 

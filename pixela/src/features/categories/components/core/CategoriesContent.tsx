@@ -2,10 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Pelicula, Serie } from "@/features/media/types/content";
 import { Badge } from "@/shared/components/Badge";
 import { ActionButtons } from "@/shared/components/ActionButtons";
-import { useRouter } from "next/navigation";
 import { useState, memo, useMemo, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { FiSearch, FiX, FiRefreshCw } from "react-icons/fi";
@@ -15,9 +15,9 @@ import { ItemCounter } from "@/features/categories/components/ui/ItemCounter";
 import { CategoriesContentProps } from "@/features/categories/types/content";
 import { useInteractiveBorder } from "@/hooks/useInteractiveBorder";
 import { tmdbImageHelpers } from "@/lib/constants/tmdb";
+import { isTopPixela } from "@/lib/topPixela";
 
 const INITIAL_VISIBLE_ITEMS = 6;
-const HIGH_RATING_THRESHOLD = 8.0;
 const BATCH_SIZE = 12;
 
 interface SearchFormData {
@@ -40,7 +40,7 @@ const STYLES = {
   searchIcon:
     "absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none",
   searchInput:
-    "w-full pl-10 pr-10 py-3 bg-pixela-dark/30 border border-pixela-accent/20 rounded-xl text-pixela-light placeholder-pixela-light/40 focus:outline-none focus:border-pixela-accent/40 transition-colors duration-300",
+    "w-full pl-10 pr-10 py-3 bg-pixela-dark/30 border border-pixela-accent/20 rounded-xl text-pixela-light placeholder-pixela-light/40 hover:border-pixela-accent/30 focus:border-pixela-accent/60 transition-colors duration-300",
   clearButton:
     "absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-pixela-light/40 hover:text-pixela-light transition-colors duration-300",
   searchIconInner: "h-5 w-5 text-pixela-light/40",
@@ -48,18 +48,25 @@ const STYLES = {
   // Categorías en Móvil
   mobileCategoriesList: "lg:hidden mb-6",
 
-  // Tarjeta de Contenido (Película/Serie) - Con efecto de borde interactivo
-  card: "w-full flex flex-col relative group overflow-hidden animate-fade-in rounded-2xl p-px cursor-pointer",
+  // Tarjeta de Contenido (Película/Serie) - Con efecto de borde interactivo.
+  // El `group` va en el contenedor que envuelve al enlace y al botón de
+  // favoritos (hermanos: un <button> no puede ir dentro de un <a>), para que
+  // pasar por encima del botón no apague el hover de la tarjeta.
+  cardWrapper: "relative group w-full",
+  card: "w-full flex flex-col relative overflow-hidden rounded-2xl p-px",
   cardBorder:
     "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   cardContent:
-    "relative z-10 h-full rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
+    "relative z-10 h-full rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5",
   posterContainer:
     "relative w-full aspect-[2/3] overflow-hidden rounded-[15px]",
   poster: "object-cover",
   noiseEffect: "noise-effect opacity-5",
   overlay:
-    "absolute inset-0 bg-gradient-to-t from-pixela-dark/95 via-pixela-dark/80 to-transparent flex flex-col justify-end p-3 md:p-4 transition-all duration-700 ease-in-out opacity-0 group-hover:opacity-100 group-hover:delay-100 rounded-lg",
+    "absolute inset-0 bg-gradient-to-t from-pixela-dark/95 via-pixela-dark/80 to-transparent flex flex-col justify-end p-3 md:p-4 transition-opacity duration-500 ease-out-expo opacity-0 group-hover:opacity-100 group-hover:delay-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100 rounded-lg",
+  // Favoritos: al hover en ratón; siempre visible en táctil y con el foco dentro.
+  favorite:
+    "opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
   overlayContent: "mb-2 md:mb-3",
   title:
     "text-pixela-light font-bold text-sm md:text-base lg:text-lg mb-1 md:mb-2 font-outfit overflow-hidden text-ellipsis whitespace-nowrap",
@@ -122,7 +129,7 @@ const STYLES = {
   recommendationCardContent:
     "relative z-10 w-full h-full overflow-hidden rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
   recommendationOverlay:
-    "absolute inset-0 flex flex-col justify-end p-4 transition-all duration-700 ease-in-out opacity-0 bg-gradient-to-t from-pixela-dark via-pixela-dark/70 to-transparent group-hover:opacity-100 group-hover:delay-100",
+    "absolute inset-0 flex flex-col justify-end p-4 transition-opacity duration-500 ease-out-expo opacity-0 bg-gradient-to-t from-pixela-dark via-pixela-dark/70 to-transparent group-hover:opacity-100 group-hover:delay-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
   recommendationTitle:
     "mb-2 text-base font-bold leading-tight text-pixela-light md:text-lg font-outfit line-clamp-2 text-left",
   recommendationInfo: "flex flex-wrap items-center gap-2 mb-2",
@@ -208,16 +215,13 @@ PosterImage.displayName = "PosterImage";
  * @param {Object} props - Propiedades del componente
  * @param {Pelicula | Serie} props.media - Película o serie
  * @param {'series' | 'movies'} props.type - Tipo de medio
- * @param {() => void} props.onFollowClick - Función para manejar el clic en el botón de seguir
  */
 const OverlayContent = ({
   media,
   type,
-  onFollowClick,
 }: {
   media: Pelicula | Serie;
   type: "series" | "movies";
-  onFollowClick: () => void;
 }) => {
   // Obtener el título según el tipo de media
   const title =
@@ -236,11 +240,6 @@ const OverlayContent = ({
 
   return (
     <div className={STYLES.overlay}>
-      <ActionButtons
-        tmdbId={Number(media.id)}
-        itemType={type === "series" ? "series" : "movie"}
-        onFollowClick={onFollowClick}
-      />
       <div className={STYLES.overlayContent}>
         <h3 className={STYLES.title}>{title}</h3>
 
@@ -283,70 +282,63 @@ const MediaCard = memo(
     type: "series" | "movies";
     index: number;
   }) => {
-    const router = useRouter();
     const cardRef = useInteractiveBorder<HTMLDivElement>();
-
-    const isHighRated = (media.vote_average ?? 0) >= HIGH_RATING_THRESHOLD;
     const isInitiallyVisible = index < INITIAL_VISIBLE_ITEMS;
 
-    const handleFollowClick = () => {
-      // TODO: wire this up to the favorites API.
-    };
-
-    /**
-     * Maneja el clic en la tarjeta de la película o serie.
-     *
-     * @returns {void}
-     */
-    const handleCardClick = () => {
-      const route =
-        type === "series" ? `/series/${media.id}` : `/movies/${media.id}`;
-      router.push(route);
-    };
+    const title =
+      type === "movies"
+        ? (media as Pelicula).title || (media as Pelicula).titulo || "Sin título"
+        : (media as Serie).name ||
+          (media as Serie).titulo ||
+          (media as Serie).title ||
+          "Sin título";
 
     return (
+      // `motion-reduce:` como red: si la animación no corre, la tarjeta no
+      // puede quedarse en `opacity-0`. El `!` hace falta porque
+      // `.animate-fade-in-up` se declara en globals.css después de las utilidades.
       <div
         ref={cardRef}
-        className={`${STYLES.card} opacity-0 animate-fade-in-up`}
+        className={`${STYLES.cardWrapper} opacity-0 animate-fade-in-up motion-reduce:opacity-100 motion-reduce:!animate-none`}
         style={{
           animationDelay: `${Math.min(index * 80, 800)}ms`,
           animationDuration: "0.6s",
           animationFillMode: "forwards",
         }}
-        onClick={handleCardClick}
       >
-        <div className={STYLES.cardBorder} />
-        <div className={STYLES.cardContent}>
-          <div className={STYLES.posterContainer}>
-            <PosterImage
-              posterPath={media.poster_path || media.poster || ""}
-              title={
-                type === "movies"
-                  ? (media as Pelicula).title ||
-                    (media as Pelicula).titulo ||
-                    "Sin título"
-                  : (media as Serie).name ||
-                    (media as Serie).titulo ||
-                    (media as Serie).title ||
-                    "Sin título"
-              }
-              isInitiallyVisible={isInitiallyVisible}
-              type={type}
-            />
+        <Link
+          href={`/${type}/${media.id}`}
+          prefetch={false}
+          aria-label={title}
+          className={STYLES.card}
+        >
+          <div className={STYLES.cardBorder} />
+          <div className={STYLES.cardContent}>
+            <div className={STYLES.posterContainer}>
+              <PosterImage
+                posterPath={media.poster_path || media.poster || ""}
+                title={title}
+                isInitiallyVisible={isInitiallyVisible}
+                type={type}
+              />
 
-            <div className={STYLES.noiseEffect} />
+              <div className={STYLES.noiseEffect} />
 
-            <OverlayContent
-              media={media}
-              type={type}
-              onFollowClick={handleFollowClick}
-            />
+              <OverlayContent media={media} type={type} />
 
-            {isHighRated && (
-              <Badge label="TOP PIXELA" position="top-left" variant="primary" />
-            )}
+              {isTopPixela(media) && (
+                <Badge label="TOP PIXELA" position="top-left" variant="primary" />
+              )}
+            </div>
           </div>
-        </div>
+        </Link>
+
+        <ActionButtons
+          tmdbId={Number(media.id)}
+          itemType={type === "series" ? "series" : "movie"}
+          mediaTitle={title}
+          className={STYLES.favorite}
+        />
       </div>
     );
   },
@@ -560,27 +552,7 @@ const RecommendationCard = memo(
   }: {
     recommendation: (Pelicula | Serie) & { mediaType: "movie" | "series" };
   }) => {
-    const router = useRouter();
     const cardRef = useInteractiveBorder<HTMLDivElement>();
-
-    const isHighRated =
-      (recommendation.vote_average ?? 0) >= HIGH_RATING_THRESHOLD;
-
-    const handleFollowClick = () => {
-      // TODO: wire this up to the favorites API.
-    };
-
-    /**
-     * Maneja el clic en la tarjeta de la película o serie.
-     * @returns {void}
-     */
-    const handleCardClick = () => {
-      const route =
-        recommendation.mediaType === "series"
-          ? `/series/${recommendation.id}`
-          : `/movies/${recommendation.id}`;
-      router.push(route);
-    };
 
     const title =
       recommendation.mediaType === "movie"
@@ -599,60 +571,70 @@ const RecommendationCard = memo(
         : (recommendation as Serie).first_air_date?.split("-")[0];
 
     return (
-      <div ref={cardRef} className={STYLES.card} onClick={handleCardClick}>
-        <div className={STYLES.cardBorder} />
-        <div className={STYLES.cardContent}>
-          <div className={STYLES.posterContainer}>
-            <PosterImage
-              posterPath={
-                recommendation.poster_path || recommendation.poster || ""
-              }
-              title={title}
-              isInitiallyVisible={true}
-              type={recommendation.mediaType === "movie" ? "movies" : "series"}
-            />
-
-            <div className={STYLES.noiseEffect} />
-
-            <div className={STYLES.recommendationOverlay}>
-              <ActionButtons
-                tmdbId={Number(recommendation.id)}
-                itemType={
-                  recommendation.mediaType === "series" ? "series" : "movie"
+      <div
+        ref={cardRef}
+        className={`${STYLES.cardWrapper} animate-fade-in motion-reduce:!animate-none`}
+      >
+        <Link
+          href={`/${recommendation.mediaType === "series" ? "series" : "movies"}/${recommendation.id}`}
+          prefetch={false}
+          aria-label={title}
+          className={STYLES.card}
+        >
+          <div className={STYLES.cardBorder} />
+          <div className={STYLES.cardContent}>
+            <div className={STYLES.posterContainer}>
+              <PosterImage
+                posterPath={
+                  recommendation.poster_path || recommendation.poster || ""
                 }
-                onFollowClick={handleFollowClick}
+                title={title}
+                isInitiallyVisible={true}
+                type={recommendation.mediaType === "movie" ? "movies" : "series"}
               />
-              <div className="mb-2 md:mb-3">
-                <h3 className={STYLES.recommendationTitle}>{title}</h3>
 
-                <div className={STYLES.recommendationInfo}>
-                  <div className={STYLES.recommendationRating}>
-                    <FaStar className={STYLES.recommendationRatingIcon} />
-                    <span className={STYLES.recommendationRatingText}>
-                      {recommendation.vote_average?.toFixed(1) || "N/A"}
+              <div className={STYLES.noiseEffect} />
+
+              <div className={STYLES.recommendationOverlay}>
+                <div className="mb-2 md:mb-3">
+                  <h3 className={STYLES.recommendationTitle}>{title}</h3>
+
+                  <div className={STYLES.recommendationInfo}>
+                    <div className={STYLES.recommendationRating}>
+                      <FaStar className={STYLES.recommendationRatingIcon} />
+                      <span className={STYLES.recommendationRatingText}>
+                        {recommendation.vote_average?.toFixed(1) || "N/A"}
+                      </span>
+                    </div>
+
+                    {releaseYear && (
+                      <span className={STYLES.recommendationYear}>
+                        {releaseYear}
+                      </span>
+                    )}
+
+                    <span className={STYLES.recommendationMediaType}>
+                      {recommendation.mediaType === "series"
+                        ? "Serie"
+                        : "Película"}
                     </span>
                   </div>
-
-                  {releaseYear && (
-                    <span className={STYLES.recommendationYear}>
-                      {releaseYear}
-                    </span>
-                  )}
-
-                  <span className={STYLES.recommendationMediaType}>
-                    {recommendation.mediaType === "series"
-                      ? "Serie"
-                      : "Película"}
-                  </span>
                 </div>
               </div>
-            </div>
 
-            {isHighRated && (
-              <Badge label="TOP PIXELA" position="top-left" variant="primary" />
-            )}
+              {isTopPixela(recommendation) && (
+                <Badge label="TOP PIXELA" position="top-left" variant="primary" />
+              )}
+            </div>
           </div>
-        </div>
+        </Link>
+
+        <ActionButtons
+          tmdbId={Number(recommendation.id)}
+          itemType={recommendation.mediaType === "series" ? "series" : "movie"}
+          mediaTitle={title}
+          className={STYLES.favorite}
+        />
       </div>
     );
   },
@@ -717,8 +699,8 @@ const RandomRecommendations = memo(
                   que harán que tu elección sea más fácil.
                 </p>
                 <p className={STYLES.descriptionText}>
-                  Descubre una película y una serie seleccionadas especialmente
-                  para ti. Es la herramienta perfecta para{" "}
+                  Una selección al azar del catálogo: una película y una serie
+                  cada vez. Es la herramienta perfecta para{" "}
                   <span className={STYLES.highlightTextWhite}>
                     auténticos cinéfilos y seriéfilos
                   </span>{" "}
@@ -731,7 +713,7 @@ const RandomRecommendations = memo(
               <div className={STYLES.lineBar} />
               <span className={STYLES.lineText}>
                 {hasSearched
-                  ? "Tus recomendaciones personales"
+                  ? "Tu selección al azar"
                   : "Descubre algo nuevo"}
               </span>
             </div>

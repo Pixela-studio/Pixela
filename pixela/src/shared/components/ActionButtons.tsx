@@ -36,6 +36,10 @@ interface ActionButtonsProps {
   followTitle?: string;
   tmdbId?: number;
   itemType?: 'movie' | 'series';
+  /** Título de la obra: entra en el nombre accesible del botón de favoritos. */
+  mediaTitle?: string;
+  /** Clases extra del contenedor (p. ej. la visibilidad hover/foco/táctil). */
+  className?: string;
 }
 
 /**
@@ -52,7 +56,9 @@ export const ActionButtons = ({
   variant = 'default',
   followTitle,
   tmdbId,
-  itemType
+  itemType,
+  mediaTitle,
+  className
 }: ActionButtonsProps) => {
   const { isFavorited, isLoading, isAuthenticated, toggleFavorite } =
     useFavoriteToggle({ tmdbId, itemType });
@@ -75,10 +81,17 @@ export const ActionButtons = ({
   // Sin estado conocido todavía: no pintamos un icono que luego cambie solo.
   if (isFavorited === null && isAuthenticated) return null;
 
-  const label = isFavorited ? 'Quitar de favoritos' : 'Añadir a favoritos';
+  // Con título, el lector de pantalla distingue un botón de otro en una rejilla.
+  const label = mediaTitle
+    ? isFavorited
+      ? `Quitar «${mediaTitle}» de favoritos`
+      : `Añadir «${mediaTitle}» a favoritos`
+    : isFavorited
+      ? 'Quitar de favoritos'
+      : 'Añadir a favoritos';
 
   return (
-    <div className={STYLES.container}>
+    <div className={clsx(STYLES.container, className)}>
       {onInfoClick && (
         <button
           type="button"

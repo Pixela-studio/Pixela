@@ -40,12 +40,10 @@ export interface PosterImageProps {
  * Props para el componente OverlayContent
  * @property {TrendingSerie | TrendingMovie} media - Datos del medio
  * @property {MediaType} type - Tipo de medio (series o películas)
- * @property {() => void} onFollowClick - Función a ejecutar al hacer clic en seguir
  */
 export interface OverlayContentProps {
   media: TrendingSerie | TrendingMovie;
   type: MediaType;
-  onFollowClick: () => void;
 }
 
 /**
