@@ -220,7 +220,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
       {users.map((user) => (
         <div
           key={user.user_id}
-          className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/5 transition-colors duration-200 hover:bg-white/10 hover:border-white/10"
+          className="bg-white/5 rounded-2xl p-4 border border-white/5 transition-colors duration-200 hover:bg-white/10 hover:border-white/10"
         >
           <div className="flex flex-col md:flex-row items-center gap-4">
             {/* Avatar - Siempre visible */}
@@ -292,7 +292,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
                   <div className="flex items-center justify-center md:justify-end gap-3">
                     <span
                       className={clsx(
-                        "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide border",
+                        "px-3 py-1 rounded-full text-xs font-semibold border",
                         user.is_admin
                           ? "bg-pixela-accent/10 border-pixela-accent/30 text-pixela-accent"
                           : "bg-white/5 border-white/10 text-gray-400",

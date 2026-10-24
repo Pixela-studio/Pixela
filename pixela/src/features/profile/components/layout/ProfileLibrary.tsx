@@ -169,7 +169,7 @@ export const ProfileLibrary = () => {
                   <div className="absolute top-2 right-2 z-10">
                     <span
                       className={clsx(
-                        "px-2 py-0.5 rounded-md text-[10px] font-bold uppercase backdrop-blur-md border shadow-sm",
+                        "px-2 py-0.5 rounded-md text-[10px] font-bold border shadow-sm",
                         STATUS_COLORS[item.status],
                       )}
                     >

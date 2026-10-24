@@ -9,9 +9,9 @@ import { ProfileInfoProps } from '@/features/profile/types/layout';
  * Estilos constantes para el componente ProfileInfo
  */
 const STYLES = {
-  container: 'p-6 lg:p-8 bg-black/20 backdrop-blur-sm rounded-2xl',
+  container: 'p-6 lg:p-8 bg-pixela-surface rounded-2xl',
   header: 'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-8',
-  title: 'text-2xl font-bold text-white',
+  title: 'font-display text-3xl md:text-4xl tracking-[-0.02em] text-white',
   editButton: clsx(
     'flex items-center gap-2',
     'bg-pixela-accent text-white',

@@ -12,7 +12,7 @@ const STYLES = {
   statsGrid: "grid grid-cols-2 md:flex md:justify-center md:flex-wrap lg:grid lg:grid-cols-3 gap-4",
   statCard: (clickable: boolean, isLastOdd: boolean) =>
     clsx(
-      "bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center transition-[background-color,border-color,transform] duration-300 group relative overflow-hidden",
+      "bg-white/5 border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center transition-[background-color,border-color,transform] duration-300 group relative overflow-hidden",
       clickable
         ? "hover:bg-white/10 cursor-pointer hover:border-white/20 active:scale-95"
         : "cursor-default",
@@ -21,7 +21,7 @@ const STYLES = {
   statValue:
     "text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform relative z-10",
   statLabel:
-    "text-xs text-gray-400 uppercase tracking-wider flex items-center gap-2 relative z-10",
+    "text-xs text-gray-400 flex items-center gap-2 relative z-10",
   statIcon: "w-4 h-4 text-pixela-accent",
 } as const;
 

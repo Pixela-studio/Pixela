@@ -23,7 +23,7 @@ const STYLES = {
   bannerImage:
     "w-full h-full object-cover transition-transform duration-700 group-hover/banner:scale-105",
   bannerOverlay:
-    "absolute inset-0 bg-black/20 transition duration-300 flex items-center justify-center backdrop-blur-[1px]",
+    "absolute inset-0 bg-black/20 transition duration-300 flex items-center justify-center",
   coverButton:
     "px-4 py-2 bg-black/60 text-white rounded-full text-sm font-medium border border-white/20 flex items-center gap-2 hover:bg-pixela-accent hover:border-pixela-accent transition shadow-lg",
 
@@ -33,7 +33,7 @@ const STYLES = {
     "relative w-32 h-32 rounded-full border-4 border-pixela-surface overflow-hidden bg-pixela-raised shadow-xl",
   avatarImage: "w-full h-full object-cover",
   avatarOverlay:
-    "absolute inset-0 bg-black/30 transition duration-300 flex items-center justify-center backdrop-blur-[1px]",
+    "absolute inset-0 bg-black/30 transition duration-300 flex items-center justify-center",
   cameraIcon: "text-white w-6 h-6",
 
   // Inputs ocultos

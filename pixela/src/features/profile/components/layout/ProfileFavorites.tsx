@@ -129,7 +129,7 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
           {/* Delete Button */}
           <button
             type="button"
-            className="absolute top-2 right-2 z-40 translate-y-2 rounded-full bg-black/50 p-2 text-white opacity-0 backdrop-blur-sm transition-[opacity,transform,background-color] duration-200 ease-out-expo hover:bg-red-500/80 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute top-2 right-2 z-40 translate-y-2 rounded-full bg-black/50 p-2 text-white opacity-0 transition-[opacity,transform,background-color] duration-200 ease-out-expo hover:bg-red-500/80 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100 focus-visible:translate-y-0 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             title={`Eliminar «${fav.title}» de favoritos`}
             aria-label={`Eliminar «${fav.title}» de favoritos`}
             disabled={deletingId === fav.id}

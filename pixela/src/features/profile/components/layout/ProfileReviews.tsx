@@ -200,7 +200,7 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
       {reviews.map((review) => (
         <div
           key={review.id}
-          className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/5 flex gap-4 transition-colors duration-200 hover:bg-white/10 hover:border-white/10 group"
+          className="bg-white/5 rounded-2xl p-4 border border-white/5 flex gap-4 transition-colors duration-200 hover:bg-white/10 hover:border-white/10 group"
         >
           {/* Poster Image */}
           <Link
