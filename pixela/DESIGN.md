@@ -1,88 +1,95 @@
 ---
 name: Pixela
-description: Descubrir cine y series como quien entra en una sala a oscuras.
+description: Una cartelera para decidir qué ver esta noche, con la gramática de los títulos de crédito.
 colors:
   accent: "#EC1B69"
-  ink: "#0F0F0F"
-  screen: "#181818"
-  surface: "#1F1F1F"
-  raised: "#2A2A2A"
-  light: "#FFFFFF"
-  text-muted: "rgba(255, 255, 255, 0.70)"
-  text-subtle: "rgba(255, 255, 255, 0.55)"
-  line: "rgba(255, 255, 255, 0.10)"
-  danger: "#EF4444"
+  accent-hover: "#F2397F"
+  ink: "#070605"
+  screen: "#0D0A08"
+  surface: "#17130F"
+  raised: "#241E19"
+  light: "#F4EDE2"
+  text-muted: "#A8A29E"
+  line: "rgba(244, 237, 226, 0.10)"
+  danger: "#F87171"
   success: "#34D399"
   rating: "#FACC15"
 typography:
   display:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "clamp(4rem, 8vw, 8rem)"
-    fontWeight: 900
-    lineHeight: 0.95
-    letterSpacing: "0.05em"
+    fontFamily: "Bodoni Moda, Didot, Georgia, serif"
+    fontSize: "clamp(3.25rem, 9vw, 8rem)"
+    fontWeight: 400
+    lineHeight: 0.88
+    letterSpacing: "-0.04em"
   headline:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "clamp(2.5rem, 5vw, 4.5rem)"
-    fontWeight: 900
-    lineHeight: 0.95
-    letterSpacing: "-0.02em"
+    fontFamily: "Bodoni Moda, Didot, Georgia, serif"
+    fontSize: "clamp(3.25rem, 7vw, 6.5rem)"
+    fontWeight: 400
+    lineHeight: 0.9
+    letterSpacing: "-0.035em"
+  statement:
+    fontFamily: "Bodoni Moda, Didot, Georgia, serif"
+    fontSize: "2rem"
+    fontWeight: 400
+    lineHeight: 1.25
+    letterSpacing: "-0.01em"
   title:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "1.5rem"
-    fontWeight: 700
-    lineHeight: 1.2
-  body:
-    fontFamily: "Outfit, system-ui, sans-serif"
+    fontFamily: "Archivo, system-ui, sans-serif"
     fontSize: "1rem"
+    fontWeight: 600
+    lineHeight: 1.35
+  body:
+    fontFamily: "Archivo, system-ui, sans-serif"
+    fontSize: "1.125rem"
     fontWeight: 400
     lineHeight: 1.6
-  label:
-    fontFamily: "Outfit, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 700
-    lineHeight: 1
-    letterSpacing: "0.2em"
+  meta:
+    fontFamily: "Archivo, system-ui, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 500
+    fontVariation: "'wdth' 112"
 rounded:
-  sm: "6px"
-  md: "12px"
+  sm: "2px"
+  md: "6px"
   lg: "16px"
-  xl: "24px"
   full: "9999px"
 spacing:
-  gutter: "16px"
-  stack-sm: "8px"
-  stack-md: "16px"
-  stack-lg: "32px"
-  section: "96px"
+  gutter-mobile: "16px"
+  gutter-desktop: "64px"
+  poster-gap: "20px"
+  section: "128px"
 components:
   button-primary:
     backgroundColor: "{colors.accent}"
-    textColor: "{colors.light}"
+    textColor: "{colors.screen}"
     rounded: "{rounded.full}"
-    padding: "12px 24px"
+    padding: "0 24px"
     height: "48px"
+  button-primary-hover:
+    backgroundColor: "{colors.accent-hover}"
   button-ghost:
-    backgroundColor: "rgba(255, 255, 255, 0.05)"
+    backgroundColor: "rgba(244, 237, 226, 0.08)"
     textColor: "{colors.light}"
     rounded: "{rounded.full}"
-    padding: "12px 24px"
+    padding: "0 24px"
     height: "48px"
+  toggle-active:
+    backgroundColor: "{colors.light}"
+    textColor: "{colors.screen}"
+    rounded: "{rounded.full}"
   input:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.light}"
     rounded: "{rounded.full}"
-    padding: "12px 24px"
     height: "48px"
+  poster:
+    backgroundColor: "{colors.surface}"
+    rounded: "{rounded.sm}"
   badge:
     backgroundColor: "{colors.accent}"
-    textColor: "{colors.light}"
-    typography: "{typography.label}"
+    textColor: "{colors.screen}"
     rounded: "{rounded.sm}"
-    padding: "6px 10px"
-  card-poster:
-    backgroundColor: "{colors.surface}"
-    rounded: "{rounded.md}"
+    padding: "4px 8px"
   panel:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.lg}"
@@ -93,201 +100,163 @@ components:
 
 ## Overview
 
-**Creative North Star: "La sala de proyección"**
+**Creative North Star: "Fundido a negro"**
 
-Pixela es una sala de cine con las luces apagadas. El fondo es negro cálido, no azul ni gris de dashboard; los pósters y los backdrops son la única fuente de luz de verdad, y el rosa `#EC1B69` es el rótulo de neón de la entrada: aparece poco, señala lo importante y nunca compite con la imagen. La tipografía hace de cartelera: títulos de sección gigantes, en Outfit Black y mayúsculas, que se leen desde el fondo de la sala.
+Pixela es una plataforma de cine con la gramática de los títulos de crédito. Cada pantalla se abre como un cartón: el nombre de la obra o de la sección en una didona de alto contraste, a escala de cartel, sobre negro de sala. El backdrop es la luz; la interfaz se aparta. Entre una vista y otra no hay deslizamientos: hay un **fundido a negro**, el corte más viejo del cine.
 
-La densidad es de cartelera, no de herramienta: filas de pósters a sangre, mucho aire entre secciones y un único gesto fuerte por pantalla. El grano de película (`.noise-effect`) y las citas de cine entre secciones son parte del carácter; no se quitan para "limpiar".
+La referencia de producto es una plataforma premium (inmersiva, backdrops a pantalla completa, filas que se recorren con calma); la referencia de lenguaje son los cartones de apertura y cierre de una película (Bodoni, marfil sobre negro, mucho aire, el nombre que vuelve a todo lo ancho al final).
 
-Se rechaza explícitamente: el look de plantilla SaaS (tarjetas icono + título + texto como estructura, glows rosas por todas partes, degradados de texto), los grises fríos o azulados (`slate`, `gray-800` sobre negro cálido) y los emojis como iconos.
+El rosa de Pixela es la luz de "acción": aparece en el botón que hay que pulsar, en el enlace activo, en el foco y en la insignia Top Pixela. Nunca en un título ni en un fondo grande.
+
+Se rechaza explícitamente: navbar de vidrio en píldora flotante, degradados decorativos, halos de color, tarjetas con icono como estructura, antetítulos en mayúsculas espaciadas, palabras resaltadas en otro color dentro de un titular, emojis como iconos, grises fríos y el velo que solo aparece con el ratón encima.
 
 **Key Characteristics:**
-- Fondo negro cálido en tres planos: `ink` (detrás de la imagen), `screen` (página) y `surface` (paneles).
-- Un solo acento, `accent`, en menos del 10 % de cualquier pantalla.
-- Títulos de sección enormes en mayúsculas que alternan alineación (izquierda / derecha) a lo largo de la home.
-- Pósters como protagonistas: sin marco en las filas a sangre, con esquina `md` en las rejillas.
-- Movimiento de proyector: entradas suaves al hacer scroll, nada en bucle salvo lo que indica carga.
+- Dos familias: Bodoni Moda para los títulos (cartones), Archivo para todo lo demás.
+- Negro cálido de sala (`#0D0A08`) y luz marfil de proyector (`#F4EDE2`); `white` y `gray` de Tailwind están sustituidos por esos tonos.
+- Grano de película global y backdrops del hero en monocromo cálido.
+- Pósters a 2:3 con esquina casi recta y el título, el año y la nota siempre debajo.
+- Un margen de página único (16 → 64 → 96 px) que comparten navbar, hero, títulos, filas y footer.
+- Movimiento de proyector: fundido entre vistas y entre diapositivas, zoom lento en los pósters, todo con `prefers-reduced-motion`.
 
 ## Colors
 
-Una paleta casi monocroma de negros cálidos, con un rosa neón como única nota de color.
+Negros cálidos de sala, marfil de proyector y un rosa reservado a la acción.
 
 ### Primary
-- **Rosa rótulo** (`#EC1B69`, Tailwind `pixela-accent`): CTA principal, estado activo de navegación y pestañas, títulos de sección, insignia "Top Pixela" y anillo de foco. Hover: `pixela-accent/90`. Nunca como fondo de un bloque grande ni como texto de cuerpo.
+- **Rosa acción** (`#EC1B69`, `pixela-accent`; hover `#F2397F`): botón primario, subrayado del enlace activo, anillo de foco, insignia Top Pixela, página activa de la paginación y código de la 404. El texto sobre el rosa es **negro de sala**: blanco sobre `#EC1B69` da 4:1 y no llega a AA a 16 px; el negro da 5:1.
 
 ### Neutral
-- **Tinta** (`#0F0F0F`, `pixela-ink`): el plano más profundo, detrás de backdrops y en el hero de detalle y perfil.
-- **Pantalla** (`#181818`, `pixela-dark`): fondo de página. Los degradados que funden una imagen con la página terminan aquí.
-- **Butaca** (`#1F1F1F`, `pixela-surface`): paneles, modales, toasts, inputs y tarjetas sin imagen.
-- **Pasillo** (`#2A2A2A`, `pixela-raised`): hover de superficies, campos activos, separadores con cuerpo.
-- **Luz** (`#FFFFFF`, `pixela-light`): texto principal.
-- **Texto secundario** (`white/70`) y **texto tenue** (`white/55`, o `gray-400`): metadatos, descripciones, pies. Es el mínimo: `gray-500` y `gray-600` no pasan 4.5:1 sobre `screen`.
-- **Línea** (`white/10`): bordes y divisores.
+- **Tinta** (`#070605`, `pixela-ink`): el plano más hondo. Ficha, actor, login y footer.
+- **Sala** (`#0D0A08`, `pixela-dark`): fondo de página.
+- **Butaca** (`#17130F`, `pixela-surface`): paneles, inputs, toggles inactivos y fondo del póster mientras carga.
+- **Pasillo** (`#241E19`, `pixela-raised`): hover de superficies.
+- **Proyector** (`#F4EDE2`, `pixela-light` y `white`): texto e iconos.
+- **Ceniza** (`#A8A29E`, `gray-400`): metadatos, descripciones y pies. Es el mínimo para texto: `gray-500` y más oscuros no pasan AA sobre sala.
 
 ### Estado
-- **Error** `red-500`, **éxito** `emerald-400`, **puntuación** `yellow-400`. Solo para su significado; nunca decorativos.
+`red-400/500` para errores, `emerald-400` para éxito y el estado "Viendo", `yellow-400` solo para la nota. Sin azules ni morados.
 
 ### Named Rules
-**La regla del rótulo.** El rosa es un neón: una pieza encendida por zona de la pantalla. Si dos elementos rosas compiten en el mismo viewport, uno sobra.
+**La regla del rótulo.** El rosa es la luz de "acción": una pieza encendida por zona. Un título en rosa compite con el botón que hay que pulsar.
 
-**La regla del negro cálido.** Ningún gris frío. Las superficies oscuras salen de los cuatro tokens neutros; `bg-gray-800`, `slate-*` y hex sueltos (`#1a1a1a`, `#111`, `#252525`…) no se usan.
+**La regla del negro cálido.** Ningún gris frío. `gray-*` ya es la escala cálida (`stone`); `slate`, `zinc`, `neutral` y los hex sueltos no se usan.
 
 ## Typography
 
-**Fuente única:** Outfit (400, 500, 700, 900) vía `next/font`, expuesta como `--font-outfit` y como `font-sans` por defecto. Fallback `system-ui, sans-serif`.
+**Display:** Bodoni Moda (con eje óptico `opsz`, normal y cursiva), `font-display`.
+**Interfaz y texto:** Archivo (con eje de anchura `wdth`), `font-sans`, el valor por defecto del `body`.
 
-**Character:** una grotesca geométrica que en Black parece letra de marquesina y en Regular se lee tranquila en descripciones largas. Una sola familia; la jerarquía sale del peso y del tamaño.
+**Character:** la didona de los cartones de crédito y los carteles clásicos frente a una grotesca sobria que se lee bien a 15 px. El contraste entre las dos crea la jerarquía; no hacen falta pesos extremos ni mayúsculas.
 
 ### Hierarchy
-- **Display** (900, 64 → 128 px, `leading-none`, mayúsculas, `tracking-wider`): títulos de sección de la home ("TENDENCIAS", "TOP CARTELERA", "FINDE EN CASA"). Uno por sección.
-- **Headline** (900, 48 → 72 px, `leading-[0.9]`, `tracking-tighter`): títulos de página y de obra ("Categorías", "Breaking Bad", el hero, el bloque Descubre).
-- **Title** (700, 24 px): cabeceras de bloque dentro de una página (Reparto, Galería, Disponible en).
-- **Body** (400, 16–18 px, `leading-relaxed`, máx. 65ch): sinopsis y textos.
-- **Label** (700, 12 px, mayúsculas, `tracking-[0.2em]`): tipo de obra, insignias. Nunca como antetítulo decorativo sobre un título.
+- **Display** (Bodoni 400, 56 → 128 px, `leading-[0.88]`, `-0.04em`): el título de la obra en el hero de la home, en la ficha y en la página de actor.
+- **Headline** (Bodoni 400, 52 → 104 px, `.title-card`): títulos de sección y de página ("Tendencias", "Categorías", "Quiénes somos", "Reparto").
+- **Statement** (Bodoni 400, 24 → 34 px, cursiva en las citas): las citas de cine entre secciones y la frase de Quiénes somos.
+- **Title** (Archivo 600, 15-16 px): título del pie de foto de un póster y nombre de un actor.
+- **Body** (Archivo 400, 16-20 px, `leading-relaxed`, 65ch como máximo): sinopsis y descripciones.
+- **Meta** (Archivo 500, 15 px, `wdth 112`, `.meta-text`): tipo de obra, año, temporadas y navegación.
 
 ### Named Rules
-**La regla de la marquesina.** Solo los títulos de sección de la home van en Display mayúsculas. Las páginas interiores usan Headline en caja normal. No se mezclan dentro de una misma pantalla.
+**La regla del cartón.** Todo título de sección o de página va en Bodoni, en caja normal y en marfil. Nada de mayúsculas espaciadas ni de una palabra resaltada en otro color.
 
-**Nada de nombres de fuente literales.** `font-['Outfit']` o `fontFamily: "'Outfit'"` no funcionan con `next/font` (registra un nombre con hash). Usa `font-outfit` o hereda `font-sans`.
+**La regla de los dos renglones.** Los títulos caben en dos líneas a cualquier ancho; si no caben, se baja el tamaño o se acorta el texto. Los títulos que vienen de TMDB se protegen con `overflow-wrap: anywhere` y `hyphens: auto`.
 
 ## Layout
 
-- **Contenedor de sección:** `w-[90%] md:w-[85%] lg:w-[80%] 2k:w-[70%] mx-auto` en la home y el hero; las cabeceras de Tendencias, Top Cartelera y Finde en casa salen todas de `src/shared/styles/headerStyles.ts`. Las páginas interiores usan `max-w-7xl px-4 md:px-8`. No introducir un tercer sistema.
-- **Filas a sangre:** los carruseles de pósters ocupan todo el ancho de la ventana; el título de sección sí respeta el contenedor.
-- **Ritmo vertical:** entre secciones de la home, `py-16` en móvil y `pt-20` en escritorio; dentro de una página, `mt-16`/`mt-24` entre bloques y `mb-6` bajo cada Title. Más aire encima de un título que debajo.
-- **Zigzag:** los títulos de sección alternan izquierda y derecha (Tendencias izquierda, Top Cartelera derecha, Finde en casa izquierda). Es intencionado.
-- **Breakpoints propios:** `ipad` (768×1024 exacto), `2k` (≥2048 px) y `ls` (horizontal con alto ≤500 px). Usa la clave `ls:` en vez de repetir la media query a mano.
-- **Margen lateral mínimo en móvil:** 16 px.
+- **Margen de página único:** `px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24`. Es el mismo en la navbar, el hero, los títulos de sección, el primer y el último póster de cada fila, la ficha, Categorías y el footer.
+- **Ritmo:** `py-20 md:py-28 lg:py-32` entre secciones de la home y `gap-16 md:gap-24` entre bloques de la ficha. Hay más aire encima de un título que debajo.
+- **Filas de pósters:** sin bucle ni autoplay. El primer póster arranca en el margen y el último cierra en el margen opuesto; las flechas se ocultan en los extremos y en táctil.
+- **Zigzag de la home:** Tendencias y Finde en casa a la izquierda, Top cartelera a la derecha. Cada título lleva debajo una frase que dice qué hay en la fila.
+- **Breakpoints propios:** `ipad`, `2k` y `ls` (móvil en horizontal).
 
 ## Elevation & Depth
 
-La profundidad viene del tono y de la imagen, no de sombras: los planos `ink` → `screen` → `surface` → `raised` y los degradados que funden backdrops con el fondo. Las sombras se reservan para lo que flota de verdad sobre imagen (navbar al hacer scroll, modales, botones del carrusel) y siempre llevan desplazamiento y desenfoque.
-
-### Shadow Vocabulary
-- **Flotante** (`shadow-lg shadow-black/40`): navbar compacta, toggles y botones sobre imagen.
-- **Modal** (`shadow-2xl shadow-black/60`): diálogos y paneles sobre overlay.
-- **CTA** (`shadow-lg shadow-pixela-accent/25`): solo el botón primario, y solo uno por vista.
+La profundidad viene del tono y de la imagen. Los planos tinta → sala → butaca → pasillo separan superficies, y los velos de los backdrops son la única gradación permitida (de lado en el hero de escritorio, de abajo arriba en móvil y en la ficha). Las sombras existen solo en lo que flota: el póster de la ficha sobre su backdrop (`shadow-2xl shadow-black/60`), los toasts y los diálogos.
 
 ### Named Rules
-**La regla del proyector.** Nada de halos de color sin desplazamiento (`shadow-[0_0_30px_…]`, `drop-shadow` rosa) como decoración. La luz de esta sala viene de la pantalla, no de los objetos.
+**La regla del proyector.** Nada de halos de color ni de sombras en reposo. La luz viene de la pantalla, no de los objetos.
 
 ## Shapes
 
-- **Píldora** (`rounded-full`): botones, inputs, toggles de Series/Películas, navbar, chips.
-- **`md` 12 px** (`rounded-xl`): pósters en rejilla, tarjetas de reparto, miniaturas de galería.
-- **`lg` 16 px** (`rounded-2xl`): paneles, modales, tarjetas de reseña.
-- **`sm` 6 px** (`rounded-md`): insignias.
-- **Sin radio:** pósters en filas a sangre y backdrops a pantalla completa.
-- Radios arbitrarios (`rounded-[15px]`, `[25px]`, `[49px]`) no: redondea al token más cercano.
+- **Píldora** (`rounded-full`): botones, inputs, toggles y filtros.
+- **Casi recta** (`rounded-sm`, 2 px): pósters, fotos de reparto, miniaturas e insignias.
+- **Panel** (`rounded-2xl`): diálogos, paneles del perfil, tarjeta de login y toasts.
 
 ## Components
 
 ### Buttons
-Clases en `globals.css` (`@layer components`). Son la única fuente de verdad: no se escriben botones con cadenas de utilidades nuevas.
-- **`.btn`**: base común. Píldora, 48 px de alto (40 px con `.btn-sm`), Outfit 600, icono a 8 px del texto, transición de color, sombra y transform de 200 ms con `ease-out-expo`, foco con el anillo global.
-- **`.btn-primary`**: fondo `accent`, texto blanco, sombra CTA. Hover `accent/90` y sube 2 px; `active` vuelve a 0. Uno por vista.
-- **`.btn-ghost`**: `white/5` con borde `white/10` y desenfoque; hover borde `accent/50`, fondo `accent/10`. Para la acción secundaria.
-- **Disabled:** opacidad 50 %, sin hover ni transform.
-
-### Chips y toggles
-- Toggle de Series/Películas: contenedor `bg-white/5 border-white/10 rounded-full p-1`; la opción activa es una píldora `accent` y la inactiva texto `white/70`.
-- Pestañas (Galería, Perfil): mismo patrón, en pequeño.
+`.btn` + `.btn-primary` / `.btn-ghost` (+ `.btn-sm`) en `globals.css`.
+- **Primario:** rosa con texto negro de sala, 48 px, Archivo 600; hover `#F2397F`; `active:scale-[0.97]`.
+- **Secundario:** marfil al 8 % sin borde ni vidrio; hover al 14 %.
+- Sin flechas "→" añadidas al texto. Un solo primario por vista.
 
 ### Pósters
-- **Fila a sangre:** sin radio ni hueco entre pósters, overlay al hover con degradado desde `screen`.
-- **Rejilla:** `rounded-xl`, overflow oculto, hover que acerca la imagen (`scale-105`, 500 ms) sin mover la tarjeta.
-- **Tarjeta = enlace.** Toda tarjeta de póster es un `<Link prefetch={false}>` con el título como nombre accesible. El marcador de favoritos es un `<button>` hermano (nunca dentro del `<a>`), con `aria-label` que nombra el título.
-- **Sin hover no hay secretos.** El título, la nota y el marcador se ven siempre en `@media (hover: none)` y con el foco dentro de la tarjeta (`group-focus-within`), no solo con el ratón encima.
-- **Foco:** anillo `accent` hacia dentro (`::after` con `ring-inset`) cuando el contenedor recorta el outline global.
-- **Insignia "Top Pixela"**: `Badge` primario arriba a la izquierda, solo con nota ≥ 8.5 **y** al menos 500 votos (`src/lib/topPixela.ts`, la única fuente de la regla).
+- `<Link prefetch={false}>` que envuelve el póster y el pie de foto; el título es el nombre accesible.
+- Póster 2:3, `rounded-sm`, fondo butaca mientras carga y grano encima.
+- Pie de foto siempre visible: título (Archivo 600, 2 líneas como máximo) y, debajo, año y nota (`★ 8,7`, con coma decimal).
+- Zoom lento (`scale-[1.04]`, 700 ms, `ease-out-expo`) solo con un puntero que pueda hacer hover.
+- Marcador de favoritos: `<button>` hermano del enlace, arriba a la derecha, visible en táctil y con foco.
+- **Top Pixela:** nota ≥ 8,5 y al menos 500 votos (`src/lib/topPixela.ts`). No se muestra en la ficha, que no tiene el número de votos.
 
-### Diálogos, menús y avisos
-- Todo diálogo usa `useFocusTrap` (Tab cicla dentro, Escape cierra y el foco vuelve al disparador) y declara `role="dialog"` o `role="alertdialog"` con `aria-modal`.
-- Lo que se puede deshacer se deshace (`toast.undoable`: "Reseña borrada · Deshacer"); lo que no, se confirma con `ConfirmDialog`. Ninguna acción destructiva es inmediata.
-- Los menús (`role="menu"`) se recorren con flechas, Inicio y Fin; las pestañas son `tablist`/`tab`/`tabpanel` con tabindex itinerante.
-- Valoraciones con `StarRatingInput` (radiogroup de medias estrellas).
+### Toggles y filtros
+Contenedor `bg-pixela-surface rounded-full p-1`. La opción activa va en marfil con texto negro y la inactiva en `white/75`. "Sorpréndeme" activo va en rosa.
 
 ### Inputs
-- Etiqueta siempre: visible encima (Outfit 14 px `white/70`) o `sr-only`, nunca solo placeholder.
-- Píldora `surface`, 48 px, icono en `accent` a la izquierda, placeholder `white/40`.
-- Hover: borde `white/20`. Foco: borde `accent/60` más el anillo global. Error: borde `red-500/60` y mensaje con `role="alert"` debajo.
+Etiqueta visible encima (Archivo 14 px, `white/70`) o `sr-only`. Píldora butaca de 48 px con borde `white/10`. Al recibir el foco, borde rosa al 60 % y anillo global. Los errores, en rojo con `role="alert"`.
 
 ### Navigation
-- Píldora flotante centrada sobre el hero; al hacer scroll se compacta a barra completa con `backdrop-blur`. Enlaces Outfit 14 px `white/65`, hover blanco, activo blanco con subrayado `accent` de 2 px.
-- En móvil, menú hamburguesa a pantalla completa.
+Barra plana a todo lo ancho: el nombre en Bodoni cursiva a la izquierda, los enlaces en Archivo `wdth 112` a 15 px (`white/70`; el activo, en marfil con subrayado rosa de 2 px) y el acceso a la cuenta a la derecha. Transparente sobre el hero y en negro de sala al 95 % al hacer scroll, sin desenfoque. Respeta `safe-area-inset-top`.
 
-### Paneles y modales
-- `surface`, `rounded-2xl`, borde `white/10`, sombra Modal, padding 24 px. Overlay `black/70` con `backdrop-blur-sm`.
+### Hero de la home
+Backdrop a pantalla completa en monocromo cálido (`grayscale sepia-[0.12]`) con velo lateral. A la izquierda, el cartón: tipo de obra en Meta, título en Display, sinopsis en Body (3 líneas) y "Ver ficha". Entre diapositivas, la imagen sale en 300 ms y la siguiente entra a los 300 ms en 700 ms: un fundido a negro. Con movimiento reducido, el carrusel arranca en pausa.
+
+### Ficha y actor
+Backdrop a sangre con velo, póster a la izquierda (sin zoom en táctil), título en Display, una línea de metadatos sin viñetas, géneros como texto, "Creada por" o "Dirección" con foto, sinopsis en Body y las acciones. Los bloques ("Dónde verla", "Reparto", "Tráilers", "Galería", "Reseñas", "Filmografía") llevan Headline. El reparto se presenta como unos créditos: foto 4:5, nombre y personaje, sin rótulos.
+
+### Footer
+Un escalón más hondo (tinta), enlaces en ceniza que se encienden en marfil, el enlace al repositorio y el nombre de Pixela a todo lo ancho en Bodoni cursiva al 6 %, cortado por abajo: el cartón de cierre.
 
 ### Motion
-- **Easing:** `ease-out-expo` = `cubic-bezier(0.22, 1, 0.36, 1)` para entradas y hovers. Nunca `ease-in` en algo que aparece.
-- **Duraciones:** 150 ms para feedback de pulsación, 200–300 ms para hovers y estados, 500–700 ms para entradas de sección y zoom de imagen.
-- **Entradas de sección:** GSAP `useScrollAnimation`, 20 px de recorrido y opacidad, una vez.
-- **Bucles infinitos:** solo indicadores de carga (`animate-pulse`, `animate-spin`, `shimmer`) y la marquesina decorativa de Descubre. El footer es estático.
-- **Esqueletos:** bloques `white/6` con `animate-pulse` y un `shimmer` blanco tenue; nada de rosa en la carga.
-- **`prefers-reduced-motion`:** obligatorio. `globals.css` neutraliza animaciones y transiciones, los hooks de GSAP muestran el contenido sin animar y el hero arranca en pausa.
-- No se usa `transition-all`: se nombran las propiedades (`transition-colors`, `transition-transform`, `transition-[color,background-color,box-shadow,transform]`).
+- **Fundido entre vistas:** `app/template.tsx` monta cada vista con `fade-from-black` (420 ms, solo opacidad). Usa `backwards` para no dejar un contexto de apilamiento al terminar.
+- **Curva:** `ease-out-expo` = `cubic-bezier(0.22, 1, 0.36, 1)`. Pulsación, 100-200 ms; hover, 200-300 ms; entradas e imágenes, 500-700 ms.
+- **Entradas de sección:** GSAP `useScrollAnimation` (20 px y opacidad, una sola vez). Con `stagger`, el contenedor se muestra y se animan los hijos.
+- **Hover:** limitado con `future.hoverOnlyWhenSupported`; en táctil el feedback es `:active`.
+- **Sin bucles**, salvo los indicadores de carga (`animate-pulse`, `shimmer`) y la marquesina decorativa de Descubre.
+- **`prefers-reduced-motion`:** el CSS acorta animaciones y transiciones a 0,01 ms, GSAP muestra el contenido sin animar y el hero arranca en pausa.
 
 ### Superficies del navegador
-Selección de texto en `accent/40`, `caret-color` en `accent`, scrollbar oscura con el pulgar en `raised`, `color-scheme: dark` y `theme-color` igual a `screen`.
+Selección en rosa al 40 %, `caret-color` rosa, scrollbar pasillo sobre sala, `color-scheme: dark`, `theme-color` igual a sala, sin destello al tocar y `touch-action: manipulation` en los controles.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** usar los tokens `pixela-ink`, `pixela-dark`, `pixela-surface`, `pixela-raised` y `pixela-accent` para todo color de superficie o acento.
-- **Do** usar `.btn-primary` / `.btn-ghost` para cualquier botón o enlace con forma de botón.
-- **Do** dar `aria-label` a cada botón que solo tenga icono.
-- **Do** dejar el texto secundario en `gray-400` o `white/55` como mínimo.
-- **Do** respetar `prefers-reduced-motion` en cualquier animación nueva, incluidas las de GSAP.
+- **Do** usar `.title-card` (o `font-display`) en todo título de sección o de página.
+- **Do** reservar el rosa a la acción y poner texto negro de sala encima.
+- **Do** usar el margen de página único y alinear con él el primer póster de cada fila.
+- **Do** poner el pie de foto debajo del póster, no encima.
+- **Do** respetar `prefers-reduced-motion` y limitar todo hover a dispositivos con puntero.
 
 ### Don't:
-- **Don't** escribir hex sueltos en clases (`bg-[#1a1a1a]`, `text-[#ec1b69]`) ni rosas parecidos (`#ff007f`, `#FF2D55`, `pink-400`).
-- **Don't** poner emojis en botones o títulos ("🏠 Volver al inicio").
-- **Don't** usar grises fríos (`gray-800`, `slate-*`) como fondo de botón o panel.
-- **Don't** añadir glows rosas sin desplazamiento ni degradados de texto.
-- **Don't** usar `transition-all` ni pulsos infinitos para llamar la atención sobre controles.
-- **Don't** pasar SVGs locales por el optimizador de `next/image`: márcalos `unoptimized`.
+- **Don't** usar vidrio (`backdrop-blur`) en barras, tarjetas o paneles; solo en el velo de un diálogo.
+- **Don't** escribir mayúsculas espaciadas, antetítulos ni palabras resaltadas en otro color.
+- **Don't** usar degradados que no sean el velo sobre una imagen.
+- **Don't** poner texto blanco sobre el rosa.
+- **Don't** usar azules, morados ni grises fríos.
+- **Don't** añadir peticiones por vista para decorar: las imágenes salen de TMDB por el loader y las fuentes las sirve `next/font`.
 
 ---
 
-## Auditoría (octubre de 2026) y cambios priorizados
+## Historial
 
-Recorrido en escritorio (1440×900) y móvil (375×812): home, categorías, detalle de serie, login, registro y 404.
+### Octubre de 2026: reforma "Fundido a negro"
+Sustituye a la dirección "Sala de proyección": Outfit Black en mayúsculas rosas, navbar en píldora de vidrio y pósters a sangre con el título solo al pasar el ratón. Las capturas de antes y después están en `docs/design/reforma/`.
 
-### Lo que funciona y se conserva
-- El hero en blanco y negro con el título gigante y la barra de progreso.
-- Las filas de pósters a sangre con títulos de marquesina en zigzag.
-- El bloque Descubre (mosaico de pósters inclinado con el titular en dos colores).
-- Las citas de cine entre secciones y el grano de película.
-
-### Hallazgos
-1. **Login y registro rotos.** El logo (`/img/Logo-login.svg`) pasaba por `/_next/image`, que rechaza SVG: se veía un icono de imagen rota. El botón "Iniciar" era `#181818` sobre `#111`, casi invisible. El título llevaba una barra literal ("Bienvenido a Pixela |") y un subtítulo en gris azulado. En registro, el enlace "¿Ya tienes cuenta?" se partía en dos líneas junto al botón.
-2. **Fuentes mal cableadas.** Outfit se registraba como `--font-sans`, pero `font-outfit` apuntaba a `--font-outfit`, que no existía (funcionaba por herencia). `font-['Outfit']` y `fontFamily: "'Outfit'"` no resolvían la fuente de `next/font`. Roboto se descargaba sin usarse en ningún sitio. 18 utilidades `font-pixela-*` y tres escalas `text-pixela-*` estaban muertas.
-3. **`globals.css` con restos.** Un bloque `@theme inline` de Tailwind 4 sin efecto en Tailwind 3 y variables `--background`/`--foreground` de modo claro: en un sistema en modo claro el color de texto heredado era `#171717` sobre fondo oscuro.
-4. **Diez negros distintos.** `#181818`, `#1a1a1a`, `#0f0f0f`, `#111`, `#141414`, `#252525`, `#2a2a2a`, `#0a0a0a`, `gray-800/900`, `rgba(17,17,17,.47)`. Y tres rosas falsos (`#ff007f`, `#FF2D55`, `pink-400`), además de `#ec1b69` escrito a mano 44 veces.
-5. **Once estilos de botón primario** con radios de 4 px a 49 px y hovers distintos. La 404 mezclaba un botón con emoji y otro gris frío (`gray-800`).
-6. **Contraste insuficiente.** `text-gray-500`/`600` en metadatos, login y reseñas (≈3.6:1 sobre `#181818`).
-7. **Motion sin `prefers-reduced-motion`** en ningún sitio: ni CSS ni GSAP. Los botones del carrusel pulsaban en bucle infinito (`embla-btn-pulse`). Había 86 `transition-all`.
-8. **Botones de icono sin nombre accesible** en el modal del hero y en el selector de banner.
-9. **Navegador sin tematizar:** selección azul por defecto, scrollbar clara en Windows y `theme-color` `#000` distinto del fondo.
-
-### Cambios aplicados en esta rama
-- [x] Tokens de color, fuente y motion en `tailwind.config.js` y `globals.css`; limpieza de utilidades y bloques muertos; Roboto fuera.
-- [x] Hex sueltos sustituidos por tokens en todo `src/`.
-- [x] `.btn`, `.btn-primary`, `.btn-ghost` y adopción en la 404/403, el estado vacío, los errores de perfil y los formularios de reseña.
-- [x] Login y registro rehechos: logo visible, botón primario real, título sin barra, inputs con foco visible.
-- [x] Contraste: `gray-500/600` subidos a `gray-400` en texto.
-- [x] `prefers-reduced-motion` global y en los hooks de GSAP; fuera el pulso infinito del carrusel.
-- [x] Superficies del navegador tematizadas (selección, caret, scrollbar, `color-scheme`, `theme-color`).
-- [x] `aria-label` en los botones de icono que no lo tenían.
-- [x] Toasts sin `border-l-4` de color: borde completo teñido sobre `surface`.
-
-### Limpieza del front (beta test, octubre de 2026)
-Hecho a partir de `docs/beta-test/INFORME.md`: tarjetas como enlaces, formularios con etiqueta, modal de reseña sin nota por defecto y con edición precargada, borrado con deshacer, pestañas y menús accesibles, plataformas como enlaces, microcopy sin promesas falsas, footer estático sin cuentas ajenas, esqueletos neutros, logo sin dominio, un solo contenedor de cabeceras, cero `transition-all`, `error.tsx` y `global-error.tsx`, y caché `immutable` solo en producción.
+### Octubre de 2026: limpieza a partir del beta test
+A partir de `docs/beta-test/INFORME.md`: tarjetas como enlaces, formularios con etiqueta, modal de reseña con edición precargada, borrado con deshacer, ARIA en pestañas, menús y plataformas, microcopy sin promesas falsas, footer sin cuentas ajenas, esqueletos neutros, logo sin dominio, cero `transition-all` y `error.tsx`.
 
 ### Pendiente, por prioridad
-1. **P1. Estado de Categorías en la URL** (`?type=&genre=&q=&page=`). Lo pidieron 5 de 6 testers; toca `useContentLoader`, que es lógica de datos.
-2. **P1. Reseñas visibles sin sesión** (modo lectura) y nota media Pixela.
-3. **P2. Buscador global en la navbar** (⌘K contra `search/multi`, con personas).
-4. **P2. Título "Quiénes somos"** en caja normal frente a las marquesinas en mayúsculas de la home. Se mantiene: es la única sección institucional y no compite con las carteleras.
-5. **P3. Tailwind 4.** Al migrar, mover estos tokens a `@theme`.
+1. **P1. Estado de Categorías en la URL** (`?type=&genre=&q=&page=`). Toca `useContentLoader`, que es lógica de datos.
+2. **P1. Reseñas visibles sin sesión** y nota media Pixela.
+3. **P2. Buscador global** (⌘K contra `search/multi`, con personas).
+4. **P2. Transición compartida póster → ficha** con la View Transitions API, cuando Next la estabilice.
+5. **P3. Tailwind 4:** al migrar, mover estos tokens a `@theme`.
