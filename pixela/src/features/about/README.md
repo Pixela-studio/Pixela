@@ -34,14 +34,13 @@ src/features/about/
 Componente principal que renderiza toda la sección "Acerca de". Incluye:
 
 - **Título y descripción general**: Presentación de la plataforma
-- **Tarjetas de características**: Pasión, Comunidad (próximamente), Misión
+- **Tarjetas de características**: Pasión, Biblioteca, Misión
 
 #### Subcomponentes:
 
 ##### FeatureCard
 - Renderiza una tarjeta individual de característica
 - Muestra ícono, título, descripción
-- Soporte para etiqueta "Próximamente"
 
 ## 📊 Datos y Configuración
 
@@ -62,7 +61,7 @@ interface FeatureCard {
 
 #### FEATURE_CARDS
 - Array con las características principales de Pixela
-- Iconos usando React Icons (FaFilm, FaUsers, FaHeart)
+- Iconos usando React Icons (FaFilm, FaBookmark, FaHeart)
 - Una característica marcada como "próximamente"
 
 ## 🎨 Estilos y Diseño

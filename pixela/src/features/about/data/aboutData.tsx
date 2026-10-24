@@ -1,4 +1,4 @@
-import { FaFilm, FaUsers, FaHeart } from 'react-icons/fa';
+import { FaFilm, FaBookmark, FaHeart } from 'react-icons/fa';
 import { FeatureCard } from '@/features/about/types/components';
 
 /**
@@ -12,11 +12,12 @@ export const FEATURE_CARDS: FeatureCard[] = [
     title: "Nuestra Pasión",
     description: "Nos dedicamos a crear una experiencia única para los amantes del cine y la televisión, ofreciendo una plataforma donde pueden descubrir y compartir sus historias favoritas."
   },
+  // Antes era "Nuestra Comunidad" con una etiqueta "Próximamente": una promesa
+  // sin fecha. Ahora la tarjeta cuenta lo que Pixela ya hace hoy.
   {
-    icon: <FaUsers />,
-    title: "Nuestra Comunidad",
-    description: "Estamos trabajando en crear un espacio donde los amantes del cine puedan conectarse, compartir sus opiniones y descubrir nuevas perspectivas. ¡Pronto podrás ser parte de nuestra comunidad!",
-    isComingSoon: true
+    icon: <FaBookmark />,
+    title: "Tu Biblioteca",
+    description: "Guarda lo que quieres ver, marca lo que estás viendo o ya has visto y escribe reseñas con tu nota. Todo queda en tu perfil para cuando vuelvas."
   },
   {
     icon: <FaHeart />,

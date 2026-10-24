@@ -18,7 +18,7 @@ const STYLES = {
 
   // Titulos
   title: "text-6xl max-sm:text-[clamp(2.5rem,10vw,3rem)] font-black mb-8 text-pixela-accent font-outfit relative inline-block [text-wrap:balance] max-sm:leading-[0.95] [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px] [@media(max-height:500px)_and_(orientation:landscape)]:mb-4",
-  titleUnderline: "absolute -bottom-2 left-0 w-0 h-1 bg-pixela-accent group-hover:w-full transition-all duration-500",
+  titleUnderline: "absolute -bottom-2 left-0 w-0 h-1 bg-pixela-accent group-hover:w-full transition-[width] duration-500",
   subtitle: "text-xl max-sm:text-base text-white/80 text-left ipad:text-left lg:text-center xl:text-center",
 
   // Cabecera de la seccion
@@ -27,7 +27,7 @@ const STYLES = {
 
   // Tarjeta de característica
   featuresGrid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6 mb-20 [&>*:nth-child(3)]:md:col-span-2 [&>*:nth-child(3)]:lg:col-span-1",
-  card: "group relative rounded-2xl p-px cursor-pointer overflow-hidden transition-transform duration-300 hover:-translate-y-1",
+  card: "group relative rounded-2xl p-px overflow-hidden transition-transform duration-300 hover:-translate-y-1",
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   cardContent: "relative z-10 h-full rounded-[15px] p-8 max-sm:p-4 ipad:p-6 flex flex-col bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5",
   cardIcon: "text-4xl text-pixela-accent ipad:text-3xl",
@@ -35,7 +35,6 @@ const STYLES = {
   cardTitle: "text-2xl font-semibold text-white mb-4 group-hover:text-pixela-accent transition-colors duration-300 flex items-center ipad:text-xl ipad:mb-3 mt-1 [@media(max-height:500px)_and_(orientation:landscape)]:text-xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",
   cardTitleContainer: "flex items-center gap-3 mb-4 ipad:flex-col ipad:items-start ipad:gap-2",
   cardDescription: "text-white/70 leading-relaxed flex-grow ipad:text-sm ipad:leading-relaxed",
-  comingSoon: "px-2 py-1 text-xs font-bold uppercase tracking-wider bg-pixela-accent/20 text-pixela-accent rounded-full border border-pixela-accent/30 ipad:px-1.5 ipad:py-0.5 ipad:text-[10px] ipad:self-start ",
 } as const;
 
 /**
@@ -44,21 +43,18 @@ const STYLES = {
  * @param {FeatureCard} props - Propiedades de la tarjeta
  * @returns {JSX.Element} Tarjeta de característica
  */
-const FeatureCard = ({ icon, title, description, isComingSoon }: FeatureCardType) => {
+const FeatureCard = ({ icon, title, description }: FeatureCardType) => {
   const cardRef = useInteractiveBorder<HTMLDivElement>();
 
   return (
     <div ref={cardRef} className={STYLES.card}>
-      <div className={STYLES.cardBorder} />
+      <div aria-hidden="true" className={STYLES.cardBorder} />
       <div className={STYLES.cardContent}>
         <div className={STYLES.cardIconContainer}>
-          <div className={STYLES.cardIcon}>{icon}</div>
+          <div aria-hidden="true" className={STYLES.cardIcon}>{icon}</div>
         </div>
         <div className={STYLES.cardTitleContainer}>
           <h3 className={STYLES.cardTitle}>{title}</h3>
-          {isComingSoon && (
-            <span className={STYLES.comingSoon}>Próximamente</span>
-          )}
         </div>
         <p className={STYLES.cardDescription}>{description}</p>
       </div>

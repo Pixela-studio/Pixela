@@ -8,5 +8,4 @@ export interface FeatureCard {
   icon: ReactNode;
   title: string;
   description: string;
-  isComingSoon?: boolean;
 } 
