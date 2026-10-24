@@ -1,5 +1,19 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require("tailwindcss/colors");
+// Grises cálidos (la escala stone de Tailwind) en lugar de los gray fríos.
+// Copiada aquí para no usar require(), que el lint marca como error.
+const WARM_GRAY = {
+  50: "#fafaf9",
+  100: "#f5f5f4",
+  200: "#e7e5e4",
+  300: "#d6d3d1",
+  400: "#a8a29e",
+  500: "#78716c",
+  600: "#57534e",
+  700: "#44403c",
+  800: "#292524",
+  900: "#1c1917",
+  950: "#0c0a09",
+};
 
 // Los tokens y sus reglas de uso están en DESIGN.md. Si añades uno aquí,
 // documéntalo allí también.
@@ -34,7 +48,7 @@ module.exports = {
          * y los velos de la app hereden ese tono sin tocar cada clase.
          */
         white: "#F4EDE2",
-        gray: colors.stone,
+        gray: WARM_GRAY,
         pixela: {
           // Planos de la sala, del más profundo al más elevado.
           ink: "#070605",
