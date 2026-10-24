@@ -78,6 +78,19 @@ const nextConfig = {
     },
     experimental: {
         optimizePackageImports: ['react-icons'],
+
+        /*
+         * Workers del build. Next usa por defecto `núcleos - 1`, y Coolify
+         * construye la imagen en el mismo servidor que sirve el resto de
+         * servicios: en una máquina de 16 núcleos eran 15 procesos de Node
+         * compitiendo con todo lo demás durante el prerender. `Dockerfile.prod`
+         * fija `NEXT_BUILD_CPUS`; en local, sin la variable, se queda el valor
+         * por defecto. Se añade solo si viene, porque un `cpus: undefined`
+         * pisaría el valor por defecto de Next en vez de heredarlo.
+         */
+        ...(Number(process.env.NEXT_BUILD_CPUS) > 0 && {
+            cpus: Number(process.env.NEXT_BUILD_CPUS),
+        }),
     },
 
     /**

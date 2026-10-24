@@ -67,7 +67,14 @@ ARG TMDB_BASE_URL="https://api.themoviedb.org/3"
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_API_URL
 
+# Workers de `next build` (ver `experimental.cpus` en next.config.js). Sin
+# esto Next lanza `nucleos - 1` procesos, y en un servidor compartido el build
+# se come la maquina mientras el resto de servicios sigue sirviendo. Dos van
+# sobrados para el centenar de paginas que se prerenderizan.
+ARG NEXT_BUILD_CPUS=2
+
 ENV TMDB_BASE_URL=${TMDB_BASE_URL} \
+    NEXT_BUILD_CPUS=${NEXT_BUILD_CPUS} \
     NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL} \
     NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NODE_ENV=production \
