@@ -17,7 +17,7 @@ const STYLES = {
   container:
     "flex flex-col items-center justify-center gap-3 px-6 py-16 text-center",
   icon: "text-white/25 [&>svg]:h-10 [&>svg]:w-10",
-  title: "font-outfit text-lg font-semibold text-white",
+  title: "text-lg font-semibold text-white",
   description: "max-w-sm text-sm leading-relaxed text-gray-400",
   action:
     "btn btn-primary btn-sm mt-3",

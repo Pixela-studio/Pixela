@@ -34,7 +34,7 @@ const STYLES = {
   // Estado vacío
   emptyContainer: "flex flex-col items-center justify-center p-8 text-gray-400",
   emptyIcon: "w-12 h-12 mb-4",
-  emptyText: "text-lg font-outfit",
+  emptyText: "text-lg",
 
   // Item de usuario
   userItem:

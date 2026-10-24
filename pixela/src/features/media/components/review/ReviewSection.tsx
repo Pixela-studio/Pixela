@@ -22,7 +22,7 @@ const STYLES = {
     errorIcon: "w-6 h-6 mr-2",
     empty: "flex flex-col items-center justify-center py-12 text-gray-400",
     emptyIcon: "w-8 h-8 mb-2",
-    emptyText: "text-base font-outfit"
+    emptyText: "text-base"
   },
   reviews: {
     container: "space-y-8"

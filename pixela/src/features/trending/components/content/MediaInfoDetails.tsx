@@ -6,7 +6,7 @@ import { MediaType } from "@/features/trending/types/common";
 
 const STYLES = {
   container: 'mb-4',
-  title: 'text-pixela-light font-bold text-xl mb-2 font-outfit',
+  title: 'text-pixela-light font-bold text-xl mb-2',
   infoContainer: 'flex items-center gap-3 mb-3',
   rating: {
     container: 'flex items-center',

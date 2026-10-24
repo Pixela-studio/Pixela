@@ -18,12 +18,12 @@ export const STYLES = {
   content: {
     wrapper: "relative z-10 mx-auto max-w-2xl text-center",
     errorCode:
-      "mb-4 font-outfit text-8xl font-black leading-none tracking-tight text-pixela-accent md:text-9xl",
+      "mb-4 text-8xl font-black leading-none tracking-tight text-pixela-accent md:text-9xl",
     // Para una palabra en lugar de un código ("Corten" en error.tsx): más
     // pequeña para que no desborde a 375 px.
     errorWord:
-      "mb-4 font-outfit text-6xl font-black leading-none tracking-tight text-pixela-accent md:text-8xl",
-    title: "mb-4 font-outfit text-3xl font-bold text-white [text-wrap:balance] md:text-4xl",
+      "mb-4 text-6xl font-black leading-none tracking-tight text-pixela-accent md:text-8xl",
+    title: "mb-4 text-3xl font-bold text-white [text-wrap:balance] md:text-4xl",
     description:
       "mx-auto mb-10 max-w-lg text-lg leading-relaxed text-white/70 [text-wrap:pretty]",
     quote: {

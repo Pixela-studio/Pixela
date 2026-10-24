@@ -20,11 +20,11 @@ const STYLES = {
 
   // Tag de tipo (PELÍCULA / SERIE) — reemplaza la accent line en dinámico.
   typeTag:
-    "inline-block text-[11px] sm:text-xs md:text-sm font-bold font-outfit uppercase tracking-[0.28em] text-pixela-accent mb-4 md:mb-5 lg:mb-6 ls:mb-2 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]",
+    "inline-block text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.28em] text-pixela-accent mb-4 md:mb-5 lg:mb-6 ls:mb-2 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]",
 
   // Título — común
   heroTitleBase:
-    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-black font-outfit text-pixela-light mb-5 md:mb-6 lg:mb-8 2k:mb-6 tracking-tight leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] [text-wrap:balance] ls:text-3xl ls:mb-2 line-clamp-3",
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2k:text-8xl font-black text-pixela-light mb-5 md:mb-6 lg:mb-8 2k:mb-6 tracking-tight leading-[0.95] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] [text-wrap:balance] ls:text-3xl ls:mb-2 line-clamp-3",
   // Welcome estático: uppercase (voz de marca).
   heroTitleStatic: "uppercase",
   // Dinámico: title case natural del título de peli/serie.

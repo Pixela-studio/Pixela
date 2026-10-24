@@ -1,6 +1,6 @@
 import { Metadata, Viewport } from "next";
 import "./globals.css";
-import { outfit } from "./ui/fonts";
+import { display, sans } from "./ui/fonts";
 import { Providers } from "./providers";
 import ClientLayout from "./ClientLayout";
 import { SITE_URL } from "@/lib/site";
@@ -67,7 +67,7 @@ export const viewport: Viewport = {
 };
 
 const STYLES = {
-  html: outfit.variable,
+  html: `${display.variable} ${sans.variable}`,
   body: "antialiased bg-pixela-dark font-sans text-pixela-light",
 } as const;
 

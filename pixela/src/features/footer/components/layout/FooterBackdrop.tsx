@@ -1,5 +1,5 @@
 const STYLES = {
-  text: "pointer-events-none select-none absolute inset-0 hidden md:flex items-center justify-center font-outfit font-black uppercase leading-none tracking-[-0.05em] whitespace-nowrap text-transparent",
+  text: "pointer-events-none select-none absolute inset-0 hidden md:flex items-center justify-center font-black uppercase leading-none tracking-[-0.05em] whitespace-nowrap text-transparent",
 } as const;
 
 /**

@@ -17,7 +17,7 @@ const STYLES = {
   container: "max-w-7xl 2k:max-w-6xl mx-auto max-sm:w-5/6 ipad:w-[90%] 2k:w-[70%]",
 
   // Titulos
-  title: "text-6xl max-sm:text-[clamp(2.5rem,10vw,3rem)] font-black mb-8 text-pixela-accent font-outfit relative inline-block [text-wrap:balance] max-sm:leading-[0.95] ls:text-[48px] ls:mb-4",
+  title: "text-6xl max-sm:text-[clamp(2.5rem,10vw,3rem)] font-black mb-8 text-pixela-accent relative inline-block [text-wrap:balance] max-sm:leading-[0.95] ls:text-[48px] ls:mb-4",
   titleUnderline: "absolute -bottom-2 left-0 w-0 h-1 bg-pixela-accent group-hover:w-full transition-[width] duration-500",
   subtitle: "text-xl max-sm:text-base text-white/80 text-left ipad:text-left lg:text-center xl:text-center",
 

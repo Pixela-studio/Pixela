@@ -55,7 +55,7 @@ export const BannerSelectorModal = ({
       <div className="relative w-full max-w-4xl bg-pixela-surface border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[80vh] animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold text-white font-outfit flex items-center gap-2">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <FiImage className="text-pixela-accent" />
             Cambiar Portada
           </h2>

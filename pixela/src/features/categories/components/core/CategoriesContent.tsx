@@ -68,7 +68,7 @@ const STYLES = {
     "opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
   overlayContent: "mb-2 md:mb-3",
   title:
-    "text-pixela-light font-bold text-sm md:text-base lg:text-lg mb-1 md:mb-2 font-outfit overflow-hidden text-ellipsis whitespace-nowrap",
+    "text-pixela-light font-bold text-sm md:text-base lg:text-lg mb-1 md:mb-2 overflow-hidden text-ellipsis whitespace-nowrap",
   mediaInfo: "flex items-center gap-2 mb-2 md:mb-3 flex-wrap",
   rating: "flex items-center",
   ratingIcon: "text-yellow-400 mr-1 text-xs md:text-sm",
@@ -94,7 +94,7 @@ const STYLES = {
   textContainer: "max-w-2xl space-y-8 lg:ml-12",
   textContent: "space-y-6",
   mainTitle:
-    "text-4xl sm:text-5xl lg:text-6xl font-black font-outfit leading-[1.1] sm:leading-tight tracking-tight text-pixela-light",
+    "text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.1] sm:leading-tight tracking-tight text-pixela-light",
   accentText: "text-pixela-accent",
   descriptionContainer:
     "space-y-4 text-base leading-relaxed md:space-y-6 md:text-lg lg:text-xl text-pixela-light/80",
@@ -124,7 +124,7 @@ const STYLES = {
   recommendationOverlay:
     "absolute inset-0 flex flex-col justify-end p-4 transition-opacity duration-500 ease-out-expo opacity-0 bg-gradient-to-t from-pixela-dark via-pixela-dark/70 to-transparent group-hover:opacity-100 group-hover:delay-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
   recommendationTitle:
-    "mb-2 text-base font-bold leading-tight text-pixela-light md:text-lg font-outfit line-clamp-2 text-left",
+    "mb-2 text-base font-bold leading-tight text-pixela-light md:text-lg line-clamp-2 text-left",
   recommendationInfo: "flex flex-wrap items-center gap-2 mb-2",
   recommendationRating: "flex items-center",
   recommendationRatingIcon: "mr-1 text-xs text-yellow-400",

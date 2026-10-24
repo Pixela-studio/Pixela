@@ -42,7 +42,7 @@ const STYLES = {
     "flex flex-col items-center gap-6 text-center lg:flex-row lg:items-start lg:gap-8 lg:text-left",
   poster: "w-40 sm:w-48 lg:w-64",
   content: "w-full lg:flex-grow",
-  title: "font-outfit text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 [text-wrap:balance]",
+  title: "text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 [text-wrap:balance]",
   subtitle: "text-xl text-pixela-accent font-medium mb-6",
   metadata: "flex flex-wrap justify-center gap-3 text-sm text-gray-400 mb-6 font-medium lg:justify-start",
   metadataItem: "bg-white/5 border border-white/10 px-3 py-1 rounded-full",

@@ -16,7 +16,7 @@ const STYLES = {
   logoColumn: "flex flex-col space-y-4 md:space-y-6 md:col-span-4 ipad:space-y-4 ipad:col-span-1",
   logoContainer: "flex items-center",
   logoWrapper: "relative",
-  logoText: "tracking-[-0.03em] leading-none text-pixela-accent font-black font-outfit text-3xl md:text-5xl ipad:text-4xl",
+  logoText: "tracking-[-0.03em] leading-none text-pixela-accent font-black text-3xl md:text-5xl ipad:text-4xl",
   description: "text-white/80 text-sm md:text-base max-w-md lg:max-w-2xl xl:max-w-xl leading-relaxed mt-2 ipad:text-sm ipad:leading-relaxed ipad:max-w-full",
 
   // Información de contacto

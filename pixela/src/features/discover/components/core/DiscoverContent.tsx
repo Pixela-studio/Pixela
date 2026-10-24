@@ -17,7 +17,7 @@ const STYLES = {
   leftSection: "w-full max-w-3xl",
 
   mainHeading:
-    "text-5xl sm:text-6xl lg:text-7xl 2k:text-8xl font-black text-white font-outfit leading-[0.9] mb-8 2k:mb-6 flex flex-col gap-0 drop-shadow-2xl tracking-tighter [text-wrap:balance]",
+    "text-5xl sm:text-6xl lg:text-7xl 2k:text-8xl font-black text-white leading-[0.9] mb-8 2k:mb-6 flex flex-col gap-0 drop-shadow-2xl tracking-tighter [text-wrap:balance]",
   accentLine: "text-pixela-accent",
 
   description:

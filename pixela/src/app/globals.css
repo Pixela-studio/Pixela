@@ -11,9 +11,12 @@
 :root {
   color-scheme: dark;
   --pixela-accent: #ec1b69;
-  --pixela-screen: #181818;
-  --pixela-raised: #2a2a2a;
+  --pixela-screen: #0d0a08;
+  --pixela-raised: #241e19;
+  --pixela-light: #f4ede2;
   --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Grano de película compartido por la capa global y `.noise-effect`. */
+  --film-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.95 0 0 0 0 0.88 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
 }
 
 html {
@@ -24,6 +27,29 @@ html {
 
 body {
   caret-color: var(--pixela-accent);
+  font-feature-settings: "kern", "liga";
+}
+
+/*
+ * Grano de película sobre toda la app, como el de una copia proyectada.
+ * Capa fija sin blend mode (solo opacidad), así que se compone en GPU y no
+ * repinta al hacer scroll.
+ */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: var(--film-grain);
+  background-size: 220px;
+}
+
+/* Los títulos en Bodoni: ligaduras y cifras de estilo antiguo, como en un cartón. */
+.font-display {
+  font-feature-settings: "kern", "liga", "onum";
+  font-optical-sizing: auto;
 }
 
 ::selection {
@@ -62,12 +88,25 @@ body {
     @apply pointer-events-none opacity-50;
   }
 
+  /* Texto negro sobre el rosa: blanco sobre #EC1B69 se queda en 4:1 y no
+     llega a AA con 16 px; el negro de sala da 5:1 y se lee como una entrada. */
   .btn-primary {
-    @apply bg-pixela-accent text-white shadow-lg shadow-pixela-accent/25 hover:-translate-y-0.5 hover:bg-pixela-accent/90 active:translate-y-0;
+    @apply bg-pixela-accent text-pixela-dark hover:bg-[#F2397F] active:scale-[0.97];
   }
 
   .btn-ghost {
-    @apply border border-white/10 bg-white/5 text-white backdrop-blur-md hover:border-pixela-accent/50 hover:bg-pixela-accent/10;
+    @apply bg-white/[0.08] text-white hover:bg-white/[0.14] active:scale-[0.97];
+  }
+
+  /* Títulos de sección: Bodoni a escala de cartón. */
+  .title-card {
+    @apply font-display font-normal leading-[0.9] tracking-[-0.035em] text-white;
+  }
+
+  /* Metadatos y navegación: Archivo algo expandida. */
+  .meta-text {
+    font-stretch: 112%;
+    @apply text-[15px] font-medium text-gray-400;
   }
 }
 
@@ -98,10 +137,28 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.04;
+  opacity: 0.08;
   z-index: 1;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='5' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: var(--film-grain);
+  background-size: 220px;
   pointer-events: none;
+}
+
+/*
+ * Fundido a negro entre vistas: `app/template.tsx` se vuelve a montar en cada
+ * navegación y su contenido entra desde negro. Solo opacidad (composición).
+ */
+@keyframes fade-from-black {
+  from {
+    opacity: 0;
+  }
+}
+
+/* `backwards` y no `both`: al terminar no deja la animación aplicada, porque
+   una opacidad animada crea un contexto de apilamiento que encerraría los
+   modales de la página por debajo de la navbar. */
+.page-fade {
+  animation: fade-from-black 420ms var(--ease-out-expo) backwards;
 }
 
 /* Animación de shimmer para skeleton loading */

@@ -18,7 +18,7 @@ const STYLES = {
     'flex justify-center sm:order-last sm:h-full sm:items-center sm:border-l sm:border-white/10 sm:bg-pixela-ink/60',
   logoLink: 'group flex flex-col items-center gap-4 rounded-2xl p-2',
   logo: 'w-16 sm:w-24 h-auto transition-transform duration-500 ease-out-expo group-hover:scale-105',
-  wordmark: 'font-outfit text-3xl sm:text-4xl font-black tracking-[-0.03em] text-white',
+  wordmark: 'text-3xl sm:text-4xl font-black tracking-[-0.03em] text-white',
   formPane: 'flex items-center justify-center sm:px-6 sm:py-12',
 } as const;
 

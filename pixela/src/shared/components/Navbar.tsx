@@ -40,19 +40,19 @@ const STYLES = {
   containerDocked: 'max-w-full py-3 px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 rounded-none bg-pixela-dark/90 border-b border-white/10 shadow-lg shadow-black/30',
 
   logo: 'mx-10 sm:mx-2 md:mx-6 lg:mx-10 transition-transform duration-300 hover:scale-[1.02] active:scale-100',
-  logoText: 'text-3xl font-bold font-outfit text-pixela-accent',
+  logoText: 'text-3xl font-bold text-pixela-accent',
   navLinks: 'hidden lg:flex flex-1 justify-center',
   navLinksContainer: 'flex space-x-8 lg:space-x-6 xl:space-x-8',
   // Inactivo atenuado a 65% para que el activo (magenta) destaque; hover
   // devuelve al 100% mientras el underline crece.
-  navLink: 'font-outfit text-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
+  navLink: 'text-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
   navLinkActive: 'text-pixela-accent hover:text-pixela-accent',
   // Se escala en vez de animar `width`: así no fuerza layout en cada frame.
   navLinkUnderline: 'absolute -bottom-1 left-0 w-full h-0.5 bg-pixela-accent origin-left scale-x-0 transition-transform duration-300 ease-out-expo group-hover:scale-x-100',
   navLinkUnderlineActive: 'scale-x-100',
   userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
   userContainer: 'flex items-center gap-2',
-  userName: 'text-pixela-light font-outfit text-sm',
+  userName: 'text-pixela-light text-sm',
   button: 'text-pixela-light/80 hover:text-pixela-accent transition-colors duration-300 p-2 rounded-full hover:bg-pixela-dark/30',
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
 
@@ -63,14 +63,14 @@ const STYLES = {
   mobileMenuHidden: '-translate-y-full',
   mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2 transition-transform hover:rotate-90 duration-300',
   mobileNavContainer: 'flex flex-col flex-1 w-full mt-4 sm:mt-8',
-  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-white/10 flex items-center justify-between w-full overflow-hidden',
+  mobileNavLink: 'group relative font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-white/10 flex items-center justify-between w-full overflow-hidden',
   mobileNavLinkText: 'relative z-10 transition-transform duration-300 group-hover:translate-x-4',
   mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-[opacity,transform] duration-300 ease-out-expo group-hover:opacity-100 group-hover:translate-x-0',
   mobileNavLinkHoverBg: 'absolute inset-0 bg-pixela-accent/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out',
   mobileUserSection: 'mt-auto pt-8 w-full',
   mobileUserContainer: 'flex flex-col gap-4 w-full',
   mobileActionButton: 'group relative flex w-full items-center justify-between px-6 py-5 border-2 border-pixela-light/20 hover:border-pixela-accent bg-transparent transition-colors duration-300 overflow-hidden',
-  mobileActionText: 'font-outfit font-bold text-xl text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
+  mobileActionText: 'font-bold text-xl text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
   mobileActionIcon: 'w-6 h-6 text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
   mobileActionHoverBg: 'absolute inset-0 bg-pixela-accent translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out',
 } as const;

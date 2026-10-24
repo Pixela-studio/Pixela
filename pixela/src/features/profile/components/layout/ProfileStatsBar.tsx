@@ -19,7 +19,7 @@ const STYLES = {
       isLastOdd ? "col-span-2 lg:col-span-1" : "col-span-1"
     ),
   statValue:
-    "text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform font-outfit relative z-10",
+    "text-2xl md:text-3xl font-bold text-white mb-1 group-hover:scale-110 transition-transform relative z-10",
   statLabel:
     "text-xs text-gray-400 uppercase tracking-wider flex items-center gap-2 relative z-10",
   statIcon: "w-4 h-4 text-pixela-accent",

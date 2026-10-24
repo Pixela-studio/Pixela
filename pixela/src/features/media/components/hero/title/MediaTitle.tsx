@@ -4,7 +4,7 @@ interface MediaTitleProps {
 
 const STYLES = {
   title:
-    "font-outfit text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-6xl [text-wrap:balance]",
+    "text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-6xl [text-wrap:balance]",
 } as const;
 
 /**

@@ -29,7 +29,7 @@ export const HEADER_TOGGLE_STYLES = {
 
 export const HEADER_TYPOGRAPHY_STYLES = {
   titleBase:
-    "font-black font-outfit tracking-wider uppercase leading-none w-full md:w-auto break-words text-pixela-accent",
+    "font-black tracking-wider uppercase leading-none w-full md:w-auto break-words text-pixela-accent",
   titleMobileBase: "block sm:hidden text-[64px] leading-[0.95]",
   titleDesktopBase:
     "hidden sm:block text-[64px] md:text-[80px] lg:text-[80px] xl:text-[96px] 2xl:text-[112px] min-[1920px]:text-[128px] 2k:text-[100px] lg:whitespace-nowrap ls:text-[48px]",

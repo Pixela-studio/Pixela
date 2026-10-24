@@ -23,7 +23,7 @@ const STYLES = {
     "relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-pixela-ink shadow-2xl overflow-hidden bg-pixela-surface",
   userDetails: "flex-1 text-center md:text-left mb-2",
   userName:
-    "text-4xl md:text-5xl font-bold text-white font-outfit mb-2 tracking-tight drop-shadow-lg",
+    "text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight drop-shadow-lg",
   userBadges: "flex flex-wrap justify-center md:justify-start gap-3",
   badge:
     "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md border",

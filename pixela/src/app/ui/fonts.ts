@@ -1,14 +1,25 @@
-import { Outfit } from "next/font/google";
+import { Archivo, Bodoni_Moda } from "next/font/google";
 
 /*
- * Outfit es la única familia de Pixela (ver DESIGN.md). Se expone como
- * `--font-outfit`, que es lo que leen `font-sans` y `font-outfit` en Tailwind.
+ * Dos familias (ver DESIGN.md › Typography):
  *
- * Roboto se descargaba en cada visita sin que ningún componente la usara.
+ * - Bodoni Moda, la voz de los títulos: la didona de alto contraste de los
+ *   cartones de crédito y los carteles clásicos. Con su eje óptico (`opsz`)
+ *   el trazo fino aguanta a 128 px sin romperse.
+ * - Archivo, la interfaz y el texto: grotesca sobria con eje de anchura
+ *   (`wdth`), que usamos algo expandida en la navegación y los metadatos.
  */
-export const outfit = Outfit({
+export const display = Bodoni_Moda({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700", "900"],
-  variable: "--font-outfit",
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  variable: "--font-display",
+  fallback: ["Didot", "Georgia", "serif"],
+});
+
+export const sans = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-sans",
   fallback: ["system-ui", "Arial", "sans-serif"],
 });

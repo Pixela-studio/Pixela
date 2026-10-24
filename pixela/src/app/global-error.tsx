@@ -1,7 +1,7 @@
 "use client";
 
 import "./globals.css";
-import { outfit } from "./ui/fonts";
+import { display, sans } from "./ui/fonts";
 import { STYLES } from "./errors/_styles";
 
 /**
@@ -10,7 +10,7 @@ import { STYLES } from "./errors/_styles";
  */
 export default function GlobalError({ reset }: { reset: () => void }) {
   return (
-    <html lang="es" className={outfit.variable}>
+    <html lang="es" className={`${display.variable} ${sans.variable}`}>
       <body className="bg-pixela-dark font-sans text-pixela-light antialiased">
         <div className={STYLES.container} role="alert">
           <div className={STYLES.content.wrapper}>
