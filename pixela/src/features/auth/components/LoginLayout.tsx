@@ -16,8 +16,9 @@ const STYLES = {
     'relative z-10 w-full max-w-[960px] grid sm:grid-cols-2 items-center gap-10 sm:gap-0 rounded-3xl sm:border sm:border-white/10 sm:bg-pixela-dark sm:shadow-2xl sm:shadow-black/60 sm:min-h-[520px] overflow-hidden',
   logoPane:
     'flex justify-center sm:order-last sm:h-full sm:items-center sm:border-l sm:border-white/10 sm:bg-pixela-ink/60',
-  logoLink: 'group rounded-2xl p-2',
-  logo: 'w-28 sm:w-44 h-auto transition-transform duration-500 ease-out-expo group-hover:scale-105',
+  logoLink: 'group flex flex-col items-center gap-4 rounded-2xl p-2',
+  logo: 'w-16 sm:w-24 h-auto transition-transform duration-500 ease-out-expo group-hover:scale-105',
+  wordmark: 'font-outfit text-3xl sm:text-4xl font-black tracking-[-0.03em] text-white',
   formPane: 'flex items-center justify-center sm:px-6 sm:py-12',
 } as const;
 
@@ -36,17 +37,20 @@ export const LoginLayout = ({ children }: LoginLayoutProps) => {
       <div className={STYLES.card}>
         <div className={STYLES.logoPane}>
           <Link href="/" className={STYLES.logoLink} aria-label="Pixela, ir al inicio">
-            {/* `unoptimized`: el optimizador de next/image rechaza SVG y el
-                logo se veía como imagen rota. Un SVG no necesita optimizarse. */}
+            {/* Solo el símbolo: el SVG anterior llevaba escrito "Pixela.io",
+                un dominio que no es del proyecto. La palabra va en HTML, con
+                la fuente de la app. `unoptimized` porque el optimizador de
+                next/image rechaza SVG. */}
             <Image
-              src="/img/Logo-login.svg"
+              src="/img/pixela-mark.svg"
               alt=""
-              width={190}
-              height={164}
+              width={113}
+              height={94}
               className={STYLES.logo}
               unoptimized
               priority
             />
+            <span className={STYLES.wordmark} aria-hidden="true">Pixela</span>
           </Link>
         </div>
         <div className={STYLES.formPane}>{children}</div>
