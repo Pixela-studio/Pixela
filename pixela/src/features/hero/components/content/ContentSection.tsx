@@ -17,7 +17,7 @@ const STYLES = {
   meta: "meta-text !text-white/75 mb-4 md:mb-6 ls:mb-2",
 
   heroTitleBase:
-    "font-display font-normal text-white text-[56px] sm:text-7xl md:text-8xl lg:text-[112px] xl:text-[128px] 2k:text-[140px] leading-[0.9] tracking-[-0.035em] [text-wrap:balance] line-clamp-3 ls:text-4xl",
+    "font-display font-normal text-white text-[56px] sm:text-7xl md:text-8xl lg:text-[112px] xl:text-[128px] 2k:text-[140px] leading-[0.9] tracking-[-0.035em] [text-wrap:balance] [overflow-wrap:anywhere] hyphens-auto line-clamp-3 ls:text-4xl",
 
   description:
     "text-base sm:text-lg lg:text-[19px] leading-relaxed text-white/80 max-w-xl [text-wrap:pretty] line-clamp-3 mt-5 md:mt-7 mb-8 md:mb-10 ls:mt-2 ls:mb-4",

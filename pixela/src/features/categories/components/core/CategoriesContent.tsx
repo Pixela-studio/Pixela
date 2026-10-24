@@ -65,7 +65,7 @@ const STYLES = {
   favorite:
     "opacity-0 transition-opacity duration-300 ease-out-expo group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100",
   overlayContent: "",
-  title: "text-[15px] md:text-base font-semibold leading-snug text-white line-clamp-2",
+  title: "text-[15px] md:text-base font-semibold leading-snug text-white line-clamp-2 [overflow-wrap:anywhere] hyphens-auto",
   mediaInfo: "mt-1 flex items-center gap-3 flex-wrap text-sm text-gray-400 tabular-nums",
   rating: "flex items-center text-white/85",
   ratingIcon: "mr-1 text-[11px]",

@@ -45,7 +45,7 @@ const STYLES = {
   poster: "w-32 sm:w-44 lg:w-64",
   content: "w-full min-w-0 lg:flex-grow",
   title:
-    "font-display font-normal text-white text-[52px] sm:text-7xl lg:text-[104px] xl:text-[120px] leading-[0.88] tracking-[-0.04em] mb-5 [text-wrap:balance] break-words",
+    "font-display font-normal text-white text-[52px] sm:text-7xl lg:text-[104px] xl:text-[120px] leading-[0.88] tracking-[-0.04em] mb-5 [text-wrap:balance] w-full [overflow-wrap:anywhere] hyphens-auto",
   subtitle: "text-lg md:text-xl text-white/85 mb-4",
   metadata: "flex flex-wrap gap-x-5 gap-y-1 text-[15px] [font-stretch:112%] text-gray-400 mb-6",
   metadataItem: "",

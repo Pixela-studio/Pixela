@@ -10,7 +10,7 @@ import { MediaInfoDetailsProps } from "@/features/trending/types/components";
  */
 const STYLES = {
   container: "pt-3",
-  title: "text-[15px] md:text-base font-semibold leading-snug text-white line-clamp-2",
+  title: "text-[15px] md:text-base font-semibold leading-snug text-white line-clamp-2 [overflow-wrap:anywhere] hyphens-auto",
   info: "mt-1 flex items-center gap-3 text-sm text-gray-400 tabular-nums",
   rating: "text-white/85",
 } as const;
