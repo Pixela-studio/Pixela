@@ -261,21 +261,24 @@ Recorrido en escritorio (1440×900) y móvil (375×812): home, categorías, deta
 9. **Navegador sin tematizar:** selección azul por defecto, scrollbar clara en Windows y `theme-color` `#000` distinto del fondo.
 
 ### Cambios aplicados en esta rama
-- [ ] Tokens de color, fuente y motion en `tailwind.config.js` y `globals.css`; limpieza de utilidades y bloques muertos; Roboto fuera.
-- [ ] Hex sueltos sustituidos por tokens en todo `src/`.
-- [ ] `.btn`, `.btn-primary`, `.btn-ghost` y adopción en la 404/403, el estado vacío, los errores de perfil y los formularios de reseña.
-- [ ] Login y registro rehechos: logo visible, botón primario real, título sin barra, inputs con foco visible.
-- [ ] Contraste: `gray-500/600` subidos a `gray-400` en texto.
-- [ ] `prefers-reduced-motion` global y en los hooks de GSAP; fuera el pulso infinito del carrusel.
-- [ ] Superficies del navegador tematizadas (selección, caret, scrollbar, `color-scheme`, `theme-color`).
-- [ ] `aria-label` en los botones de icono que no lo tenían.
+- [x] Tokens de color, fuente y motion en `tailwind.config.js` y `globals.css`; limpieza de utilidades y bloques muertos; Roboto fuera.
+- [x] Hex sueltos sustituidos por tokens en todo `src/`.
+- [x] `.btn`, `.btn-primary`, `.btn-ghost` y adopción en la 404/403, el estado vacío, los errores de perfil y los formularios de reseña.
+- [x] Login y registro rehechos: logo visible, botón primario real, título sin barra, inputs con foco visible.
+- [x] Contraste: `gray-500/600` subidos a `gray-400` en texto.
+- [x] `prefers-reduced-motion` global y en los hooks de GSAP; fuera el pulso infinito del carrusel.
+- [x] Superficies del navegador tematizadas (selección, caret, scrollbar, `color-scheme`, `theme-color`).
+- [x] `aria-label` en los botones de icono que no lo tenían.
+- [x] Toasts sin `border-l-4` de color: borde completo teñido sobre `surface`.
 
 ### Pendiente, por prioridad
 1. **P1. Insignia "Top Pixela" en casi todas las tarjetas.** El umbral (nota ≥ 8) lo superan casi todas las obras populares, así que la insignia deja de significar algo. Propuesta: subirlo a 8.5 o mostrarla solo en el top 3 de cada fila. Es una decisión de producto.
-2. **P1. Quitar `transition-all` en lo que queda** (unas 70 apariciones en componentes de feature) y pasar las duraciones a la escala 150/250/500.
+2. **P1. Quitar `transition-all` en lo que queda** (62 apariciones en componentes de feature) y pasar las duraciones a la escala 150/250/500.
 3. **P1. Un solo contenedor.** Unificar `headerStyles.ts` con `TrendingHeader` (duplica las mismas cadenas) y usar la clave `ls:` en vez de la media query a mano.
 4. **P2. Footer.** Ocho animaciones infinitas de partículas y líneas con `rgba(255,0,127)`. Ya se paran con reduced-motion y el color pasa a token, pero sobran la mitad.
 5. **P2. Inputs del perfil** (`profile/InputField`, inputs inline de `ProfileUsers`) con el patrón de input de login.
 6. **P2. Esqueletos de carga** con degradado `accent → pink-400`: pasar a un `shimmer` neutro sobre `surface`.
 7. **P3. Título "Quiénes somos"** en caja normal frente a las marquesinas en mayúsculas de la home: decidir si entra en la regla de la marquesina.
 8. **P3. Tailwind 4.** Al migrar, mover estos tokens a `@theme`.
+9. **P2. Logo de login.** `public/img/Logo-login.svg` lleva el texto "Pixela.io", un dominio que no es del proyecto (ver CLAUDE.md). Hace falta un SVG nuevo sin el dominio.
+10. **P2. Caché en desarrollo.** `next.config.js` sirve `/_next/static` con `immutable` también en `next dev`, donde los nombres de chunk no cambian con el contenido: el navegador se queda con JS antiguo tras editar y hay que forzar la recarga. Limitar esa cabecera a producción.
