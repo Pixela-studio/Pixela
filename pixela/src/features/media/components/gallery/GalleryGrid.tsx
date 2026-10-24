@@ -1,6 +1,7 @@
 "use client";
 
 import { GalleryGridProps } from '@/features/media/types/gallery';
+import { MediaType } from '@/features/media/types/mediaBase';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -35,12 +36,26 @@ const STYLES = {
   }
 } as const;
 
+// El tipo de obra llega aparte para que el texto alternativo no llame
+// "película" a una serie.
+type GalleryGridWithMediaProps = GalleryGridProps & {
+  mediaType: MediaType;
+  title?: string;
+};
+
 /**
  * Componente que muestra una cuadrícula de imágenes (fondos o pósters)
  * @param {GalleryGridProps} props - Propiedades del componente
  * @returns {JSX.Element} Cuadrícula de imágenes
  */
-export const GalleryGrid = ({ images, type, onImageClick, showAll = false }: GalleryGridProps) => {
+export const GalleryGrid = ({
+  images,
+  type,
+  onImageClick,
+  showAll = false,
+  mediaType,
+  title,
+}: GalleryGridWithMediaProps) => {
   // Estado para manejar errores de carga de imágenes
   const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
 
@@ -53,6 +68,12 @@ export const GalleryGrid = ({ images, type, onImageClick, showAll = false }: Gal
     setImageErrors(prev => ({ ...prev, [filePath]: true }));
   };
 
+  const imageKind = type === 'backdrops' ? 'Fondo' : 'Póster';
+  const mediaNoun = mediaType === 'serie' ? 'la serie' : 'la película';
+  const imageAlt = title
+    ? `${imageKind} de ${mediaNoun} «${title}»`
+    : `${imageKind} de ${mediaNoun}`;
+
   return (
     <div className={`${STYLES.container.base} ${STYLES.container[type]}`}>
       {displayImages.map((image) => (
@@ -64,7 +85,7 @@ export const GalleryGrid = ({ images, type, onImageClick, showAll = false }: Gal
           {!imageErrors[image.file_path] ? (
             <Image
               src={image.file_path}
-              alt={`${type === 'backdrops' ? 'Fondo' : 'Póster'} de la película`}
+              alt={imageAlt}
               fill
               className={STYLES.image.base}
               sizes={type === 'backdrops' 

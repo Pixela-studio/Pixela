@@ -125,6 +125,8 @@ export function GallerySection({ media }: GallerySectionProps) {
         <GalleryGrid
           images={activeGalleryTab === 'backdrops' ? images.backdrops : images.posters}
           type={activeGalleryTab}
+          mediaType={media.tipo}
+          title={media.titulo}
           onImageClick={(image) => setSelectedGalleryImage(image.file_path)}
           showAll={showAll}
         />

@@ -20,8 +20,10 @@ import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
  * es guardar en la biblioteca (`LibraryButton`); favorito y reseña quedan como
  * secundarias.
  */
+// En móvil siguen siendo círculos de icono; desde `sm:` llevan una etiqueta
+// corta visible, porque en la beta Carmen no entendía qué hacía cada icono.
 const SECONDARY_BUTTON =
-  "flex h-12 w-12 items-center justify-center rounded-full border transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink disabled:cursor-not-allowed disabled:opacity-60";
+  "flex h-12 min-w-12 items-center justify-center gap-2 rounded-full border px-3.5 font-medium transition-[color,background-color,border-color,box-shadow] duration-300 sm:px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink disabled:cursor-not-allowed disabled:opacity-60";
 
 const STYLES = {
   container: "flex flex-wrap items-center justify-center gap-3 lg:justify-start",
@@ -31,9 +33,10 @@ const STYLES = {
         ? "border-white/20 bg-pixela-accent text-white hover:bg-pixela-accent/90"
         : "border-white/15 bg-white/10 text-white hover:bg-white/20"
     }`,
-  bookmarkIcon: "h-5 w-5 transition-all duration-300",
+  bookmarkIcon: "h-5 w-5 shrink-0",
+  buttonLabel: "sr-only sm:not-sr-only",
   reviewButton: `${SECONDARY_BUTTON} border-white/15 bg-white/10 text-white hover:bg-white/20`,
-  penIcon: "h-5 w-5",
+  penIcon: "h-5 w-5 shrink-0",
 };
 
 /**
@@ -69,9 +72,11 @@ export const ActionButtons = ({
     setShowReviewModal(true);
   };
 
+  // El nombre accesible contiene el texto visible (WCAG 2.5.3) y añade la acción.
   const favoriteLabel = isFavorited
-    ? "Quitar de favoritos"
-    : "Agregar a favoritos";
+    ? "En favoritos. Quitar de favoritos"
+    : "Añadir a favoritos";
+  const favoriteText = isFavorited ? "En favoritos" : "Favorito";
 
   return (
     <>
@@ -89,16 +94,22 @@ export const ActionButtons = ({
           title={favoriteLabel}
         >
           <FaBookmark aria-hidden="true" className={STYLES.bookmarkIcon} />
+          <span aria-hidden="true" className={STYLES.buttonLabel}>
+            {favoriteText}
+          </span>
         </button>
 
         <button
           onClick={handleReview}
           className={STYLES.reviewButton}
           type="button"
-          aria-label={`Escribir una reseña de «${title}»`}
+          aria-label={`Reseñar «${title}»`}
           title="Escribir una reseña"
         >
           <FaPen aria-hidden="true" className={STYLES.penIcon} />
+          <span aria-hidden="true" className={STYLES.buttonLabel}>
+            Reseñar
+          </span>
         </button>
       </div>
 
