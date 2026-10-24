@@ -1,13 +1,17 @@
 import { useCallback } from "react";
-import { FiHeart, FiStar, FiActivity } from "react-icons/fi";
+import { FiStar, FiActivity } from "react-icons/fi";
+import { FaBookmark } from "react-icons/fa";
+import type { IconType } from "react-icons";
 import { favoritesAPI } from "@/api/favorites/favorites";
 import { reviewsAPI } from "@/api/reviews/reviews";
 import { useAsyncResource } from "@/hooks/useAsyncResource";
 
-type ProfileStat = { label: string; value: string; icon: typeof FiHeart };
+type ProfileStat = { label: string; value: string; icon: IconType };
+
+// Favoritos con marcador, como en el resto de la app (antes aquí era un corazón).
 
 const INITIAL_STATS: ProfileStat[] = [
-  { label: "Favoritos", value: "0", icon: FiHeart },
+  { label: "Favoritos", value: "0", icon: FaBookmark },
   { label: "Reseñas", value: "0", icon: FiStar },
   { label: "Nivel", value: "Novato", icon: FiActivity },
 ];
@@ -33,7 +37,7 @@ export const useProfileStats = () => {
     ]);
 
     return [
-      { label: "Favoritos", value: String(favorites.length), icon: FiHeart },
+      { label: "Favoritos", value: String(favorites.length), icon: FaBookmark },
       { label: "Reseñas", value: String(reviews.length), icon: FiStar },
       {
         label: "Nivel",

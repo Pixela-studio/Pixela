@@ -12,7 +12,7 @@ const STYLES = {
   statsGrid: "grid grid-cols-2 md:flex md:justify-center md:flex-wrap lg:grid lg:grid-cols-3 gap-4",
   statCard: (clickable: boolean, isLastOdd: boolean) =>
     clsx(
-      "bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center transition-all duration-300 group relative overflow-hidden",
+      "bg-white/5 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center transition-[background-color,border-color,transform] duration-300 group relative overflow-hidden",
       clickable
         ? "hover:bg-white/10 cursor-pointer hover:border-white/20 active:scale-95"
         : "cursor-default",
@@ -36,6 +36,13 @@ export const ProfileStatsBar = ({
     return null;
   };
 
+  // Nombre accesible de las tarjetas que llevan a una pestaña: "Ver tus 12 favoritos".
+  const getStatActionLabel = (label: string, value: string): string => {
+    const noun = label.toLowerCase();
+    if (value === "1") return `Ver tu ${noun.replace(/s$/, "")}`;
+    return `Ver tus ${value} ${noun}`;
+  };
+
   return (
     <div className={STYLES.statsContainer}>
       <div className={STYLES.statsGrid}>
@@ -43,15 +50,29 @@ export const ProfileStatsBar = ({
           const targetTab = getTabForStat(stat.label);
           const isLastOdd = stats.length % 2 !== 0 && idx === stats.length - 1;
           
-          return (
-            <div
-              key={idx}
-              className={STYLES.statCard(!!targetTab, isLastOdd)}
-              onClick={() => targetTab && onTabChange(targetTab)}
-            >
-              <stat.icon className={STYLES.statIcon} />
+          const content = (
+            <>
+              <stat.icon aria-hidden="true" className={STYLES.statIcon} />
               <span className={STYLES.statValue}>{stat.value}</span>
               <span className={STYLES.statLabel}>{stat.label}</span>
+            </>
+          );
+
+          // Las que llevan a una pestaña son botones reales (antes `div onClick`,
+          // inalcanzables con teclado); "Nivel" es solo informativa.
+          return targetTab ? (
+            <button
+              key={stat.label}
+              type="button"
+              className={STYLES.statCard(true, isLastOdd)}
+              onClick={() => onTabChange(targetTab)}
+              aria-label={getStatActionLabel(stat.label, stat.value)}
+            >
+              {content}
+            </button>
+          ) : (
+            <div key={stat.label} className={STYLES.statCard(false, isLastOdd)}>
+              {content}
             </div>
           );
         })}

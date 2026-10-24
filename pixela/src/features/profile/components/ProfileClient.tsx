@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, type KeyboardEvent } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { UserResponse } from "@/api/auth/types";
 import { User } from "@/api/users/types";
@@ -24,6 +25,7 @@ import {
   FiGrid,
   FiStar,
 } from "react-icons/fi";
+import type { IconType } from "react-icons";
 import { FaRegBookmark, FaRegComments } from "react-icons/fa";
 import { UserCreateModal } from "./form/UserCreateModal";
 import { clsx } from "clsx";
@@ -45,7 +47,7 @@ const STYLES = {
     "grid grid-cols-2 sm:flex sm:flex-wrap justify-center md:justify-start gap-2 mb-10 border-b border-white/10",
   tabButton: (isActive: boolean) =>
     clsx(
-      "px-2 sm:px-6 py-4 sm:py-3 text-[13px] sm:text-sm font-medium transition-all duration-300 relative flex flex-col sm:flex-row items-center justify-center gap-2",
+      "px-2 sm:px-6 py-4 sm:py-3 text-[13px] sm:text-sm font-medium transition-colors duration-300 relative flex flex-col sm:flex-row items-center justify-center gap-2",
       isActive ? "text-white" : "text-gray-400 hover:text-white",
     ),
   tabIndicator: (isActive: boolean) =>
@@ -73,15 +75,82 @@ const STYLES = {
     "fixed inset-0 bg-pixela-ink/90 backdrop-blur-xl z-[100] flex flex-col items-center justify-center",
 } as const;
 
+type ProfileTab = { id: TabType; label: string; icon: IconType };
+
+const BASE_TABS: ProfileTab[] = [
+  { id: "profile", label: "General", icon: FiSettings },
+  { id: "library", label: "Biblioteca", icon: FiGrid },
+  { id: "reviews", label: "Reseñas", icon: FaRegComments },
+  { id: "favorites", label: "Favoritos", icon: FaRegBookmark },
+];
+
+const ADMIN_TAB: ProfileTab = { id: "users", label: "Usuarios", icon: FiUsers };
+
+const DEFAULT_TAB: TabType = "profile";
+
+const tabId = (id: TabType) => `profile-tab-${id}`;
+const panelId = (id: TabType) => `profile-panel-${id}`;
+
+/** Pestaña pedida en `?tab=`; si no existe (o es de admin sin serlo), la general. */
+const resolveTab = (param: string | null, tabs: ProfileTab[]): TabType =>
+  tabs.find((tab) => tab.id === param)?.id ?? DEFAULT_TAB;
+
 export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
   const updateUser = useAuthStore((state) => state.updateUser);
-  const [activeTab, setActiveTab] = useState<TabType>("profile");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState<UserResponse>(initialUser);
   const [redirecting, setRedirecting] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshUsers, setRefreshUsers] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const tabs = user.is_admin ? [...BASE_TABS, ADMIN_TAB] : BASE_TABS;
+  const tabRefs = useRef<Partial<Record<TabType, HTMLButtonElement | null>>>({});
+
+  // La pestaña vive en la URL (`/profile?tab=library`) para que el footer y
+  // cualquier enlace puedan abrir una concreta. El estado local da respuesta
+  // inmediata al pulsar y se reajusta si la URL cambia por fuera (por ejemplo,
+  // al pulsar "Mi biblioteca" en el footer estando ya en el perfil).
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<TabType>(() =>
+    resolveTab(tabParam, tabs),
+  );
+  const [lastTabParam, setLastTabParam] = useState(tabParam);
+  if (tabParam !== lastTabParam) {
+    setLastTabParam(tabParam);
+    setActiveTab(resolveTab(tabParam, tabs));
+  }
+
+  const changeTab = (tab: TabType) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === DEFAULT_TAB) params.delete("tab");
+    else params.set("tab", tab);
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+
+  // Patrón de pestañas de WAI-ARIA: solo la activa está en el orden de Tab y
+  // las flechas (más Inicio y Fin) mueven el foco y activan la pestaña.
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const current = tabs.findIndex((tab) => tab.id === activeTab);
+    let next: number | null = null;
+
+    if (event.key === "ArrowRight") next = (current + 1) % tabs.length;
+    else if (event.key === "ArrowLeft")
+      next = (current - 1 + tabs.length) % tabs.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = tabs.length - 1;
+    if (next === null) return;
+
+    event.preventDefault();
+    const target = tabs[next].id;
+    changeTab(target);
+    tabRefs.current[target]?.focus();
+  };
 
   // Use the extracted hook for stats
   const { stats, refreshStats } = useProfileStats();
@@ -204,53 +273,58 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
       <ProfileHero user={user} />
 
       {/* Quick Stats */}
-      <ProfileStatsBar stats={stats} onTabChange={setActiveTab} />
+      <ProfileStatsBar stats={stats} onTabChange={changeTab} />
 
       {/* Main Content */}
       <div className={STYLES.mainContent}>
         {/* Navigation Tabs */}
-        <div className={STYLES.tabsContainer}>
-          {[
-            { id: "profile", label: "General", icon: FiSettings },
-            { id: "library", label: "Biblioteca", icon: FiGrid },
-            { id: "reviews", label: "Reseñas", icon: FaRegComments },
-            { id: "favorites", label: "Favoritos", icon: FaRegBookmark },
-            ...(user.is_admin
-              ? [{ id: "users", label: "Usuarios", icon: FiUsers }]
-              : []),
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
-              className={STYLES.tabButton(activeTab === tab.id)}
-            >
-              <tab.icon className={STYLES.tabIcon} />
-              {tab.label}
-              <div className={STYLES.tabIndicator(activeTab === tab.id)} />
-            </button>
-          ))}
+        <div
+          role="tablist"
+          aria-label="Secciones del perfil"
+          className={STYLES.tabsContainer}
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                ref={(node) => {
+                  tabRefs.current[tab.id] = node;
+                }}
+                type="button"
+                role="tab"
+                id={tabId(tab.id)}
+                aria-selected={isActive}
+                aria-controls={panelId(tab.id)}
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => changeTab(tab.id)}
+                onKeyDown={handleTabKeyDown}
+                className={STYLES.tabButton(isActive)}
+              >
+                <tab.icon aria-hidden="true" className={STYLES.tabIcon} />
+                {tab.label}
+                <div aria-hidden="true" className={STYLES.tabIndicator(isActive)} />
+              </button>
+            );
+          })}
         </div>
 
         {/* Dynamic Content */}
-        <div className={STYLES.contentWrapper}>
+        <div
+          role="tabpanel"
+          id={panelId(activeTab)}
+          aria-labelledby={tabId(activeTab)}
+          tabIndex={0}
+          className={STYLES.contentWrapper}
+        >
+          {/* "Actividad Reciente" se quitó: mostraba siempre el mismo texto
+              vacío, sin datos detrás. Vuelve cuando haya actividad real. */}
           {activeTab === "profile" && !isEditing && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
-              <div className="lg:col-span-2">
-                <ProfileInfo
-                  user={{ ...user, user_id: user.user_id }}
-                  onEdit={() => setIsEditing(true)}
-                />
-              </div>
-              <div className="space-y-6">
-                <div className="bg-pixela-surface rounded-2xl p-6 border border-white/5">
-                  <h3 className="text-xl font-bold text-white mb-4 font-outfit">
-                    Actividad Reciente
-                  </h3>
-                  <p className="text-gray-400 text-sm">
-                    No hay actividad reciente para mostrar.
-                  </p>
-                </div>
-              </div>
+            <div className="max-w-3xl animate-fade-in">
+              <ProfileInfo
+                user={{ ...user, user_id: user.user_id }}
+                onEdit={() => setIsEditing(true)}
+              />
             </div>
           )}
 
