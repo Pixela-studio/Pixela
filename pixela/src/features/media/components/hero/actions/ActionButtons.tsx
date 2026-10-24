@@ -30,7 +30,7 @@ const STYLES = {
   favoriteButton: (isFavorited: boolean) =>
     `${SECONDARY_BUTTON} ${
       isFavorited
-        ? "border-white/20 bg-pixela-accent text-white hover:bg-pixela-accent/90"
+        ? "border-white/20 bg-pixela-accent text-pixela-dark hover:bg-[#F2397F]"
         : "border-white/15 bg-white/10 text-white hover:bg-white/20"
     }`,
   bookmarkIcon: "h-5 w-5 shrink-0",

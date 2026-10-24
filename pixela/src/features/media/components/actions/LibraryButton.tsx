@@ -204,7 +204,7 @@ export const LibraryButton = ({
           // Acción principal de la ficha: relleno sólido para que domine la fila.
           status
             ? "bg-white/10 text-white ring-1 ring-inset ring-white/20 hover:bg-white/15"
-            : "bg-pixela-accent text-white hover:bg-pixela-accent/90",
+            : "bg-pixela-accent text-pixela-dark hover:bg-[#F2397F]",
           className,
         )}
       >

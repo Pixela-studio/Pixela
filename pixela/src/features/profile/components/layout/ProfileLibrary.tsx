@@ -100,7 +100,7 @@ export const ProfileLibrary = () => {
                   "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition duration-300",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
                   isActive
-                    ? "border-pixela-accent bg-pixela-accent text-white"
+                    ? "border-pixela-accent bg-pixela-accent text-pixela-dark"
                     : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white",
                   count === 0 && !isActive && "opacity-50",
                 )}

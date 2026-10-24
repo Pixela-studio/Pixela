@@ -8,7 +8,7 @@ const STYLES = {
     // Botones de página
     button: 'flex items-center justify-center rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium',
     pageButton: 'w-10 h-10 md:w-12 md:h-12 text-base md:text-lg relative',
-    activeButton: 'bg-pixela-accent text-white shadow-xl shadow-pixela-accent/20 scale-105',
+    activeButton: 'bg-pixela-accent text-pixela-dark',
     inactiveButton: 'bg-pixela-dark/30 text-pixela-light/80 border border-pixela-accent/20 hover:bg-pixela-accent/10 hover:border-pixela-accent/40 hover:scale-105',
 
     // Estados de loading

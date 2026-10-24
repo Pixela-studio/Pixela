@@ -14,7 +14,7 @@ const STYLES = {
   title: 'font-display text-3xl md:text-4xl tracking-[-0.02em] text-white',
   editButton: clsx(
     'flex items-center gap-2',
-    'bg-pixela-accent text-white',
+    'bg-pixela-accent text-pixela-dark',
     'px-6 py-2 rounded-full',
     'hover:bg-pixela-accent/80',
     'transition-colors duration-300',

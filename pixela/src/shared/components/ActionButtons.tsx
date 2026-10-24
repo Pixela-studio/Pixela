@@ -16,7 +16,7 @@ const STYLES = {
       default: 'w-10 h-10 flex items-center justify-center bg-pixela-dark hover:bg-pixela-dark/80 rounded text-pixela-light transition-colors border border-pixela-accent/40'
     },
     favorite: {
-      active: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-lg bg-pixela-accent text-white hover:bg-pixela-accent/90',
+      active: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 bg-pixela-accent text-pixela-dark hover:bg-[#F2397F]',
       inactive: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-lg bg-black/40 backdrop-blur-sm text-white hover:bg-black/50'
     }
   },

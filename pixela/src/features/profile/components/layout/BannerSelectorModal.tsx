@@ -113,7 +113,7 @@ export const BannerSelectorModal = ({
                     )}
                   >
                     {currentBanner === url ? (
-                      <div className="bg-pixela-accent text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                      <div className="bg-pixela-accent text-pixela-dark px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
                         <FiCheck />
                         Actual
                       </div>
