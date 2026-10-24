@@ -6,7 +6,7 @@
  * dejaba la otra desincronizada sin que nada lo señalara.
  */
 export const STYLES = {
-  container: "min-h-screen bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] flex flex-col items-center justify-center p-4 relative overflow-hidden pt-20",
+  container: "min-h-screen bg-gradient-to-br from-pixela-ink via-pixela-dark to-pixela-ink flex flex-col items-center justify-center p-4 relative overflow-hidden pt-20",
   background: {
     particles: "absolute inset-0 opacity-10",
     gradient: "absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"

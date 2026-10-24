@@ -31,7 +31,7 @@ const STYLES = {
   loadingContainer:
     "relative w-full h-screen bg-pixela-dark flex flex-col justify-center",
   loadingCard:
-    "w-[280px] md:w-[375px] h-[395px] md:h-[528px] bg-gray-800 flex items-center justify-center",
+    "w-[280px] md:w-[375px] h-[395px] md:h-[528px] bg-pixela-raised flex items-center justify-center",
   loadingText: "text-pixela-light",
 } as const;
 

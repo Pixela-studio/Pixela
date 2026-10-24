@@ -16,7 +16,7 @@ const STYLES = {
   // Columna de visuales (Mini Hero)
   avatarColumn: "flex flex-col gap-4 w-full lg:w-[400px] flex-shrink-0",
   previewCard:
-    "relative w-full h-[280px] rounded-2xl overflow-hidden bg-[#1A1A1A] group border border-white/5 shadow-2xl",
+    "relative w-full h-[280px] rounded-2xl overflow-hidden bg-pixela-surface group border border-white/5 shadow-2xl",
 
   // Banner Area
   bannerArea: "h-[160px] w-full relative cursor-pointer group/banner",
@@ -30,7 +30,7 @@ const STYLES = {
   // Avatar Area (Overlapping)
   avatarArea: "absolute left-6 bottom-6 cursor-pointer group/avatar",
   avatarWrapper:
-    "relative w-32 h-32 rounded-full border-4 border-[#1A1A1A] overflow-hidden bg-[#2A2A2A] shadow-xl",
+    "relative w-32 h-32 rounded-full border-4 border-pixela-surface overflow-hidden bg-pixela-raised shadow-xl",
   avatarImage: "w-full h-full object-cover",
   avatarOverlay:
     "absolute inset-0 bg-black/30 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px]",

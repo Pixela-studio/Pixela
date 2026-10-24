@@ -95,7 +95,7 @@ function LoginForm() {
 
       {/* `role="alert"` para que un lector de pantalla anuncie el fallo. */}
       {error && (
-        <div role="alert" className="text-[#ec1b69] text-[14px]">
+        <div role="alert" className="text-pixela-accent text-[14px]">
           {error}
         </div>
       )}
@@ -121,7 +121,7 @@ function LoginForm() {
           ¿No tienes cuenta?
           <Link
             href="/register"
-            className="ml-2 text-[#ec1b69] hover:text-[#ec1b69]/80 transition-colors duration-300"
+            className="ml-2 text-pixela-accent hover:text-pixela-accent/80 transition-colors duration-300"
           >
             Registrarse
           </Link>

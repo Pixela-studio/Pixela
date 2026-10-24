@@ -28,7 +28,7 @@ const STYLES = {
     'absolute right-3 top-1/2 -translate-y-1/2',
     'text-gray-400 hover:text-pixela-accent transition-colors',
     'cursor-pointer z-10 p-1 rounded',
-    'hover:bg-gray-700/20'
+    'hover:bg-white/5'
   ),
   eyeIcon: 'w-4 h-4'
 } as const;

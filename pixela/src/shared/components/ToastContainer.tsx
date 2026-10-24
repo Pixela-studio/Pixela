@@ -23,22 +23,22 @@ const TOAST_STYLES = {
 
 const TOAST_VARIANTS: Record<ToastType, { bg: string; text: string; border: string }> = {
   success: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
     text: 'text-white', 
     border: 'border-l-4 border-green-500' 
   },
   error: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
     text: 'text-white', 
     border: 'border-l-4 border-pixela-accent' 
   },
   warning: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
     text: 'text-white', 
     border: 'border-l-4 border-yellow-500' 
   },
   info: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-gradient-to-r from-pixela-dark to-pixela-dark', 
     text: 'text-white', 
     border: 'border-l-4 border-pixela-accent' 
   },

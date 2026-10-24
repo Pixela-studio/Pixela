@@ -37,7 +37,7 @@ const STYLES = {
 
   // Item de usuario
   userItem:
-    "flex items-center bg-pixela-dark-opacity/50 pt-2 px-4 rounded gap-4",
+    "flex items-center bg-dark-opacity pt-2 px-4 rounded gap-4",
   avatarContainer: "min-w-[32px] max-w-[32px] flex justify-center",
   contentContainer: "flex flex-col justify-center flex-2 pl-5",
 
@@ -49,15 +49,15 @@ const STYLES = {
 
   // Inputs y controles
   input: clsx(
-    "w-full bg-[#1a1a1a]/70 border border-transparent rounded-md",
+    "w-full bg-pixela-surface/70 border border-transparent rounded-md",
     "px-3 py-1.5 text-white text-sm",
-    "focus:outline-none focus:border-[#ec1b69]/40 focus:bg-[#1a1a1a]/80",
+    "focus:outline-none focus:border-pixela-accent/40 focus:bg-pixela-surface/80",
     "transition-all duration-200 placeholder:text-gray-500/40",
   ),
   select: clsx(
-    "w-full bg-[#1a1a1a]/70 border border-transparent rounded-md",
+    "w-full bg-pixela-surface/70 border border-transparent rounded-md",
     "px-3 py-1.5 text-white text-sm",
-    "focus:outline-none focus:border-[#ec1b69]/40 focus:bg-[#1a1a1a]/80",
+    "focus:outline-none focus:border-pixela-accent/40 focus:bg-pixela-surface/80",
     "transition-all duration-200 appearance-none cursor-pointer",
   ),
   selectIcon: {
@@ -74,8 +74,8 @@ const STYLES = {
     clsx(
       "text-xs py-1 px-3 rounded-md w-fit font-medium mt-1",
       isAdmin
-        ? "bg-[#ec1b69]/10 text-[#ec1b69] border border-[#ec1b69]/20"
-        : "bg-gray-800/60 text-gray-400 border border-gray-700/50",
+        ? "bg-pixela-accent/10 text-pixela-accent border border-pixela-accent/20"
+        : "bg-pixela-raised/60 text-gray-400 border border-white/10",
     ),
 
   // Acciones

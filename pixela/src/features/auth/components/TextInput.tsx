@@ -17,14 +17,14 @@ export const TextInput = ({ icon, className = '', type = 'text', ...props }: Tex
   return (
     <div className="relative group overflow-hidden">
       {icon && (
-        <div className="absolute top-0 bottom-0 left-0 pl-3 flex items-center pointer-events-none z-10 text-[#ec1b69]">
+        <div className="absolute top-0 bottom-0 left-0 pl-3 flex items-center pointer-events-none z-10 text-pixela-accent">
           <span className="h-5 w-5 flex items-center justify-center">{icon}</span>
         </div>
       )}
       
       <input 
         type={inputType}
-        className={`w-full h-[48px] py-3 text-white border border-transparent bg-[#181818] hover:border-gray-500 focus:border-gray-500 hover:border-opacity-70 focus:border-opacity-90 rounded-[49px] transition-all duration-200 ease-out outline-none focus:outline-none focus:ring-0 px-6 placeholder-gray-500/50 placeholder-shown:text-[16px] focus:placeholder-gray-500/30 ${icon ? 'pl-10' : ''} ${className}`}
+        className={`w-full h-[48px] py-3 text-white border border-transparent bg-pixela-dark hover:border-gray-500 focus:border-gray-500 hover:border-opacity-70 focus:border-opacity-90 rounded-[49px] transition-all duration-200 ease-out outline-none focus:outline-none focus:ring-0 px-6 placeholder-gray-500/50 placeholder-shown:text-[16px] focus:placeholder-gray-500/30 ${icon ? 'pl-10' : ''} ${className}`}
         {...props}
       />
       
@@ -32,7 +32,7 @@ export const TextInput = ({ icon, className = '', type = 'text', ...props }: Tex
         <button 
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#ec1b69] transition-colors duration-200 cursor-pointer z-10 p-1 rounded focus:outline-none"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-pixela-accent transition-colors duration-200 cursor-pointer z-10 p-1 rounded focus:outline-none"
           aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
         >
           {showPassword ? <VscEyeClosed className="h-4 w-4" /> : <VscEye className="h-4 w-4" />}

@@ -19,7 +19,7 @@ const STYLES = {
   loadingContainer: "mt-12 mb-12",
   loadingSpinner: "flex justify-center py-10",
   loadingPulse: "animate-pulse flex space-x-4",
-  loadingPlaceholder: "h-48 w-full bg-gray-700 rounded-lg",
+  loadingPlaceholder: "h-48 w-full bg-pixela-raised rounded-lg",
 
   // Mensajes de error
   errorMessage: "mb-4 p-3 bg-red-900/50 text-red-200 rounded-lg",

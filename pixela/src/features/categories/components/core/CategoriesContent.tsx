@@ -53,7 +53,7 @@ const STYLES = {
   cardBorder:
     "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   cardContent:
-    "relative z-10 h-full rounded-[15px] bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
+    "relative z-10 h-full rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
   posterContainer:
     "relative w-full aspect-[2/3] overflow-hidden rounded-[15px]",
   poster: "object-cover",
@@ -73,7 +73,7 @@ const STYLES = {
 
   // Placeholder para Tarjetas sin Imagen
   placeholderContainer:
-    "absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black flex flex-col items-center justify-center p-4 text-center",
+    "absolute inset-0 bg-gradient-to-br from-pixela-raised via-pixela-surface to-black flex flex-col items-center justify-center p-4 text-center",
   placeholderEmoji: "text-4xl mb-3 opacity-50",
   placeholderTitle:
     "text-white text-sm font-medium leading-tight mb-2 line-clamp-3",
@@ -120,7 +120,7 @@ const STYLES = {
   recommendationCardBorder:
     "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   recommendationCardContent:
-    "relative z-10 w-full h-full overflow-hidden rounded-[15px] bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
+    "relative z-10 w-full h-full overflow-hidden rounded-[15px] bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
   recommendationOverlay:
     "absolute inset-0 flex flex-col justify-end p-4 transition-all duration-700 ease-in-out opacity-0 bg-gradient-to-t from-pixela-dark via-pixela-dark/70 to-transparent group-hover:opacity-100 group-hover:delay-100",
   recommendationTitle:

@@ -21,7 +21,7 @@ const STYLES = {
     'font-outfit w-full sm:w-auto justify-center'
   ),
   content: 'flex flex-col gap-6',
-  field: 'pb-4 border-b border-gray-700/70 last:border-b-0',
+  field: 'pb-4 border-b border-white/10 last:border-b-0',
   label: 'text-sm text-gray-400 mb-2 font-outfit',
   value: clsx(
     'flex items-center gap-2',

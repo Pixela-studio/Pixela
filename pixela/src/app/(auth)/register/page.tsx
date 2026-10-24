@@ -139,7 +139,7 @@ export default function RegisterPage() {
 
       {/* Mensaje de error */}
       {error && (
-        <div className="text-[#ec1b69] text-[14px]">
+        <div className="text-pixela-accent text-[14px]">
           {error}
         </div>
       )}
@@ -154,7 +154,7 @@ export default function RegisterPage() {
         
         <Link 
             href="/login"
-            className="text-[14px] text-[#ec1b69] hover:text-[#ec1b69]/80 transition-colors duration-300"
+            className="text-[14px] text-pixela-accent hover:text-pixela-accent/80 transition-colors duration-300"
         >
             ¿Ya tienes cuenta?
         </Link>

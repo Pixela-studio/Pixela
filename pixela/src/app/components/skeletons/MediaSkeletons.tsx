@@ -54,12 +54,12 @@ const STYLES = {
  * Skeleton completo para página de media
  */
 export const MediaPageSkeleton = () => (
-  <div className="min-h-screen bg-[#0F0F0F]">
+  <div className="min-h-screen bg-pixela-ink">
     {/* Hero Section Skeleton */}
     <div className="relative min-h-[80vh] w-full">
       {/* Backdrop skeleton */}
       <div className="absolute inset-0 bg-gradient-to-br from-pixela-accent/10 via-pixela-dark/40 to-pink-400/10 animate-shimmer">
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-pixela-ink via-transparent to-transparent"></div>
       </div>
       
       {/* Content skeleton */}

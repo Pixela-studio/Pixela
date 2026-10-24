@@ -29,7 +29,7 @@ const STYLES = {
   featuresGrid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-6 mb-20 [&>*:nth-child(3)]:md:col-span-2 [&>*:nth-child(3)]:lg:col-span-1",
   card: "group relative rounded-2xl p-px cursor-pointer overflow-hidden transition-transform duration-300 hover:-translate-y-1",
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-  cardContent: "relative z-10 h-full rounded-[15px] p-8 max-sm:p-4 ipad:p-6 flex flex-col bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5",
+  cardContent: "relative z-10 h-full rounded-[15px] p-8 max-sm:p-4 ipad:p-6 flex flex-col bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5",
   cardIcon: "text-4xl text-pixela-accent ipad:text-3xl",
   cardIconContainer: "mb-6 [@media(max-height:500px)_and_(orientation:landscape)]:mb-3",
   cardTitle: "text-2xl font-semibold text-white mb-4 group-hover:text-pixela-accent transition-colors duration-300 flex items-center ipad:text-xl ipad:mb-3 mt-1 [@media(max-height:500px)_and_(orientation:landscape)]:text-xl [@media(max-height:500px)_and_(orientation:landscape)]:mb-2",

@@ -3,7 +3,7 @@ import { Particle, ParticleOptions } from "@/features/footer/types/components";
 
 const STYLES = {
   container: "absolute inset-0 w-full h-full overflow-hidden pointer-events-none",
-  particle: "absolute rounded-full bg-[#EC1B69] animate-float"
+  particle: "absolute rounded-full bg-pixela-accent animate-float"
 } as const;
 
 
@@ -90,7 +90,7 @@ export const FooterParticles = () => {
               top: `${particle.top}%`,
               left: `${particle.left}%`,
               opacity: particle.opacity,
-              background: 'radial-gradient(circle, rgba(255,0,127,0.8) 0%, rgba(255,0,127,0) 70%)',
+              background: 'radial-gradient(circle, rgba(236, 27, 105,0.8) 0%, rgba(236, 27, 105,0) 70%)',
               filter: 'blur(1px)',
               animation: `glowAndFloat ${particle.duration}s infinite ease-in-out`,
               animationDelay: `${particle.delay}s`,

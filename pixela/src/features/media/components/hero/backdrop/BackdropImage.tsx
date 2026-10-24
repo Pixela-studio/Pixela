@@ -7,10 +7,10 @@ const STYLES = {
   // Doble degradado: vertical para fundir con la página y horizontal para que
   // el texto de la izquierda mantenga contraste sobre imágenes claras.
   overlayVertical:
-    "absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/85 to-[#0F0F0F]/30",
+    "absolute inset-0 bg-gradient-to-t from-pixela-ink via-pixela-ink/85 to-pixela-ink/30",
   overlayHorizontal:
-    "absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/80 via-[#0F0F0F]/20 to-transparent",
-  fallback: "absolute inset-0 bg-gradient-to-br from-[#1A1A1A] to-[#0F0F0F]",
+    "absolute inset-0 bg-gradient-to-r from-pixela-ink/80 via-pixela-ink/20 to-transparent",
+  fallback: "absolute inset-0 bg-gradient-to-br from-pixela-dark to-pixela-ink",
 } as const;
 
 /**

@@ -6,8 +6,8 @@ interface LoginLayoutProps {
 
 export const LoginLayout = ({ children }: LoginLayoutProps) => {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-tr from-[#111111] to-[#181818]">
-      <div className="w-full max-w-[960px] px-2 sm:px-6 py-8 overflow-hidden min-h-[400px] flex flex-col sm:flex-row items-center bg-transparent sm:bg-[#111111] sm:bg-opacity-95 backdrop-blur-sm rounded-[25px]">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-tr from-pixela-ink to-pixela-dark">
+      <div className="w-full max-w-[960px] px-2 sm:px-6 py-8 overflow-hidden min-h-[400px] flex flex-col sm:flex-row items-center bg-transparent sm:bg-pixela-ink sm:bg-opacity-95 backdrop-blur-sm rounded-[25px]">
         {/* Logo */}
         <div className="w-full sm:w-1/2 flex justify-center mb-8 sm:mb-0 order-first sm:order-last">
           <div className="relative group">

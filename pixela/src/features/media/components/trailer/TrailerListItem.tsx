@@ -33,8 +33,8 @@ const TrailerListItem = ({
         flex items-stretch rounded-xl overflow-hidden transition-all duration-200
         ${isLarge ? 'min-h-[100px] h-24' : 'min-h-[80px] h-20'} flex-shrink-0
         ${isSelected
-          ? 'bg-gradient-to-r from-pixela-accent/20 to-[#1a1a1a]/95 border border-pixela-accent/30 shadow-lg shadow-pixela-accent/10'
-          : 'bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 border border-white/5'}
+          ? 'bg-gradient-to-r from-pixela-accent/20 to-pixela-dark/95 border border-pixela-accent/30 shadow-lg shadow-pixela-accent/10'
+          : 'bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 border border-white/5'}
       `}
     >
       {/* Miniatura */}

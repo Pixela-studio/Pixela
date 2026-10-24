@@ -14,7 +14,7 @@ const STYLES = {
   // Borde animado que sigue al mouse (igual que las cards de about)
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   // Contenido de la card con fondo degradado (igual que las cards de about)
-  cardContent: "relative z-10 h-full rounded-[15px] px-6 py-5 flex flex-col gap-3 bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
+  cardContent: "relative z-10 h-full rounded-[15px] px-6 py-5 flex flex-col gap-3 bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
   
   header: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2",
   user: {

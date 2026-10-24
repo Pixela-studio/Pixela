@@ -61,7 +61,7 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gray-800">
+          <div className="flex items-center justify-center w-full h-full bg-pixela-raised">
             <FiUser className="w-1/3 text-gray-400 h-1/3" />
           </div>
         )}
@@ -87,7 +87,7 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
    * sitio es peor que una tarjeta quieta.
    */
   const estiloBase = clsx(
-    "block rounded-2xl overflow-hidden group bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 border border-white/5 shadow-2xl shadow-pixela-accent/5",
+    "block rounded-2xl overflow-hidden group bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 border border-white/5 shadow-2xl shadow-pixela-accent/5",
     enlazable && "hover:-translate-y-1 transition-transform duration-300 cursor-pointer",
     className
   );

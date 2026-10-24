@@ -13,11 +13,11 @@ const STYLES = {
   // Estilos del modal y overlay
   modal: {
     overlay: "fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4",
-    container: "bg-[#1A1A1A] rounded-xl w-full max-w-2xl border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto relative"
+    container: "bg-pixela-surface rounded-xl w-full max-w-2xl border border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto relative"
   },
   // Estilos del header
   header: {
-    container: "sticky top-0 bg-[#1A1A1A] flex items-center justify-between p-6 border-b border-white/10 z-10",
+    container: "sticky top-0 bg-pixela-surface flex items-center justify-between p-6 border-b border-white/10 z-10",
     title: "text-xl font-semibold text-white",
     closeButton: "text-gray-400 transition-colors hover:text-white"
   },
@@ -32,7 +32,7 @@ const STYLES = {
     },
     review: {
       label: "block mb-2 text-sm font-medium text-gray-300",
-      textarea: "w-full h-32 bg-[#252525] border border-white/10 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-pixela-accent transition-colors resize-none"
+      textarea: "w-full h-32 bg-pixela-raised border border-white/10 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-pixela-accent transition-colors resize-none"
     },
     error: "p-3 mb-4 text-sm text-red-400 border rounded-lg bg-red-500/10 border-red-500/20",
     errorSimple: "mb-2 text-sm text-pixela-accent italic",

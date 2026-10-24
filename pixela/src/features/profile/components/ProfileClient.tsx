@@ -35,7 +35,7 @@ import { ProfileStatsBar } from "./layout/ProfileStatsBar";
 
 const STYLES = {
   // Contenedores principales
-  pageWrapper: "min-h-screen bg-[#0F0F0F] relative overflow-x-hidden",
+  pageWrapper: "min-h-screen bg-pixela-ink relative overflow-x-hidden",
 
   // Main Content Area
   mainContent: "max-w-7xl mx-auto px-4 md:px-8 pb-20",
@@ -70,7 +70,7 @@ const STYLES = {
 
   // Loading/Redirect Overlay
   loadingOverlay:
-    "fixed inset-0 bg-[#0F0F0F]/90 backdrop-blur-xl z-[100] flex flex-col items-center justify-center",
+    "fixed inset-0 bg-pixela-ink/90 backdrop-blur-xl z-[100] flex flex-col items-center justify-center",
 } as const;
 
 export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
@@ -242,7 +242,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                 />
               </div>
               <div className="space-y-6">
-                <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-white/5">
+                <div className="bg-pixela-surface rounded-2xl p-6 border border-white/5">
                   <h3 className="text-xl font-bold text-white mb-4 font-outfit">
                     Actividad Reciente
                   </h3>

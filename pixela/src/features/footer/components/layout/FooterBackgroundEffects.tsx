@@ -6,19 +6,19 @@ const STYLES = {
   container: "absolute top-0 left-0 w-full h-full opacity-0 transition-opacity duration-1000",
   
   // Gradientes animados
-  gradientContainer: "absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-[#EC1B69]/10 filter blur-[80px] animate-pulse-slow",
+  gradientContainer: "absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-pixela-accent/10 filter blur-[80px] animate-pulse-slow",
   gradientContainer2: "absolute bottom-[20%] right-[10%] w-80 h-80 rounded-full bg-purple-500/10 filter blur-[100px] animate-pulse-slow animation-delay-1000",
   
   // Elementos de fondo
   pixelGrid: "absolute inset-0 w-full h-full",
   flowLinesContainer: "absolute inset-0 w-full h-full overflow-hidden",
-  flowLine: "absolute bg-gradient-to-r from-[#EC1B69]/5 to-transparent",
+  flowLine: "absolute bg-gradient-to-r from-pixela-accent/5 to-transparent",
   
   // Elementos decorativos
-  bubble: "absolute bottom-0 rounded-full bg-[#EC1B69]/20 backdrop-blur-md",
+  bubble: "absolute bottom-0 rounded-full bg-pixela-accent/20 backdrop-blur-md",
   digitalElementsContainer: "absolute inset-0 overflow-hidden pointer-events-none",
   triangle: "absolute opacity-20",
-  pixel: "absolute bg-[#EC1B69]",
+  pixel: "absolute bg-pixela-accent",
   
   // Texto de fondo
   backgroundText: "pointer-events-none select-none absolute inset-0 w-full h-full hidden md:flex items-center justify-center font-black uppercase tracking-tighter z-0 leading-none text-transparent transition-opacity duration-1000"
@@ -143,7 +143,7 @@ export const FooterBackgroundEffects: React.FC<BackgroundEffectProps> = ({ isAni
               left: `${triangle.left}%`,
               borderLeft: `${triangle.size/2}px solid transparent`,
               borderRight: `${triangle.size/2}px solid transparent`,
-              borderBottom: `${triangle.size}px solid rgba(255,0,127,0.6)`,
+              borderBottom: `${triangle.size}px solid rgba(236, 27, 105,0.6)`,
               transform: `rotate(${triangle.rotation}deg)`,
               animation: `spinFloat ${triangle.duration}s infinite linear`,
               animationDelay: `${triangle.delay}s`,
@@ -178,7 +178,7 @@ export const FooterBackgroundEffects: React.FC<BackgroundEffectProps> = ({ isAni
           letterSpacing: "-0.05em",
           userSelect: "none",
           whiteSpace: "nowrap",
-          backgroundImage: "linear-gradient(8deg, rgb(24, 24, 24) -50%, rgb(26, 26, 26) 0%, rgba(26, 26, 26, 0.8) 35%, rgba(255, 0, 127, 0.12) 100%, rgba(255, 0, 127, 0.08) 100%)",
+          backgroundImage: "linear-gradient(8deg, rgb(24, 24, 24) -50%, rgb(26, 26, 26) 0%, rgba(26, 26, 26, 0.8) 35%, rgba(236, 27, 105, 0.12) 100%, rgba(236, 27, 105, 0.08) 100%)",
           WebkitBackgroundClip: "text",
           backgroundClip: "text",
         }}

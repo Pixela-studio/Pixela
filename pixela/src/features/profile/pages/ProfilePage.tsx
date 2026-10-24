@@ -50,7 +50,7 @@ export default function ProfilePage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+      <div className="min-h-screen bg-pixela-ink flex items-center justify-center">
         <FiLoader className="w-10 h-10 text-pixela-accent animate-spin" />
       </div>
     );

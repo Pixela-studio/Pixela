@@ -36,7 +36,7 @@ interface ActorPageProps {
 }
 
 const STYLES = {
-  container: "relative min-h-[80vh] w-full bg-[#0F0F0F]",
+  container: "relative min-h-[80vh] w-full bg-pixela-ink",
   contentWrapper: "relative container mx-auto px-4 pt-36 pb-12 md:pt-44 lg:pt-[30vh] lg:pb-20",
   layout:
     "flex flex-col items-center gap-6 text-center lg:flex-row lg:items-start lg:gap-8 lg:text-left",
@@ -68,7 +68,7 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
     : "";
 
   return (
-    <div className="bg-[#0F0F0F] min-h-screen">
+    <div className="bg-pixela-ink min-h-screen">
       <div className={STYLES.container}>
         {/* BackdropImage Reutilizado (Top Hero Movie effect) */}
         {bestWorkBackdrop && <BackdropImage backdropUrl={bestWorkBackdrop} />}
@@ -138,7 +138,7 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
                    */
                   const contenido = (
                     <>
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#1A1A1A] mb-3 shadow-lg shadow-black/50">
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-pixela-surface mb-3 shadow-lg shadow-black/50">
                         <Image
                           src={imageSrc}
                           alt={item.title || item.name || ""}

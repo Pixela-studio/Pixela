@@ -131,7 +131,7 @@ export const LibraryButton = ({
         }
         className={clsx(
           "flex items-center gap-2 whitespace-nowrap rounded-lg px-6 py-3 font-medium transition-all duration-300",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
           "disabled:cursor-not-allowed disabled:opacity-60",
           // Acción principal de la ficha: relleno sólido para que domine la fila.
           status
@@ -156,7 +156,7 @@ export const LibraryButton = ({
         <div
           role="menu"
           aria-label="Estado en la biblioteca"
-          className="absolute top-full left-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-[#1A1A1A] p-1 shadow-2xl animate-fade-in"
+          className="absolute top-full left-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-pixela-surface p-1 shadow-2xl animate-fade-in"
         >
           <div className="flex flex-col gap-1">
             {Object.entries(STATUS_CONFIG).map(([key, config]) => {

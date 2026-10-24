@@ -91,7 +91,7 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
       {favorites.map((fav) => (
         <div
           key={fav.id}
-          className="relative group aspect-[2/3] rounded-lg overflow-hidden bg-gray-900 border border-white/5 transition-all hover:scale-105 hover:border-pixela-accent/50 hover:shadow-lg hover:shadow-pixela-accent/20"
+          className="relative group aspect-[2/3] rounded-lg overflow-hidden bg-pixela-surface border border-white/5 transition-all hover:scale-105 hover:border-pixela-accent/50 hover:shadow-lg hover:shadow-pixela-accent/20"
         >
           <Link
             href={`/${fav.item_type === "movie" ? "movies" : "series"}/${fav.tmdb_id}`}
@@ -107,7 +107,7 @@ export const ProfileFavorites = ({ onStatsUpdate }: ProfileFavoritesProps) => {
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-800 text-gray-500 text-xs text-center p-2">
+              <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-500 text-xs text-center p-2">
                 Sin imagen
               </div>
             )}

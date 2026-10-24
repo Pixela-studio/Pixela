@@ -21,7 +21,7 @@ import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
  * secundarias.
  */
 const SECONDARY_BUTTON =
-  "flex h-12 w-12 items-center justify-center rounded-full border transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F] disabled:cursor-not-allowed disabled:opacity-60";
+  "flex h-12 w-12 items-center justify-center rounded-full border transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink disabled:cursor-not-allowed disabled:opacity-60";
 
 const STYLES = {
   container: "flex flex-wrap items-center justify-center gap-3 lg:justify-start",

@@ -20,7 +20,7 @@ const STYLES = {
   title: "font-outfit text-lg font-semibold text-white",
   description: "max-w-sm text-sm leading-relaxed text-gray-400",
   action:
-    "mt-3 inline-flex items-center gap-2 rounded-full bg-pixela-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-pixela-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]",
+    "mt-3 inline-flex items-center gap-2 rounded-full bg-pixela-accent px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-pixela-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
 } as const;
 
 /**

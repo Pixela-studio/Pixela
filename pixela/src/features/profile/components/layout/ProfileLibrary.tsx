@@ -98,7 +98,7 @@ export const ProfileLibrary = () => {
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
                   "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
                   isActive
                     ? "border-pixela-accent bg-pixela-accent text-white"
                     : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white",
@@ -141,7 +141,7 @@ export const ProfileLibrary = () => {
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-[#1A1A1A] border border-white/5 transition-all hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
+                className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-pixela-surface border border-white/5 transition-all hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
               >
                 <Link
                   href={`/${item.item_type === "movie" ? "movies" : "series"}/${item.tmdb_id}`}
@@ -157,7 +157,7 @@ export const ProfileLibrary = () => {
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-800 text-gray-500 text-xs text-center p-2">
+                    <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-500 text-xs text-center p-2">
                       Sin imagen
                     </div>
                   )}

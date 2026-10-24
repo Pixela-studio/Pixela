@@ -24,7 +24,7 @@ export function PlatformCard({ provider }: PlatformCardProps) {
   return (
     <div
       onClick={handleClick}
-      className="p-3 rounded-2xl flex items-center gap-3 bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 border border-white/5 shadow-2xl shadow-pixela-accent/5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer select-none"
+      className="p-3 rounded-2xl flex items-center gap-3 bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 border border-white/5 shadow-2xl shadow-pixela-accent/5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer select-none"
       role="button"
       tabIndex={0}
     >
@@ -38,7 +38,7 @@ export function PlatformCard({ provider }: PlatformCardProps) {
             height={32}
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full text-xs text-gray-400 bg-gray-800">
+          <div className="flex items-center justify-center w-full h-full text-xs text-gray-400 bg-pixela-raised">
             {(provider.nombre || '?').substring(0, 2)}
           </div>
         )}

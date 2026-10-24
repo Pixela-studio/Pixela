@@ -13,7 +13,7 @@ import { MediaType } from "@/features/categories/types/media";
 const STYLES = {
   // Layout Principal
   container:
-    "min-h-screen bg-gradient-to-br from-pixela-dark via-[#1a1a1a] to-pixela-dark pt-24",
+    "min-h-screen bg-gradient-to-br from-pixela-dark via-pixela-dark to-pixela-dark pt-24",
   contentWrapper: "container mx-auto px-4 py-8 md:py-12",
   mainContent: "flex flex-col lg:flex-row gap-6 md:gap-8 items-start",
 

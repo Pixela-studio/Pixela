@@ -10,7 +10,7 @@ const STYLES = {
     container: "flex items-center gap-2",
     button: "text-2xl"
   },
-  textarea: "w-full bg-[#1a1a1a]/70 border border-white/10 rounded-lg p-3 text-white resize-none min-h-[100px] focus:outline-none focus:border-pixela-accent/40",
+  textarea: "w-full bg-pixela-surface/70 border border-white/10 rounded-lg p-3 text-white resize-none min-h-[100px] focus:outline-none focus:border-pixela-accent/40",
   buttons: {
     container: "flex justify-end gap-2",
     save: "px-4 py-2 text-sm bg-pixela-accent text-white rounded-lg hover:bg-pixela-accent/80 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed",

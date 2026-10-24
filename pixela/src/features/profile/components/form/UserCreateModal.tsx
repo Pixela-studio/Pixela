@@ -32,10 +32,10 @@ const INITIAL_FORM_STATE: UserForm = {
 const STYLES = {
   // Layout y contenedor principal
   overlay: 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-start justify-center',
-  container: 'bg-gradient-to-b from-[#1A1A1A] to-[#141414] w-full h-30 border border-white/5 shadow-2xl overflow-y-auto',
+  container: 'bg-gradient-to-b from-pixela-dark to-pixela-ink w-full h-30 border border-white/5 shadow-2xl overflow-y-auto',
   
   // Header del modal
-  header: 'flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#1A1A1A] z-10',
+  header: 'flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-pixela-surface z-10',
   title: 'text-2xl font-bold text-white mb-1',
   subtitle: 'text-sm text-gray-400',
   closeButton: 'text-gray-400 hover:text-white transition-colors',
@@ -50,21 +50,21 @@ const STYLES = {
   
   // Inputs y controles
   input: clsx(
-    'w-full bg-[#252525]/50 border border-white/5 rounded-xl p-3',
+    'w-full bg-pixela-raised/50 border border-white/5 rounded-xl p-3',
     'text-white placeholder-gray-500',
     'focus:outline-none focus:border-pixela-accent/50 focus:ring-1 focus:ring-pixela-accent/30',
     'transition-all duration-200'
   ),
   
   select: clsx(
-    'w-full bg-[#252525]/50 border border-white/5 rounded-xl p-3 text-white',
+    'w-full bg-pixela-raised/50 border border-white/5 rounded-xl p-3 text-white',
     'focus:outline-none focus:border-pixela-accent/50 focus:ring-1 focus:ring-pixela-accent/30',
     'transition-all duration-200',
     '[&::-ms-expand]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-calendar-picker-indicator]:hidden',
     'appearance-none bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E")]',
     'bg-[length:24px_18px] bg-[right_1rem_center] bg-no-repeat pr-12',
-    '[&>option]:bg-[#1A1A1A] [&>option]:text-white [&>option]:p-4',
-    '[&>option]:hover:bg-[#252525] [&>option]:focus:bg-[#252525] [&>option]:active:bg-[#252525]'
+    '[&>option]:bg-pixela-surface [&>option]:text-white [&>option]:p-4',
+    '[&>option]:hover:bg-pixela-raised [&>option]:focus:bg-pixela-raised [&>option]:active:bg-pixela-raised'
   ),
   
   // Feedback y mensajes
@@ -89,7 +89,7 @@ const STYLES = {
     'absolute right-3 top-1/2 transform -translate-y-1/2',
     'text-gray-400 hover:text-pixela-accent transition-colors',
     'cursor-pointer z-10 p-1 rounded',
-    'hover:bg-gray-700/20'
+    'hover:bg-white/5'
   ),
   eyeIcon: 'w-4 h-4'
 } as const;

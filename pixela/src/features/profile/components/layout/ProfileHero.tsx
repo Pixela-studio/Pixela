@@ -11,7 +11,7 @@ const STYLES = {
   heroSection: "relative h-[40vh] min-h-[300px] w-full isolate",
   heroBackground: "absolute inset-0 z-0",
   heroGradient:
-    "absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent z-10",
+    "absolute inset-0 bg-gradient-to-t from-pixela-ink via-pixela-ink/60 to-transparent z-10",
   heroContent: "absolute -bottom-16 left-0 w-full z-20",
 
   // Header User Info (Overlapping Hero)
@@ -20,7 +20,7 @@ const STYLES = {
   avatarWrapper: "relative group",
   avatarRing: "hidden",
   avatarContainer:
-    "relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#0F0F0F] shadow-2xl overflow-hidden bg-[#1A1A1A]",
+    "relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-pixela-ink shadow-2xl overflow-hidden bg-pixela-surface",
   userDetails: "flex-1 text-center md:text-left mb-2",
   userName:
     "text-4xl md:text-5xl font-bold text-white font-outfit mb-2 tracking-tight drop-shadow-lg",

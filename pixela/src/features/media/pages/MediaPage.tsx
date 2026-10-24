@@ -82,7 +82,7 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
   }, [tmdbId, itemType]);
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F]">
+    <div className="min-h-screen bg-pixela-ink">
       {/* Hero Section */}
       <HeroSection
         media={media}
