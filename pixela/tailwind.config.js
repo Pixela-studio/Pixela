@@ -4,6 +4,11 @@ const colors = require("tailwindcss/colors");
 // Los tokens y sus reglas de uso están en DESIGN.md. Si añades uno aquí,
 // documéntalo allí también.
 module.exports = {
+  // `hover:` solo se aplica en dispositivos que pueden pasar por encima: en
+  // táctil el primer toque dejaba el hover pegado hasta tocar otra cosa.
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/features/**/*.{js,ts,jsx,tsx,mdx}",

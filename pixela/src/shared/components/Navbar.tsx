@@ -28,11 +28,14 @@ const isNavLinkActive = (href: string, pathname: string): boolean => {
 const STYLES = {
   // Barra plana (DESIGN.md › Navigation): transparente sobre el hero y con el
   // negro de sala sólido al hacer scroll. Sin píldora flotante ni vidrio.
-  navBase: 'w-full fixed top-0 left-0 z-50',
+  // El fondo va en el <nav> (no en el contenedor) para cubrir también la
+  // franja de la muesca, que se reserva con safe-area-inset-top.
+  navBase: 'w-full fixed top-0 left-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-colors duration-300 ease-out-expo',
+  navDocked: 'bg-pixela-dark/95',
 
-  containerBase: 'w-full mx-auto flex items-center px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 transition-[background-color,padding] duration-300 ease-out-expo',
+  containerBase: 'w-full mx-auto flex items-center px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 transition-[padding] duration-300 ease-out-expo',
   containerFloating: 'py-5 lg:py-7 bg-transparent',
-  containerDocked: 'py-3 lg:py-4 bg-pixela-dark/95',
+  containerDocked: 'py-3 lg:py-4',
 
   logo: 'mr-auto lg:mr-12 rounded-md',
   logoText: 'font-display italic font-bold text-[28px] lg:text-[30px] leading-none tracking-[-0.02em] text-white',
@@ -242,7 +245,7 @@ export const Navbar = () => {
   return (
     <>
       <nav
-        className={STYLES.navBase}
+        className={`${STYLES.navBase} ${isDocked ? STYLES.navDocked : ''}`}
         role="navigation"
       >
         <div

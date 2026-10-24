@@ -21,6 +21,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* Sin el destello gris que pintan iOS y Android al tocar: cada control
+     tiene su propio :active. Y sin inflar el texto en horizontal. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
   background: var(--pixela-screen);
   scrollbar-color: var(--pixela-raised) var(--pixela-screen);
 }
@@ -50,6 +54,22 @@ body::after {
 .font-display {
   font-feature-settings: "kern", "liga", "onum";
   font-optical-sizing: auto;
+}
+
+/* Los controles responden al instante (sin la espera del doble toque) y una
+   pulsación larga no selecciona su texto. El contenido sigue seleccionable. */
+button,
+a,
+[role="button"],
+[role="tab"] {
+  touch-action: manipulation;
+}
+
+button,
+[role="button"],
+[role="tab"] {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 ::selection {

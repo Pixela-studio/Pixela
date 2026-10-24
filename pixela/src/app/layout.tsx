@@ -63,6 +63,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  // El fondo llega bajo la muesca; la navbar se aparta con safe-area-inset.
+  viewportFit: "cover",
   themeColor: "#181818",
 };
 
