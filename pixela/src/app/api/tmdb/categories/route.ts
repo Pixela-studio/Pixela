@@ -19,13 +19,20 @@ const CACHE_HEADERS = {
   'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800',
 } as const;
 
+/**
+ * Y por lo mismo, en la Data Cache dura una semana y no la hora por defecto: sin
+ * CDN delante (despliegue propio), es lo único que separa cada visita de dos
+ * llamadas a TMDB.
+ */
+const GENRES_CACHE = { revalidate: 604800 } as const;
+
 export async function GET() {
   try {
     // En paralelo: eran dos `await` secuenciales, el segundo esperando al primero
     // sin necesitarlo.
     const [movieGenres, tvGenres] = await Promise.all([
-      fetchFromTmdb<{ genres: Genre[] }>('/genre/movie/list'),
-      fetchFromTmdb<{ genres: Genre[] }>('/genre/tv/list'),
+      fetchFromTmdb<{ genres: Genre[] }>('/genre/movie/list', {}, GENRES_CACHE),
+      fetchFromTmdb<{ genres: Genre[] }>('/genre/tv/list', {}, GENRES_CACHE),
     ]);
 
     const combinedGenres = new Map<number, Genre>();
