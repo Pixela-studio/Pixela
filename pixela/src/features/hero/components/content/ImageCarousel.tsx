@@ -10,9 +10,11 @@ const STYLES = {
   carousel: {
     base: "absolute inset-0 w-full h-full",
     imageContainer: {
-      base: "absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out",
-      fadeIn: "opacity-100",
-      fadeOut: "opacity-0",
+      // Fundido a negro: la imagen que sale se apaga deprisa y la que entra
+      // espera a que la pantalla esté negra, como un corte entre planos.
+      base: "absolute inset-0 w-full h-full transition-opacity ease-out-expo",
+      fadeIn: "opacity-100 duration-700 delay-300",
+      fadeOut: "opacity-0 duration-300",
     },
   },
 
@@ -22,20 +24,24 @@ const STYLES = {
     // Antes había un darkOverlay con `bg-pixela-dark/300` — /300 no existe en
     // la escala de opacidad de Tailwind, así que esa capa nunca aplicaba.
     // Eliminada.
+    // Velo para leer el texto: de izquierda a derecha en escritorio (el
+    // cartón de título vive a la izquierda) y de abajo arriba en móvil.
     gradientOverlay:
-      "bg-gradient-to-t from-pixela-dark/90 via-pixela-dark/50 to-pixela-dark/80",
+      "bg-gradient-to-t from-pixela-dark/90 via-pixela-dark/40 to-pixela-dark/60 md:bg-gradient-to-r md:from-pixela-dark/95 md:via-pixela-dark/50 md:to-transparent",
     topGradient:
-      "absolute top-0 left-0 w-full h-32 sm:h-48 md:h-56 lg:h-64 bg-gradient-to-b from-pixela-dark via-pixela-dark/50 to-transparent",
+      "absolute top-0 left-0 w-full h-32 sm:h-40 bg-gradient-to-b from-pixela-dark/70 to-transparent",
     bottomGradient:
-      "absolute bottom-0 left-0 w-full h-48 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-t from-pixela-dark via-pixela-dark/50 to-transparent",
+      "absolute bottom-0 left-0 w-full h-40 sm:h-56 md:h-72 bg-gradient-to-t from-pixela-dark to-transparent",
   },
 
   // Estilos de la imagen
   image: {
-    container: "relative w-full h-full lg:pt-16",
+    container: "relative w-full h-full",
     // Concepto B&W preservado. Ligero boost de contraste para que la escala
     // de grises no se lea plana sobre el gradiente oscuro.
-    base: "w-full h-full object-cover grayscale contrast-[1.08]",
+    // Monocromo cálido de copia antigua: escala de grises con un punto de
+    // sepia, a juego con el marfil del texto.
+    base: "w-full h-full object-cover grayscale contrast-[1.08] brightness-[0.85] sepia-[0.12]",
     mobile: "block md:hidden", // Visible solo en móvil
     desktop: "hidden md:block", // Visible solo en escritorio
   },

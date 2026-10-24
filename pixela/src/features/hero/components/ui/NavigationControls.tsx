@@ -9,12 +9,12 @@ const STYLES = {
   navigation: {
     button: {
       container: {
-        base: "absolute top-[35%] md:top-[40%] lg:top-1/2 transform -translate-y-1/2 z-20",
-        left: "left-2 sm:left-3 md:left-4 lg:left-4",
-        right: "right-2 sm:right-3 md:right-4 lg:right-4"
+        base: "absolute top-1/2 -translate-y-1/2 z-20 hidden md:block",
+        left: "left-3 lg:left-5",
+        right: "right-3 lg:right-5"
       },
-      base: "p-1 sm:p-1 md:p-1.5 lg:p-2 rounded-full bg-pixela-dark/40 backdrop-blur-sm text-pixela-light hover:text-pixela-accent hover:bg-pixela-dark/60 transition duration-300",
-      icon: "h-6 w-6 sm:h-6 sm:w-6 md:h-7 md:w-7 lg:h-8 lg:w-8"
+      base: "grid h-12 w-12 place-items-center rounded-full bg-white/[0.08] text-white hover:bg-white/[0.16] active:scale-[0.97] transition duration-200",
+      icon: "h-6 w-6"
     }
   }
 } as const;
