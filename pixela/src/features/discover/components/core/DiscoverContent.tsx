@@ -26,13 +26,13 @@ const STYLES = {
 
   actions: "flex flex-row items-center justify-start gap-8 2k:gap-6",
   exploreButton:
-    "group relative px-8 py-4 rounded-full font-bold text-base transition-all duration-500 overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 hover:border-pixela-accent/50 hover:bg-pixela-accent/10 hover:shadow-[0_0_30px_rgba(236,27,105,0.3)]",
+    "btn btn-ghost group relative overflow-hidden px-8",
   buttonContent:
     "relative z-10 flex items-center justify-center text-white group-hover:text-pixela-accent transition-colors duration-300",
   buttonIcon:
-    "w-5 h-5 ml-2 transition-transform duration-500 group-hover:translate-x-1.5",
+    "w-5 h-5 ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5",
   buttonHoverEffect:
-    "absolute inset-0 bg-gradient-to-r from-pixela-accent/20 to-transparent w-0 group-hover:w-full transition-all duration-500 ease-out",
+    "absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-pixela-accent/20 to-transparent transition-transform duration-500 ease-out-expo group-hover:scale-x-100",
 } as const;
 
 interface DiscoverContentProps {
@@ -84,6 +84,7 @@ export const DiscoverContent = ({ heading }: DiscoverContentProps) => {
           <div className={STYLES.actions}>
             <Link
               href="/categories"
+              prefetch={false}
               className={STYLES.exploreButton}
               onClick={() => setSelectedMediaType("series")}
             >

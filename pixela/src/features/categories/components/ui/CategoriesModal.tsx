@@ -17,7 +17,7 @@ const STYLES = {
 
     // Lista y Botones de Categorías
     list: 'flex-1 space-y-2 md:space-y-3 overflow-y-auto pb-8',
-    categoryButton: 'w-full px-4 md:px-6 py-3.5 md:py-4 rounded-lg transition-all duration-200 font-medium text-base md:text-lg flex items-center gap-3',
+    categoryButton: 'w-full px-4 md:px-6 py-3.5 md:py-4 rounded-lg transition duration-200 font-medium text-base md:text-lg flex items-center gap-3',
     categoryButtonActive: 'bg-pixela-accent/10 text-pixela-accent border border-pixela-accent/30',
     categoryButtonInactive: 'bg-pixela-dark/30 text-pixela-light/80 border border-pixela-accent/20 hover:bg-pixela-accent/10 hover:border-pixela-accent/40'
 } as const;

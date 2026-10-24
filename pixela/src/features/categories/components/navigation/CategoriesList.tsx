@@ -21,7 +21,7 @@ const STYLES = {
     list: 'space-y-1.5 md:space-y-6',
 
     // Botones de categoría
-    categoryButton: 'w-full px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 font-medium text-sm flex items-center gap-2 md:gap-3 mb-2 md:mb-4',
+    categoryButton: 'w-full px-3 md:px-4 py-2 md:py-3 rounded-lg transition duration-200 font-medium text-sm flex items-center gap-2 md:gap-3 mb-2 md:mb-4',
     categoryButtonActive: 'bg-pixela-accent/10 text-pixela-accent border border-pixela-accent/30',
     categoryButtonInactive: 'bg-pixela-dark/20 text-pixela-light/60 border border-pixela-accent/10 hover:bg-pixela-accent/5 hover:text-pixela-accent/80',
     categoryIcon: 'w-4 h-4 text-pixela-light/60',

@@ -141,7 +141,7 @@ const MarqueeContent = memo(
       {images.map((src, idx) => (
         <div
           key={`${src}-${idx}`}
-          className="relative w-[200px] h-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-2xl transition-all duration-500"
+          className="relative w-[200px] h-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-2xl transition duration-500"
         >
           <Image
             src={tmdbImageHelpers.poster(src) || TMDB_PLACEHOLDER.POSTER}

@@ -97,7 +97,7 @@ export const ProfileLibrary = () => {
                 aria-selected={isActive}
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
-                  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300",
+                  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition duration-300",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
                   isActive
                     ? "border-pixela-accent bg-pixela-accent text-white"
