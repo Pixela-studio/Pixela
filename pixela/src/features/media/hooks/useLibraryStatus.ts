@@ -4,6 +4,18 @@ import { WatchStatus } from "@/api/library/types";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { toast } from "@/lib/toast";
 
+/**
+ * Etiquetas en castellano de cada estado. Las comparten el menú de
+ * LibraryButton y los avisos de este hook para no enseñar el enum crudo
+ * ("Marcado como WATCHING").
+ */
+export const WATCH_STATUS_LABELS: Record<WatchStatus, string> = {
+  [WatchStatus.PLAN_TO_WATCH]: "Planeado",
+  [WatchStatus.WATCHING]: "Viendo",
+  [WatchStatus.COMPLETED]: "Completado",
+  [WatchStatus.DROPPED]: "Abandonado",
+};
+
 interface UseLibraryStatusProps {
   tmdbId: number;
   itemType: "movie" | "series";
@@ -53,7 +65,7 @@ export const useLibraryStatus = ({
         if (libraryItemId) {
           await libraryAPI.updateStatus(libraryItemId, newStatus);
           setStatus(newStatus);
-          toast.success(`Marcado como ${newStatus}`); // Could map to label if needed
+          toast.success(`Marcado como ${WATCH_STATUS_LABELS[newStatus].toLowerCase()}`);
         } else {
           const newItem = await libraryAPI.addToLibrary({
             tmdb_id: tmdbId,

@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   FiPlus,
@@ -12,7 +18,10 @@ import {
   FiStopCircle,
 } from "react-icons/fi";
 import { WatchStatus } from "@/api/library/types";
-import { useLibraryStatus } from "../../hooks/useLibraryStatus";
+import {
+  useLibraryStatus,
+  WATCH_STATUS_LABELS,
+} from "../../hooks/useLibraryStatus";
 import { toast } from "@/lib/toast";
 import clsx from "clsx";
 
@@ -23,28 +32,38 @@ interface LibraryButtonProps {
   className?: string;
 }
 
+// Las etiquetas viven en useLibraryStatus para que el menú y los avisos digan
+// lo mismo; aquí solo se añaden icono y color.
 const STATUS_CONFIG = {
   [WatchStatus.PLAN_TO_WATCH]: {
-    label: "Planeado",
+    label: WATCH_STATUS_LABELS[WatchStatus.PLAN_TO_WATCH],
     icon: FiClock,
     color: "text-blue-400",
   },
   [WatchStatus.WATCHING]: {
-    label: "Viendo",
+    label: WATCH_STATUS_LABELS[WatchStatus.WATCHING],
     icon: FiPlay,
     color: "text-green-400",
   },
   [WatchStatus.COMPLETED]: {
-    label: "Completado",
+    label: WATCH_STATUS_LABELS[WatchStatus.COMPLETED],
     icon: FiCheck,
     color: "text-yellow-400",
   },
   [WatchStatus.DROPPED]: {
-    label: "Abandonado",
+    label: WATCH_STATUS_LABELS[WatchStatus.DROPPED],
     icon: FiStopCircle,
     color: "text-red-400",
   },
 };
+
+// Opciones del menú en orden de documento, para el foco itinerante.
+const getMenuItems = (menu: HTMLElement | null) =>
+  Array.from(
+    menu?.querySelectorAll<HTMLButtonElement>(
+      '[role="menuitemradio"], [role="menuitem"]',
+    ) ?? [],
+  );
 
 export const LibraryButton = ({
   tmdbId,
@@ -61,10 +80,31 @@ export const LibraryButton = ({
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Cierra el menú y, si se cerró desde teclado o eligiendo una opción,
+  // devuelve el foco al botón para no dejarlo perdido en el documento.
+  const closeMenu = useCallback((returnFocus: boolean) => {
+    setIsOpen(false);
+    if (returnFocus) triggerRef.current?.focus();
+  }, []);
+
+  // Al abrir, el foco entra en la opción marcada (o en la primera), como
+  // pide el patrón de menú de WAI-ARIA.
+  useEffect(() => {
+    if (!isOpen) return;
+    const items = getMenuItems(menuRef.current);
+    const checked = items.find(
+      (item) => item.getAttribute("aria-checked") === "true",
+    );
+    (checked ?? items[0])?.focus();
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
 
+    // Clic fuera: se cierra sin robar el foco a lo que se haya pulsado.
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -74,27 +114,54 @@ export const LibraryButton = ({
       }
     };
 
-    // Escape para cerrar: el desplegable solo se podía cerrar con el ratón,
-    // así que con teclado quedabas atrapado dentro del menú.
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
 
+  // Foco itinerante: flechas, Inicio y Fin recorren las opciones; Escape
+  // cierra y vuelve al botón; Tab cierra y deja seguir el orden natural.
+  const handleMenuKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const items = getMenuItems(menuRef.current);
+    if (items.length === 0) return;
+    const current = items.indexOf(document.activeElement as HTMLButtonElement);
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        items[(current + 1) % items.length].focus();
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        items[(current - 1 + items.length) % items.length].focus();
+        break;
+      case "Home":
+        event.preventDefault();
+        items[0].focus();
+        break;
+      case "End":
+        event.preventDefault();
+        items[items.length - 1].focus();
+        break;
+      case "Escape":
+        event.preventDefault();
+        closeMenu(true);
+        break;
+      case "Tab":
+        // Sin preventDefault: el foco vuelve al botón y el Tab continúa desde él.
+        closeMenu(true);
+        break;
+    }
+  };
+
   const handleUpdateStatus = (newStatus: WatchStatus) => {
-    setIsOpen(false);
+    closeMenu(true);
     updateStatus(newStatus);
   };
 
   const handleRemove = () => {
-    setIsOpen(false);
+    closeMenu(true);
     removeFromLibrary();
   };
 
@@ -119,6 +186,7 @@ export const LibraryButton = ({
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={handleTriggerClick}
         disabled={loading}
@@ -130,7 +198,7 @@ export const LibraryButton = ({
             : `Añadir «${title}» a mi biblioteca`
         }
         className={clsx(
-          "flex items-center gap-2 whitespace-nowrap rounded-lg px-6 py-3 font-medium transition-all duration-300",
+          "flex items-center gap-2 whitespace-nowrap rounded-lg px-6 py-3 font-medium transition-[color,background-color,box-shadow] duration-300",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
           "disabled:cursor-not-allowed disabled:opacity-60",
           // Acción principal de la ficha: relleno sólido para que domine la fila.
@@ -154,8 +222,10 @@ export const LibraryButton = ({
       {/* Dropdown */}
       {isOpen && (
         <div
+          ref={menuRef}
           role="menu"
           aria-label="Estado en la biblioteca"
+          onKeyDown={handleMenuKeyDown}
           className="absolute top-full left-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-pixela-surface p-1 shadow-2xl animate-fade-in"
         >
           <div className="flex flex-col gap-1">
@@ -170,6 +240,7 @@ export const LibraryButton = ({
                   type="button"
                   role="menuitemradio"
                   aria-checked={isActive}
+                  tabIndex={-1}
                   onClick={() => handleUpdateStatus(statusKey)}
                   className={clsx(
                     "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
@@ -179,10 +250,16 @@ export const LibraryButton = ({
                       : "text-gray-400 hover:bg-white/5 hover:text-white",
                   )}
                 >
-                  <StatusIcon className={clsx("w-4 h-4", config.color)} />
+                  <StatusIcon
+                    aria-hidden="true"
+                    className={clsx("w-4 h-4", config.color)}
+                  />
                   <span className="flex-1 text-left">{config.label}</span>
                   {isActive && (
-                    <FiCheck className="w-4 h-4 text-pixela-accent" />
+                    <FiCheck
+                      aria-hidden="true"
+                      className="w-4 h-4 text-pixela-accent"
+                    />
                   )}
                 </button>
               );
@@ -194,10 +271,11 @@ export const LibraryButton = ({
                 <button
                   type="button"
                   role="menuitem"
+                  tabIndex={-1}
                   onClick={handleRemove}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300 focus-visible:outline-none focus-visible:bg-red-500/10"
                 >
-                  <FiTrash2 className="w-4 h-4" />
+                  <FiTrash2 aria-hidden="true" className="w-4 h-4" />
                   <span className="flex-1 text-left">Eliminar de lista</span>
                 </button>
               </>
