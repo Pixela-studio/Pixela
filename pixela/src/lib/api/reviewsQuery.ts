@@ -76,7 +76,14 @@ export async function getMediaReviewsSafe(
   try {
     return await getMediaReviews(tmdbId, itemType);
   } catch (error) {
-    logger.error("Failed to load reviews for media page", error, {
+    // Aviso y no error: el fallo está controlado (la ficha se pinta sin
+    // reseñas) y `console.error` en el servidor dispara el overlay de Next en
+    // desarrollo. Se registra el mensaje en texto porque un `Error` se
+    // serializa como `{}` al llegar al navegador. De Prisma basta la última
+    // línea ("Error querying the database: …"); el resto es el código citado.
+    const message = error instanceof Error ? error.message : String(error);
+    logger.warn("Failed to load reviews for media page", {
+      error: message.trim().split("\n").pop(),
       tmdbId,
       itemType,
     });
