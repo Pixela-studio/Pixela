@@ -32,6 +32,26 @@ const SEARCH_LIMIT = {
   windowMs: 60_000,
 } as const;
 
+/**
+ * Límite general del resto del proxy (descubrir, géneros, tendencias, fichas e
+ * imágenes).
+ *
+ * En Vercel estas rutas las absorbía la CDN gracias a `s-maxage`. En un
+ * despliegue propio (Coolify, sin CDN delante) esa cabecera no la honra nadie:
+ * cada petición llega al proceso de Node. La Data Cache evita repetir la llamada
+ * a TMDB para la misma URL, pero un id o un filtro nuevo es un fallo de caché, y
+ * recorrer ids a ritmo de script es sacarle a TMDB el catálogo con nuestra
+ * clave y llenar `.next/cache` de entradas.
+ *
+ * 120 por minuto y por IP es holgado para una persona en `/categories` (cada
+ * cambio de página son una o dos peticiones) y corta el recorrido automatizado.
+ */
+const PROXY_LIMIT = {
+  name: "tmdb-proxy",
+  limit: 120,
+  windowMs: 60_000,
+} as const;
+
 export { parseTmdbId, toTmdbType } from "@/lib/api/tmdbDetails";
 export type { PixelaMediaType, TmdbMediaType } from "@/lib/api/tmdbDetails";
 
@@ -78,6 +98,9 @@ const listResponse = (data: TmdbListResponse) =>
 
 /** GET /discover/{movie|tv} */
 export async function proxyDiscover(request: Request, type: PixelaMediaType) {
+  const limited = enforceRateLimit(request, PROXY_LIMIT);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
   const tmdbType = toTmdbType(type);
 
@@ -118,6 +141,8 @@ export async function proxySearch(request: Request, type: PixelaMediaType) {
         page: pageSchema.parse(searchParams.get("page") ?? "1"),
         include_adult: false,
       },
+      // Espacio de consultas infinito: cachearlo solo llenaría el disco.
+      { revalidate: false },
     );
     return listResponse(data);
   } catch (error) {
@@ -127,6 +152,9 @@ export async function proxySearch(request: Request, type: PixelaMediaType) {
 
 /** GET /trending/{movie|tv}/week */
 export async function proxyTrending(request: Request, type: PixelaMediaType) {
+  const limited = enforceRateLimit(request, PROXY_LIMIT);
+  if (limited) return limited;
+
   const { searchParams } = new URL(request.url);
 
   try {
@@ -150,6 +178,9 @@ export async function proxyGenre(
   type: PixelaMediaType,
   rawGenreId: string,
 ) {
+  const limited = enforceRateLimit(request, PROXY_LIMIT);
+  if (limited) return limited;
+
   const genreId = parseTmdbId(rawGenreId);
   if (genreId === null) {
     return apiError("Género inválido", 400);
@@ -177,7 +208,14 @@ export async function proxyGenre(
 }
 
 /** GET /{movie|tv}/{id} con todo lo que la ficha necesita. */
-export async function proxyDetails(type: PixelaMediaType, rawId: string) {
+export async function proxyDetails(
+  request: Request,
+  type: PixelaMediaType,
+  rawId: string,
+) {
+  const limited = enforceRateLimit(request, PROXY_LIMIT);
+  if (limited) return limited;
+
   const id = parseTmdbId(rawId);
   if (id === null) {
     return apiError("Identificador inválido", 400);
@@ -203,7 +241,14 @@ export async function proxyDetails(type: PixelaMediaType, rawId: string) {
 }
 
 /** GET /{movie|tv}/{id}/images */
-export async function proxyImages(type: PixelaMediaType, rawId: string) {
+export async function proxyImages(
+  request: Request,
+  type: PixelaMediaType,
+  rawId: string,
+) {
+  const limited = enforceRateLimit(request, PROXY_LIMIT);
+  if (limited) return limited;
+
   const id = parseTmdbId(rawId);
   if (id === null) {
     return apiError("Identificador inválido", 400);

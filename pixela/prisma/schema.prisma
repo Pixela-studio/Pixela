@@ -52,6 +52,10 @@ model Review {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, itemType, tmdbId])
+  // Reseñas de una ficha (`getMediaReviews`). El índice único empieza por
+  // `userId` y no sirve para filtrar solo por título: sin este, cada
+  // regeneración de una ficha recorría la tabla entera.
+  @@index([itemType, tmdbId, createdAt(sort: Desc)])
   @@map("reviews")
 }
 
