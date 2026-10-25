@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
 const STYLES = {
-  base: 'text-xs font-bold px-2.5 py-1.5 rounded-md',
+  base: 'text-xs font-semibold px-2 py-1 rounded-sm',
   position: {
     'top-left': 'absolute top-3 left-3 z-10',
     'top-right': 'absolute top-3 right-3 z-10',
@@ -10,7 +10,7 @@ const STYLES = {
     'none': ''
   },
   variant: {
-    primary: 'bg-pixela-accent text-pixela-light',
+    primary: 'bg-pixela-accent text-pixela-dark',
     secondary: 'bg-pixela-dark text-pixela-light',
     success: 'bg-green-500 text-white',
     warning: 'bg-yellow-500 text-pixela-dark',

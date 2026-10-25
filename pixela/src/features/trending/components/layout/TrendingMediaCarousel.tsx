@@ -2,6 +2,7 @@
 import { MediaCarousel } from '@/shared/components/MediaCarousel';
 import { TrendingMediaCard } from '../content/TrendingMediaCard';
 import type { TrendingMediaCarouselProps, TrendingMediaSlideProps } from '@/features/trending/types';
+import { HEADER_LAYOUT_STYLES } from '@/shared/styles/headerStyles';
 
 
 /**
@@ -9,8 +10,8 @@ import type { TrendingMediaCarouselProps, TrendingMediaSlideProps } from '@/feat
  */
 const STYLES = {
   container: 'trending-carousel mx-0',
-  slides: 'flex gap-0',
-  slide: 'relative w-[280px] min-w-[280px] max-w-[280px] md:w-[375px] md:min-w-[375px] md:max-w-[375px] flex-none'
+  slides: HEADER_LAYOUT_STYLES.slides,
+  slide: HEADER_LAYOUT_STYLES.slide,
 } as const;
 
 /**

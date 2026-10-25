@@ -33,6 +33,8 @@ export interface ReviewSectionProps {
   tmdbId: number;
   itemType: 'movie' | 'series';
   reviews: Review[];
+  /** Título de la obra, para los nombres accesibles de editar y borrar. */
+  mediaTitle?: string;
   loading: boolean;
   error: string | null;
   refreshReviews: () => void;

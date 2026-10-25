@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, memo } from 'react';
+import { FiUser } from 'react-icons/fi';
 import { CreatorAvatarProps } from '@/features/media/types/creators';
 
 const STYLES = {
@@ -10,7 +11,7 @@ const STYLES = {
   avatar: 'rounded-full object-cover border-2 border-pixela-accent/30',
   name: 'text-white font-medium',
   placeholderContainer: 'w-10 h-10 rounded-full border-2 border-pixela-accent/30 bg-gradient-to-br from-pixela-dark via-pixela-dark/80 to-black flex items-center justify-center',
-  placeholderIcon: 'text-pixela-accent/60 text-lg',
+  placeholderIcon: 'h-5 w-5 text-white/40',
   placeholderInitials: 'text-white text-sm font-semibold'
 } as const;
 
@@ -31,7 +32,7 @@ const AvatarPlaceholder = memo(({ name }: { name: string }) => {
       {initials ? (
         <span className={STYLES.placeholderInitials}>{initials}</span>
       ) : (
-        <span className={STYLES.placeholderIcon}>👤</span>
+        <FiUser className={STYLES.placeholderIcon} aria-hidden="true" />
       )}
     </div>
   );

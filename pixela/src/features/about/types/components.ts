@@ -1,12 +1,8 @@
-import { ReactNode } from 'react';
-
 /**
- * Interfaz que define la estructura de una tarjeta de característica
- * @interface FeatureCard
+ * Un punto de "Quiénes somos": qué hace Pixela, en una frase.
+ * @interface AboutPoint
  */
-export interface FeatureCard {
-  icon: ReactNode;
+export interface AboutPoint {
   title: string;
   description: string;
-  isComingSoon?: boolean;
-} 
+}

@@ -82,14 +82,9 @@ export function CastSection({ actors }: CastSectionProps) {
    * @returns {JSX.Element} Componente de sección de reparto
    */
   return (
-    <div className="pt-8 mb-12">
-      <div className="flex items-center justify-between mb-6">
-        <div className="pt-4">
-          <h2 className="text-2xl font-bold text-white">Reparto Principal</h2>
-          <span className="inline-block px-2 py-1 mt-1 text-xs text-gray-400 rounded-full bg-pixela-dark/60">
-            {actors.length} {actors.length === 1 ? "actor" : "actores"}
-          </span>
-        </div>
+    <div>
+      <div className="flex items-end justify-between mb-8">
+        <h2 className="title-card text-5xl md:text-6xl">Reparto</h2>
 
         {!useGrid && (
           <ActorSliderControls
@@ -110,7 +105,9 @@ export function CastSection({ actors }: CastSectionProps) {
         // Slider en móvil, tablet, y desktop con muchos actores
         <div className="relative">
           <div
-            className={clsx("overflow-hidden w-full cursor-grab touch-pan-y", {
+            // `py-1`: hueco para el anillo de foco y el `-translate-y-1` del hover,
+            // que el overflow-hidden del carrusel recortaba por arriba.
+            className={clsx("overflow-hidden w-full py-1 cursor-grab touch-pan-y", {
               "cursor-grabbing": isDragging,
             })}
             ref={emblaRef}

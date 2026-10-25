@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import Image from 'next/image';
 import { Wallpaper } from '@/features/media/types/gallery';
 import { GallerySectionProps } from '@/features/media/types/gallery';
@@ -13,13 +14,13 @@ import { GallerySkeleton } from '@/app/components/skeletons';
 const STYLES = {
   // Contenedor principal y título
   container: "mt-12 mb-24",
-  title: "text-2xl font-bold text-white mb-5",
+  title: "title-card text-5xl md:text-6xl mb-8",
 
   // Estados de carga y animaciones
   loadingContainer: "mt-12 mb-12",
   loadingSpinner: "flex justify-center py-10",
   loadingPulse: "animate-pulse flex space-x-4",
-  loadingPlaceholder: "h-48 w-full bg-gray-700 rounded-lg",
+  loadingPlaceholder: "h-48 w-full bg-pixela-raised rounded-lg",
 
   // Mensajes de error
   errorMessage: "mb-4 p-3 bg-red-900/50 text-red-200 rounded-lg",
@@ -27,7 +28,7 @@ const STYLES = {
   // Contenedor de la cuadrícula y botones
   gridContainer: "mt-6",
   buttonContainer: "flex justify-start mt-4",
-  button: "px-5 py-2 rounded-lg font-semibold bg-pixela-accent hover:bg-pixela-accent/80 text-white shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pixela-accent/80 focus:ring-offset-2",
+  button: "btn btn-primary btn-sm",
 
   // Estilos del modal de vista previa
   modal: {
@@ -66,6 +67,13 @@ export function GallerySection({ media }: GallerySectionProps) {
     selectedGalleryImage,
     setSelectedGalleryImage
   } = useMediaStore();
+
+  // Vista ampliada como diálogo: foco atrapado, Escape cierra y el foco vuelve
+  // a la miniatura que la abrió.
+  const previewRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(previewRef, Boolean(selectedGalleryImage), {
+    onEscape: () => setSelectedGalleryImage(null),
+  });
 
   // Renderizar el componente solo en el cliente
   useEffect(() => {
@@ -125,6 +133,8 @@ export function GallerySection({ media }: GallerySectionProps) {
         <GalleryGrid
           images={activeGalleryTab === 'backdrops' ? images.backdrops : images.posters}
           type={activeGalleryTab}
+          mediaType={media.tipo}
+          title={media.titulo}
           onImageClick={(image) => setSelectedGalleryImage(image.file_path)}
           showAll={showAll}
         />
@@ -146,20 +156,30 @@ export function GallerySection({ media }: GallerySectionProps) {
           className={STYLES.modal.overlay}
           onClick={() => setSelectedGalleryImage(null)}
         >
-          <div className={STYLES.modal.container} onClick={e => e.stopPropagation()}>
+          <div
+            ref={previewRef}
+            className={STYLES.modal.container}
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Vista ampliada"
+          >
             <Image 
               src={selectedGalleryImage} 
-              alt="Preview"
+              alt=""
               className={STYLES.modal.image}
               width={1920}
               height={1080}
               priority
             />
             <button
+              type="button"
               className={STYLES.modal.closeButton}
               onClick={() => setSelectedGalleryImage(null)}
+              aria-label="Cerrar vista ampliada"
             >
               <svg
+                aria-hidden="true"
                 className={STYLES.modal.closeIcon}
                 fill="none"
                 stroke="currentColor"

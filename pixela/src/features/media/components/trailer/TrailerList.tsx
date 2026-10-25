@@ -14,8 +14,8 @@ export function TrailerList({
   const displayTrailers = trailers.slice(0, Math.min(6, trailers.length));
   
   return (
-    <div className="w-full lg:w-1/3">
-      <div className="flex flex-col pr-3 space-y-4 overflow-visible">
+    <div className="w-full">
+      <div className="flex flex-col space-y-3">
         {displayTrailers.map((trailer, index) => (
           <TrailerListItem
             key={trailer.key}

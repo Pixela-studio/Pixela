@@ -6,15 +6,25 @@ import Image from 'next/image';
 import { StarDisplay } from './StarDisplay';
 import { ReviewEditForm } from './ReviewEditForm';
 import { ReviewCardProps } from '@/features/media/types/reviews';
+
+interface ReviewCardWithPermissionsProps extends ReviewCardProps {
+  /**
+   * Puede borrar aunque no sea el autor (admin). La API solo deja editar al
+   * autor (`isUserReview`) y borrar al autor o a un admin.
+   */
+  canDelete?: boolean;
+  /** Título de la obra, para el nombre accesible de los botones. */
+  mediaTitle?: string;
+}
 import { useInteractiveBorder } from '@/hooks';
 
 const STYLES = {
   // Contenedor principal con efecto de borde interactivo (igual que las cards de about)
-  card: "group relative rounded-2xl p-px cursor-pointer overflow-hidden transition-all duration-300",
+  card: "group relative rounded-2xl p-px overflow-hidden",
   // Borde animado que sigue al mouse (igual que las cards de about)
   cardBorder: "absolute inset-0 rounded-2xl bg-[radial-gradient(250px_at_var(--mouse-x)_var(--mouse-y),_rgba(236,27,105,0.8),_transparent_75%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
   // Contenido de la card con fondo degradado (igual que las cards de about)
-  cardContent: "relative z-10 h-full rounded-[15px] px-6 py-5 flex flex-col gap-3 bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 shadow-2xl shadow-pixela-accent/5 transition-all duration-300",
+  cardContent: "relative z-10 h-full rounded-2xl px-6 py-5 flex flex-col gap-3 bg-pixela-dark/95",
   
   header: "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2",
   user: {
@@ -31,14 +41,14 @@ const STYLES = {
     container: "flex items-center gap-2 justify-end min-w-32"
   },
   edit: {
-    button: "p-2 text-gray-400 hover:text-white transition-colors duration-200",
+    button: "rounded-full p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-200",
     icon: "w-4 h-4"
   },
   actions: {
     container: "flex items-center gap-1"
   },
   delete: {
-    button: "p-2 text-gray-400 hover:text-red-400 transition-colors duration-200",
+    button: "rounded-full p-2 text-white/70 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200",
     icon: "w-4 h-4"
   },
   content: {
@@ -60,13 +70,20 @@ export const ReviewCard = ({
   onSave,
   onCancel,
   onDelete,
-  isDeleting
-}: ReviewCardProps) => {
+  isDeleting,
+  canDelete = isUserReview,
+  mediaTitle,
+}: ReviewCardWithPermissionsProps) => {
   const cardRef = useInteractiveBorder<HTMLDivElement>();
+  const ofTitle = mediaTitle ? ` de «${mediaTitle}»` : '';
+  const editLabel = `Editar tu reseña${ofTitle}`;
+  const deleteLabel = isUserReview
+    ? `Borrar tu reseña${ofTitle}`
+    : `Borrar la reseña de ${review.user_name || 'este usuario'}${ofTitle}`;
 
   return (
     <div ref={cardRef} className={STYLES.card}>
-      <div className={STYLES.cardBorder} />
+      <div className={STYLES.cardBorder} aria-hidden="true" />
       <div className={STYLES.cardContent}>
         <div className={STYLES.header}>
           <div className={STYLES.user.container}>
@@ -95,28 +112,36 @@ export const ReviewCard = ({
             )}
           </div>
           <div className={STYLES.rightSection.container}>
-            {isUserReview && !isEditing && (
+            {(isUserReview || canDelete) && !isEditing && (
               <div className={STYLES.actions.container}>
-                <button
-                  onClick={() => onEditClick(review)}
-                  className={STYLES.edit.button}
-                  title="Editar reseña"
-                  disabled={isDeleting}
-                >
-                  <FiEdit2 className={STYLES.edit.icon} />
-                </button>
-                <button
-                  onClick={() => onDelete(review)}
-                  className={STYLES.delete.button}
-                  title="Eliminar reseña"
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <FiLoader className={STYLES.delete.icon} />
-                  ) : (
-                    <FaTrash className={STYLES.delete.icon} />
-                  )}
-                </button>
+                {isUserReview && (
+                  <button
+                    type="button"
+                    onClick={() => onEditClick(review)}
+                    className={STYLES.edit.button}
+                    aria-label={editLabel}
+                    title={editLabel}
+                    disabled={isDeleting}
+                  >
+                    <FiEdit2 className={STYLES.edit.icon} aria-hidden="true" />
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    type="button"
+                    onClick={() => onDelete(review)}
+                    className={STYLES.delete.button}
+                    aria-label={deleteLabel}
+                    title={deleteLabel}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <FiLoader className={`${STYLES.delete.icon} animate-spin`} aria-hidden="true" />
+                    ) : (
+                      <FaTrash className={STYLES.delete.icon} aria-hidden="true" />
+                    )}
+                  </button>
+                )}
               </div>
             )}
             <span className={STYLES.user.date}>

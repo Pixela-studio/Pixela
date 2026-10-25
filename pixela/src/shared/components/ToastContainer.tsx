@@ -7,7 +7,7 @@ import { FiX } from 'react-icons/fi';
 const TOAST_STYLES = {
   container: 'fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none',
   toast: {
-    base: 'pointer-events-auto max-w-md w-full rounded-lg shadow-2xl p-4 backdrop-blur-md border border-white/10 transition-all duration-300 ease-out transform',
+    base: 'pointer-events-auto max-w-md w-full rounded-2xl shadow-2xl shadow-black/60 p-4 backdrop-blur-md border transition-[opacity,transform] duration-300 ease-out-expo',
     entering: 'animate-slide-in-right',
     exiting: 'animate-slide-out-right opacity-0',
   },
@@ -18,29 +18,29 @@ const TOAST_STYLES = {
   message: 'text-sm opacity-90',
   closeButton: 'flex-shrink-0 p-1 rounded-md hover:bg-white/10 transition-colors',
   action: 'mt-3 pt-3 border-t border-current/20',
-  actionButton: 'text-sm font-medium underline hover:no-underline transition-all',
+  actionButton: 'text-sm font-medium underline underline-offset-4 hover:no-underline',
 } as const;
 
 const TOAST_VARIANTS: Record<ToastType, { bg: string; text: string; border: string }> = {
   success: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-green-500' 
+    border: 'border-emerald-400/40' 
   },
   error: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-pixela-accent' 
+    border: 'border-red-500/50' 
   },
   warning: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-yellow-500' 
+    border: 'border-yellow-400/40' 
   },
   info: { 
-    bg: 'bg-gradient-to-r from-pixela-dark to-[#1a1a1a]', 
+    bg: 'bg-pixela-surface', 
     text: 'text-white', 
-    border: 'border-l-4 border-pixela-accent' 
+    border: 'border-white/10' 
   },
 };
 
@@ -73,12 +73,18 @@ const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
     if (exitTimer.current) clearTimeout(exitTimer.current);
   }, []);
 
+  // El auto-cierre se pausa mientras el puntero o el foco están dentro: un
+  // aviso con "Deshacer" no puede desaparecer mientras alguien va a pulsarlo,
+  // y a quien navega con teclado le da el tiempo que necesite (WCAG 2.2.1).
+  const [isPaused, setIsPaused] = useState(false);
+
   useEffect(() => {
+    if (isPaused) return;
     if (toastData.duration > 0 && ['success', 'info'].includes(toastData.type)) {
       const timer = setTimeout(handleDismiss, toastData.duration);
       return () => clearTimeout(timer);
     }
-  }, [toastData.duration, toastData.type, handleDismiss]);
+  }, [toastData.duration, toastData.type, handleDismiss, isPaused]);
 
   return (
     <div
@@ -92,6 +98,12 @@ const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setIsPaused(false);
+      }}
     >
       <div className={TOAST_STYLES.content}>
         <div className={TOAST_STYLES.textContainer}>
@@ -106,17 +118,19 @@ const ToastItem = ({ toast: toastData, onDismiss }: ToastItemProps) => {
         </div>
         
         <button
+          type="button"
           onClick={handleDismiss}
           className={TOAST_STYLES.closeButton}
           aria-label="Cerrar notificación"
         >
-          <FiX className="w-5 h-5" />
+          <FiX className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
 
       {toastData.action && (
         <div className={TOAST_STYLES.action}>
           <button
+            type="button"
             onClick={() => {
               toastData.action?.onClick();
               handleDismiss();

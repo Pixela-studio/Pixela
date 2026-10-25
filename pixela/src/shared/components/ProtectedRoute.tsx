@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 const STYLES = {
-  loadingContainer: "min-h-screen bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] flex flex-col items-center justify-center pt-20",
+  loadingContainer: "min-h-screen bg-gradient-to-br from-pixela-ink via-pixela-dark to-pixela-ink flex flex-col items-center justify-center pt-20",
   loadingContent: "text-center",
   loadingSpinner: "animate-spin rounded-full h-12 w-12 border-b-2 border-pixela-accent mx-auto mb-4",
   loadingText: "text-gray-300"

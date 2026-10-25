@@ -16,8 +16,8 @@ const STYLES = {
     card: 'w-full flex flex-col relative group overflow-hidden animate-pulse',
 
     // Contenedor del poster y efectos visuales con diseño Pixela
-    posterContainer: 'relative w-full aspect-[2/3] overflow-hidden rounded-lg bg-gradient-to-br from-pixela-dark/40 via-pixela-accent/5 to-pixela-dark/50',
-    shimmer: 'absolute inset-0 bg-gradient-to-r from-transparent via-pixela-accent/15 to-transparent animate-shimmer',
+    posterContainer: 'relative w-full aspect-[2/3] overflow-hidden rounded-lg bg-white/[0.06]',
+    shimmer: 'absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer',
     noiseEffect: 'noise-effect opacity-3',
 
     // Overlay y contenido superpuesto con colores Pixela
@@ -31,9 +31,9 @@ const STYLES = {
     titleLong: 'w-full',
     
     details: 'flex items-center gap-2 mt-2',
-    rating: 'h-3 w-8 md:h-4 md:w-10 bg-pixela-accent/30 rounded animate-pulse',
+    rating: 'h-3 w-8 md:h-4 md:w-10 bg-white/[0.06] rounded animate-pulse',
     year: 'h-3 w-8 md:h-4 md:w-10 bg-pixela-light/15 rounded animate-pulse',
-    type: 'h-3 w-12 md:h-4 md:w-16 bg-pink-400/20 rounded animate-pulse',
+    type: 'h-3 w-12 md:h-4 md:w-16 bg-white/[0.06] rounded animate-pulse',
     
     // Pulsos variados para elementos
     pulse: 'animate-pulse',

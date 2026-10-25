@@ -8,27 +8,27 @@ import { InputFieldProps } from '@/features/profile/types/form';
  */
 const STYLES = {
   container: 'relative w-full mb-1.5',
-  label: 'block text-sm text-gray-400 mb-0.5 font-outfit font-medium',
-  iconContainer: 'absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-base pointer-events-none',
-  input: (hasError: boolean) => clsx(
-    'w-full py-4 px-4 pl-12',
-    'bg-black/30 border rounded-xl',
-    'text-white text-base',
-    'placeholder:text-white/30',
-    'transition-all duration-200',
-    'focus:outline-none focus:shadow-none',
-    hasError 
-      ? 'border-pixela-accent/50 focus:border-pixela-accent/50'
-      : 'border-white/10 focus:border-pixela-accent/50'
+  label: 'block mb-1.5 text-sm font-medium text-white/70',
+  iconContainer: 'absolute left-4 top-1/2 -translate-y-1/2 text-pixela-accent text-base pointer-events-none',
+  // Mismo patrón que el input de login (DESIGN.md › Inputs): `surface`, borde
+  // `white/10`, foco con borde de acento más anillo `focus-visible`.
+  input: (hasError: boolean, hasToggle: boolean) => clsx(
+    'w-full h-12 rounded-full border bg-pixela-surface pl-12 text-base text-white',
+    hasToggle ? 'pr-12' : 'pr-6',
+    'placeholder:text-white/40',
+    'transition-[border-color,box-shadow] duration-200 ease-out-expo',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent/30',
+    hasError
+      ? 'border-red-500/60 hover:border-red-500/80 focus:border-red-500'
+      : 'border-white/10 hover:border-white/20 focus:border-pixela-accent/60'
   ),
-  errorMessage: 'text-pixela-accent text-xs mt-0.5',
-  helperText: 'mt-1.5 mb-1 text-[0.75rem] italic font-light text-gray-400/70 pl-0.5 leading-relaxed',
+  errorMessage: 'mt-1.5 text-sm text-red-400',
+  helperText: 'mt-1.5 text-xs text-white/55 leading-relaxed',
   passwordContainer: 'relative',
   eyeButton: clsx(
     'absolute right-3 top-1/2 -translate-y-1/2',
-    'text-gray-400 hover:text-pixela-accent transition-colors',
-    'cursor-pointer z-10 p-1 rounded',
-    'hover:bg-gray-700/20'
+    'rounded-full p-2 text-white/55 transition-colors duration-200 hover:text-pixela-accent',
+    'cursor-pointer z-10'
   ),
   eyeIcon: 'w-4 h-4'
 } as const;
@@ -53,6 +53,10 @@ export const InputField = ({
   const isPasswordField = type === 'password';
   const inputType = isPasswordField && showPassword ? 'text' : type;
 
+  const errorId = `${name}-error`;
+  const helperId = `${name}-helper`;
+  const describedBy = error ? errorId : helperText ? helperId : undefined;
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -63,14 +67,16 @@ export const InputField = ({
         {labelText}
       </label>
       <div className={isPasswordField ? STYLES.passwordContainer : 'relative'}>
-        <div className={STYLES.iconContainer}>
+        <div className={STYLES.iconContainer} aria-hidden="true">
           {icon}
         </div>
         <input
           id={name}
           type={inputType}
           placeholder={placeholder}
-          className={STYLES.input(!!error)}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
+          className={STYLES.input(!!error, isPasswordField)}
           {...register}
         />
         {isPasswordField && (
@@ -81,20 +87,20 @@ export const InputField = ({
             aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
           >
             {showPassword ? (
-              <FiEyeOff className={STYLES.eyeIcon} />
+              <FiEyeOff className={STYLES.eyeIcon} aria-hidden="true" />
             ) : (
-              <FiEye className={STYLES.eyeIcon} />
+              <FiEye className={STYLES.eyeIcon} aria-hidden="true" />
             )}
           </button>
         )}
       </div>
       {error && (
-        <p className={STYLES.errorMessage}>
+        <p id={errorId} role="alert" className={STYLES.errorMessage}>
           {error.message || "Este campo es requerido"}
         </p>
       )}
       {helperText && !error && (
-        <p className={STYLES.helperText}>
+        <p id={helperId} className={STYLES.helperText}>
           {helperText}
         </p>
       )}

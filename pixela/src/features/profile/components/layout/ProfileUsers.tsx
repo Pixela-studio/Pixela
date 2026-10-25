@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import type { User } from "@/api/users/types";
 import { usersAPI } from "@/api/users/users";
 import { useAsyncResource } from "@/hooks/useAsyncResource";
@@ -33,11 +34,11 @@ const STYLES = {
   // Estado vacío
   emptyContainer: "flex flex-col items-center justify-center p-8 text-gray-400",
   emptyIcon: "w-12 h-12 mb-4",
-  emptyText: "text-lg font-outfit",
+  emptyText: "text-lg",
 
   // Item de usuario
   userItem:
-    "flex items-center bg-pixela-dark-opacity/50 pt-2 px-4 rounded gap-4",
+    "flex items-center bg-dark-opacity pt-2 px-4 rounded gap-4",
   avatarContainer: "min-w-[32px] max-w-[32px] flex justify-center",
   contentContainer: "flex flex-col justify-center flex-2 pl-5",
 
@@ -45,20 +46,22 @@ const STYLES = {
   editForm:
     "grid grid-cols-1 sm:grid-cols-3 gap-4 gap-y-2 w-full max-w-lg mx-auto mb-8",
   formGroup: "flex flex-col",
-  label: "text-xs text-gray-400 mb-1 block",
+  label: "mb-1 block pl-4 text-xs font-medium text-white/70",
 
   // Inputs y controles
+  // Patrón de input de DESIGN.md en tamaño compacto: `surface`, borde
+  // `white/10`, foco con borde de acento y anillo `focus-visible`.
   input: clsx(
-    "w-full bg-[#1a1a1a]/70 border border-transparent rounded-md",
-    "px-3 py-1.5 text-white text-sm",
-    "focus:outline-none focus:border-[#ec1b69]/40 focus:bg-[#1a1a1a]/80",
-    "transition-all duration-200 placeholder:text-gray-500/40",
+    "w-full h-10 rounded-full border border-white/10 bg-pixela-surface px-4 text-sm text-white",
+    "placeholder:text-white/40 hover:border-white/20 focus:border-pixela-accent/60",
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent/30",
+    "transition-[border-color,box-shadow] duration-200 ease-out-expo",
   ),
   select: clsx(
-    "w-full bg-[#1a1a1a]/70 border border-transparent rounded-md",
-    "px-3 py-1.5 text-white text-sm",
-    "focus:outline-none focus:border-[#ec1b69]/40 focus:bg-[#1a1a1a]/80",
-    "transition-all duration-200 appearance-none cursor-pointer",
+    "w-full h-10 rounded-full border border-white/10 bg-pixela-surface pl-4 pr-10 text-sm text-white",
+    "hover:border-white/20 focus:border-pixela-accent/60",
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent/30",
+    "transition-[border-color,box-shadow] duration-200 ease-out-expo appearance-none cursor-pointer",
   ),
   selectIcon: {
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ec1b69' stroke-opacity='0.4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
@@ -74,8 +77,8 @@ const STYLES = {
     clsx(
       "text-xs py-1 px-3 rounded-md w-fit font-medium mt-1",
       isAdmin
-        ? "bg-[#ec1b69]/10 text-[#ec1b69] border border-[#ec1b69]/20"
-        : "bg-gray-800/60 text-gray-400 border border-gray-700/50",
+        ? "bg-pixela-accent/10 text-pixela-accent border border-pixela-accent/20"
+        : "bg-pixela-raised/60 text-gray-400 border border-white/10",
     ),
 
   // Acciones
@@ -115,6 +118,8 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  /** Usuario pendiente de confirmar su borrado. */
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   /**
    * Maneja la eliminación de un usuario
@@ -124,8 +129,10 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
     setDeletingId(userId);
     try {
       await usersAPI.delete(userId);
+      setUserToDelete(null);
       await reloadUsers();
     } catch {
+      setUserToDelete(null);
       setError(ERROR_MESSAGES.DELETE);
     } finally {
       setDeletingId(null);
@@ -192,7 +199,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
 
   if (error) {
     return (
-      <div className={STYLES.errorContainer}>
+      <div role="alert" className={STYLES.errorContainer}>
         <FiAlertCircle className={STYLES.errorIcon} />
         <span>{error}</span>
       </div>
@@ -213,7 +220,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
       {users.map((user) => (
         <div
           key={user.user_id}
-          className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/5 transition-all hover:bg-white/10 hover:border-white/10"
+          className="bg-white/5 rounded-2xl p-4 border border-white/5 transition-colors duration-200 hover:bg-white/10 hover:border-white/10"
         >
           <div className="flex flex-col md:flex-row items-center gap-4">
             {/* Avatar - Siempre visible */}
@@ -231,39 +238,43 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
               {editingId === user.user_id ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 animate-fade-in">
                   <div>
-                    <label className="text-xs text-gray-400 mb-1 block">
+                    <label htmlFor={`user-${user.user_id}-name`} className={STYLES.label}>
                       Nombre
                     </label>
                     <input
+                      id={`user-${user.user_id}-name`}
                       type="text"
                       value={editingUser?.name || ""}
                       onChange={(e) => handleEditChange("name", e.target.value)}
-                      className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm text-white focus:border-pixela-accent focus:outline-none"
+                      className={STYLES.input}
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-400 mb-1 block">
+                    <label htmlFor={`user-${user.user_id}-email`} className={STYLES.label}>
                       Email
                     </label>
                     <input
+                      id={`user-${user.user_id}-email`}
                       type="email"
                       value={editingUser?.email || ""}
                       onChange={(e) =>
                         handleEditChange("email", e.target.value)
                       }
-                      className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm text-white focus:border-pixela-accent focus:outline-none"
+                      className={STYLES.input}
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-400 mb-1 block">
+                    <label htmlFor={`user-${user.user_id}-role`} className={STYLES.label}>
                       Rol
                     </label>
                     <select
+                      id={`user-${user.user_id}-role`}
                       value={editingUser?.is_admin ? "true" : "false"}
                       onChange={(e) =>
                         handleEditChange("is_admin", e.target.value === "true")
                       }
-                      className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm text-white focus:border-pixela-accent focus:outline-none appearance-none"
+                      className={STYLES.select}
+                      style={STYLES.selectIcon}
                     >
                       <option value="true">Administrador</option>
                       <option value="false">Usuario</option>
@@ -281,7 +292,7 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
                   <div className="flex items-center justify-center md:justify-end gap-3">
                     <span
                       className={clsx(
-                        "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide border",
+                        "px-3 py-1 rounded-full text-xs font-semibold border",
                         user.is_admin
                           ? "bg-pixela-accent/10 border-pixela-accent/30 text-pixela-accent"
                           : "bg-white/5 border-white/10 text-gray-400",
@@ -299,35 +310,43 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
               {editingId === user.user_id ? (
                 <>
                   <button
+                    type="button"
                     onClick={() => handleSaveEdit()}
-                    className="p-2 bg-green-500/10 text-green-500 rounded hover:bg-green-500/20 transition-colors"
+                    aria-label={`Guardar los cambios de ${user.name}`}
+                    className="rounded-full p-2 bg-emerald-400/10 text-emerald-400 hover:bg-emerald-400/20 transition-colors duration-200"
                   >
-                    <FiCheck className="w-5 h-5" />
+                    <FiCheck className="w-5 h-5" aria-hidden="true" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleCancelEdit()}
-                    className="p-2 bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors"
+                    aria-label={`Descartar los cambios de ${user.name}`}
+                    className="rounded-full p-2 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors duration-200"
                   >
-                    <FiX className="w-5 h-5" />
+                    <FiX className="w-5 h-5" aria-hidden="true" />
                   </button>
                 </>
               ) : (
                 <>
                   <button
+                    type="button"
                     onClick={() => handleStartEdit(user)}
-                    className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors group"
+                    aria-label={`Editar a ${user.name}`}
+                    className="rounded-full p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-200"
                   >
-                    <FiEdit className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <FiEdit className="w-5 h-5" aria-hidden="true" />
                   </button>
                   <button
-                    onClick={() => handleDelete(user.user_id)}
+                    type="button"
+                    onClick={() => setUserToDelete(user)}
                     disabled={deletingId === user.user_id}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors group"
+                    aria-label={`Borrar a ${user.name}`}
+                    className="rounded-full p-2 text-white/70 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200"
                   >
                     {deletingId === user.user_id ? (
-                      <FiLoader className="w-5 h-5 animate-spin" />
+                      <FiLoader className="w-5 h-5 animate-spin" aria-hidden="true" />
                     ) : (
-                      <FaTrash className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      <FaTrash className="w-5 h-5" aria-hidden="true" />
                     )}
                   </button>
                 </>
@@ -336,6 +355,20 @@ export const ProfileUsers = ({ refresh, onUserUpdated }: ProfileUsersProps) => {
           </div>
         </div>
       ))}
+
+      {/* Confirmación y no "deshacer": borrar una cuenta arrastra sus reseñas,
+          favoritos y biblioteca, y afecta a otra persona. */}
+      <ConfirmDialog
+        isOpen={userToDelete !== null}
+        title={`¿Borrar a ${userToDelete?.name ?? "este usuario"}?`}
+        description="Se borrarán su cuenta, sus reseñas, sus favoritos y su biblioteca. No se puede deshacer."
+        confirmLabel="Borrar usuario"
+        busy={userToDelete !== null && deletingId === userToDelete.user_id}
+        onConfirm={() => {
+          if (userToDelete) void handleDelete(userToDelete.user_id);
+        }}
+        onCancel={() => setUserToDelete(null)}
+      />
     </div>
   );
 };

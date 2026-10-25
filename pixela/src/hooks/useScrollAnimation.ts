@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { prefersReducedMotion } from '@/lib/motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,6 +54,13 @@ export const useScrollAnimation = ({
 
     // Configurar estado inicial de todos los elementos
     const allRefs = validElements.map(element => element.ref.current);
+
+    // Con movimiento reducido el contenido se muestra tal cual, sin entrada.
+    if (prefersReducedMotion()) {
+      gsap.set(allRefs, { clearProps: 'opacity,visibility,transform' });
+      return;
+    }
+
     gsap.set(allRefs, { autoAlpha: 0, y: initialY });
 
     // Crear timeline principal
@@ -78,8 +86,12 @@ export const useScrollAnimation = ({
       };
 
       if (element.stagger) {
-        // Si tiene stagger, animar los hijos del elemento
-        const children = gsap.utils.toArray(elementRef.children);
+        // Con stagger se animan los hijos: el contenedor se muestra ya (si no,
+        // se quedaba en opacidad 0 para siempre) y son los hijos los que parten
+        // ocultos.
+        const children = gsap.utils.toArray<HTMLElement>(elementRef.children);
+        gsap.set(elementRef, { autoAlpha: 1, y: 0 });
+        gsap.set(children, { autoAlpha: 0, y: initialY });
         tl.to(children, config, element.delay || (index === 0 ? 0 : "-=0.3"));
       } else {
         // Animar el elemento directamente

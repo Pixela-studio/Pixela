@@ -28,8 +28,8 @@ const STATUS_FILTERS = [
 
 const STATUS_COLORS = {
   [WatchStatus.PLAN_TO_WATCH]:
-    "bg-blue-500/20 text-blue-400 border-blue-500/50",
-  [WatchStatus.WATCHING]: "bg-green-500/20 text-green-400 border-green-500/50",
+    "bg-white/10 text-white/85 border-white/20",
+  [WatchStatus.WATCHING]: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
   [WatchStatus.COMPLETED]:
     "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
   [WatchStatus.DROPPED]: "bg-red-500/20 text-red-400 border-red-500/50",
@@ -97,10 +97,10 @@ export const ProfileLibrary = () => {
                 aria-selected={isActive}
                 onClick={() => setActiveFilter(filter.id)}
                 className={clsx(
-                  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]",
+                  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition duration-300",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
                   isActive
-                    ? "border-pixela-accent bg-pixela-accent text-white"
+                    ? "border-white bg-white text-pixela-dark"
                     : "border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white",
                   count === 0 && !isActive && "opacity-50",
                 )}
@@ -141,11 +141,14 @@ export const ProfileLibrary = () => {
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-[#1A1A1A] border border-white/5 transition-all hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
+                className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-pixela-surface border border-white/5 transition-[transform,border-color,box-shadow] duration-300 ease-out-expo hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
               >
                 <Link
                   href={`/${item.item_type === "movie" ? "movies" : "series"}/${item.tmdb_id}`}
-                  className="block w-full h-full relative"
+                  aria-label={`${item.title} (${STATUS_FILTERS.find((f) => f.id === item.status)?.label ?? item.status})`}
+                  // El contenedor recorta (overflow-hidden), así que el anillo
+                  // de foco se pinta por dentro en un ::after.
+                  className="relative block w-full h-full rounded-[inherit] after:pointer-events-none after:absolute after:inset-0 after:z-30 after:rounded-[inherit] after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-pixela-accent"
                   prefetch={false}
                 >
                   {item.poster_path ? (
@@ -157,7 +160,7 @@ export const ProfileLibrary = () => {
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-800 text-gray-500 text-xs text-center p-2">
+                    <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-gray-400 text-xs text-center p-2">
                       Sin imagen
                     </div>
                   )}
@@ -166,7 +169,7 @@ export const ProfileLibrary = () => {
                   <div className="absolute top-2 right-2 z-10">
                     <span
                       className={clsx(
-                        "px-2 py-0.5 rounded-md text-[10px] font-bold uppercase backdrop-blur-md border shadow-sm",
+                        "px-2 py-0.5 rounded-md text-[10px] font-bold border shadow-sm",
                         STATUS_COLORS[item.status],
                       )}
                     >
@@ -175,7 +178,7 @@ export const ProfileLibrary = () => {
                   </div>
 
                   {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity duration-300 ease-out-expo flex flex-col justify-end p-3">
                     <h3 className="text-white text-sm font-bold line-clamp-2 leading-tight mb-1">
                       {item.title}
                     </h3>

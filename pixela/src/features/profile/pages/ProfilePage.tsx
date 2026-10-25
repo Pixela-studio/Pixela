@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { UserResponse } from "@/api/auth/types";
 import { authAPI } from "@/api/auth/auth";
 import { ProfileError } from "@/features/profile/components";
@@ -48,14 +48,22 @@ export default function ProfilePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading)
-    return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
-        <FiLoader className="w-10 h-10 text-pixela-accent animate-spin" />
-      </div>
-    );
+  const loader = (
+    <div className="min-h-screen bg-pixela-ink flex items-center justify-center">
+      <FiLoader className="w-10 h-10 text-pixela-accent animate-spin" />
+    </div>
+  );
+
+  if (loading) return loader;
   if (error) return <ProfileError message={error || "Error desconocido"} />;
   if (!user) return <ProfileError message="No hay datos" />;
 
-  return <ProfileClient user={user} />;
+  // ProfileClient lee `?tab=` con useSearchParams; el App Router exige un
+  // límite de Suspense alrededor para no forzar el renderizado en cliente de
+  // toda la ruta.
+  return (
+    <Suspense fallback={loader}>
+      <ProfileClient user={user} />
+    </Suspense>
+  );
 }

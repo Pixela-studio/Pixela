@@ -2,47 +2,154 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Pixela solo tiene tema oscuro: la "sala de proyección" de DESIGN.md.
+ * Antes había variables de modo claro que, en un sistema en modo claro,
+ * dejaban el color de texto heredado en #171717 sobre fondo oscuro, y un
+ * bloque `@theme inline` de Tailwind 4 que Tailwind 3 ignoraba.
+ */
+:root {
+  color-scheme: dark;
+  --pixela-accent: #ec1b69;
+  --pixela-screen: #0d0a08;
+  --pixela-raised: #241e19;
+  --pixela-light: #f4ede2;
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Grano de película compartido por la capa global y `.noise-effect`. */
+  --film-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.95 0 0 0 0 0.88 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
 html {
   scroll-behavior: smooth;
+  /* Sin el destello gris que pintan iOS y Android al tocar: cada control
+     tiene su propio :active. Y sin inflar el texto en horizontal. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  background: var(--pixela-screen);
+  scrollbar-color: var(--pixela-raised) var(--pixela-screen);
+}
+
+body {
+  caret-color: var(--pixela-accent);
+  font-feature-settings: "kern", "liga";
+}
+
+/*
+ * Grano de película sobre toda la app, como el de una copia proyectada.
+ * Capa fija sin blend mode (solo opacidad), así que se compone en GPU y no
+ * repinta al hacer scroll.
+ */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: var(--film-grain);
+  background-size: 220px;
+}
+
+/* Los títulos en Bodoni: ligaduras y cifras de estilo antiguo, como en un cartón. */
+.font-display {
+  font-feature-settings: "kern", "liga", "onum";
+  font-optical-sizing: auto;
+}
+
+/* Los controles responden al instante (sin la espera del doble toque) y una
+   pulsación larga no selecciona su texto. El contenido sigue seleccionable. */
+button,
+a,
+[role="button"],
+[role="tab"] {
+  touch-action: manipulation;
+}
+
+button,
+[role="button"],
+[role="tab"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+::selection {
+  background: rgb(236 27 105 / 0.4);
+  color: #fff;
 }
 
 /* Sitewide focus-visible ring. Base rule for anything the browser
    considers keyboard-focused. Individual components can override with
    Tailwind focus-visible: utilities if they need a bespoke look. */
 :focus-visible {
-  outline: 2px solid #ec1b69;
+  outline: 2px solid var(--pixela-accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Botones. Única fuente de verdad para cualquier botón o enlace con forma de
+ * botón (ver DESIGN.md › Components › Buttons). Había once variantes de
+ * primario escritas a mano, con radios de 4 px a 49 px.
+ */
+@layer components {
+  .btn {
+    @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-6 text-base font-semibold;
+    font-stretch: 112%;
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-duration: 200ms;
+    transition-timing-function: var(--ease-out-expo);
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-outfit: var(--font-outfit);
-  --font-roboto: var(--font-roboto);
-}
+  .btn-sm {
+    @apply h-10 px-5 text-sm;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    @apply pointer-events-none opacity-50;
+  }
+
+  /* Rótulo de crédito: marfil de proyector con texto negro de sala y la
+     esquina casi recta de los pósters. El rosa se queda en el foco, el enlace
+     activo y las insignias. */
+  .btn-primary {
+    @apply bg-white text-pixela-dark hover:bg-white/85 active:scale-[0.97];
+  }
+
+  .btn-ghost {
+    @apply border border-white/20 bg-transparent text-white hover:border-white/45 hover:bg-white/[0.04] active:scale-[0.97];
+  }
+
+  /* Títulos de sección: Bodoni a escala de cartón. */
+  .title-card {
+    @apply font-display font-normal leading-[0.9] tracking-[-0.035em] text-white;
+  }
+
+  /* Metadatos y navegación: Archivo algo expandida. */
+  .meta-text {
+    font-stretch: 112%;
+    @apply text-[15px] font-medium text-gray-400;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    var(--font-sans),
-    system-ui,
-    -apple-system,
-    sans-serif;
+/*
+ * Movimiento reducido. Se acorta en vez de anular: varias entradas parten de
+ * `opacity-0` con `animation-fill-mode: forwards`, y `animation: none` las
+ * dejaría invisibles para siempre.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Clase para añadir efecto de ruido de película */
@@ -52,10 +159,28 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.04;
+  opacity: 0.08;
   z-index: 1;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='5' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: var(--film-grain);
+  background-size: 220px;
   pointer-events: none;
+}
+
+/*
+ * Fundido a negro entre vistas: `app/template.tsx` se vuelve a montar en cada
+ * navegación y su contenido entra desde negro. Solo opacidad (composición).
+ */
+@keyframes fade-from-black {
+  from {
+    opacity: 0;
+  }
+}
+
+/* `backwards` y no `both`: al terminar no deja la animación aplicada, porque
+   una opacidad animada crea un contexto de apilamiento que encerraría los
+   modales de la página por debajo de la navbar. */
+.page-fade {
+  animation: fade-from-black 420ms var(--ease-out-expo) backwards;
 }
 
 /* Animación de shimmer para skeleton loading */
@@ -73,7 +198,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(236, 27, 105, 0.1) 50%,
+    rgba(255, 255, 255, 0.06) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
@@ -107,22 +232,6 @@ body {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
-}
-
-.animation-delay-200 {
-  animation-delay: 200ms;
-}
-
-.animation-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animation-delay-600 {
-  animation-delay: 600ms;
-}
-
-.animation-delay-800 {
-  animation-delay: 800ms;
 }
 
 /* Toast Animations */
@@ -163,21 +272,4 @@ body {
   -webkit-touch-callout: none;
   -khtml-user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-/* Animación de pulso para los botones de embla carrusel */
-@keyframes embla-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(236, 27, 105, 0.5);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(236, 27, 105, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(236, 27, 105, 0);
-  }
-}
-
-.embla-btn-pulse {
-  animation: embla-pulse 2s infinite;
 }

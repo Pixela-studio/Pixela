@@ -8,25 +8,25 @@ import { HeroImage } from "@/features/hero/types/content";
 const STYLES = {
   progress: {
     container:
-      "absolute bottom-6 sm:bottom-14 md:bottom-20 lg:bottom-28 2k:bottom-16 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-xl px-4 lg:px-0 [@media(max-height:500px)_and_(orientation:landscape)]:bottom-2",
-    content: "flex flex-col items-center gap-3 sm:gap-3 md:gap-3 lg:gap-4",
+      "absolute bottom-6 sm:bottom-10 lg:bottom-14 2k:bottom-12 inset-x-0 z-20 px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 ls:bottom-2",
+    content: "flex flex-col gap-3 lg:gap-4 max-w-xl",
     controls: "flex items-center justify-between w-full",
     counter:
-      "text-pixela-light/70 text-xs sm:text-xs md:text-sm lg:text-sm font-medium",
+      "text-white/70 text-sm font-medium tabular-nums [font-stretch:112%]",
   },
   bar: {
-    container: "w-full h-1 bg-pixela-light/20 rounded-full overflow-hidden",
-    fill: "h-full bg-pixela-accent",
+    container: "w-full h-0.5 bg-white/15 overflow-hidden",
+    fill: "h-full bg-white",
   },
   dot: {
-    base: "h-2 rounded-full transition-all duration-300",
-    active: "bg-pixela-accent w-4 sm:w-4 md:w-5 lg:w-6",
-    inactive: "bg-pixela-light/50 w-2 hover:bg-pixela-light/70",
+    base: "h-2 rounded-full transition-[width,background-color] duration-300 ease-out-expo",
+    active: "bg-white w-6",
+    inactive: "bg-white/35 w-2 hover:bg-white/60",
   },
   playback: {
     button:
-      "p-1 sm:p-1 md:p-1.5 lg:p-2 rounded-full bg-pixela-dark/40 backdrop-blur-sm text-pixela-light hover:text-pixela-accent hover:bg-pixela-dark/60 transition-all duration-300",
-    icon: "h-3 w-3 sm:h-3 sm:w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4",
+      "grid h-9 w-9 place-items-center rounded-full bg-white/[0.08] text-white hover:bg-white/[0.16] active:scale-[0.97] transition duration-200",
+    icon: "h-4 w-4",
   },
 } as const;
 

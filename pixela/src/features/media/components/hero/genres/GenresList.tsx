@@ -1,19 +1,13 @@
 import { GenresListProps } from '@/features/media/types/genres';
 
+/*
+ * Los géneros como texto en la línea de metadatos ("Drama, Crimen"). Eran
+ * píldoras rojas (red-600), un color fuera de la paleta que competía con el
+ * rosa de las acciones.
+ */
 const STYLES = {
-  container: "flex flex-wrap gap-2 mb-4",
-  genreBadge: "bg-red-600/20 text-red-400 px-3 py-1 rounded-full text-sm font-medium hover:bg-red-600/30 transition duration-300 shadow-sm shadow-red-950/30"
+  genres: "text-[15px] [font-stretch:112%] text-gray-400",
 } as const;
 
-export const GenresList = ({ genres }: GenresListProps) => (
-  <div className={STYLES.container}>
-    {genres.map((genre, index) => (
-      <span 
-        key={index}
-        className={STYLES.genreBadge}
-      >
-        {genre}
-      </span>
-    ))}
-  </div>
-); 
+export const GenresList = ({ genres }: GenresListProps) =>
+  genres.length > 0 ? <p className={STYLES.genres}>{genres.join(", ")}</p> : null;

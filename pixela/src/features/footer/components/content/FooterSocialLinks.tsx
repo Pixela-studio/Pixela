@@ -1,51 +1,38 @@
-'use client';
+import { FaGithub } from 'react-icons/fa';
+import { FiArrowUpRight } from 'react-icons/fi';
 
-import Link from 'next/link';
-import { FaInstagram, FaLinkedin, FaGithub } from 'react-icons/fa';
+/*
+ * Antes enlazaba a instagram.com/pixela, linkedin.com/company/pixela y
+ * github.com/pixela: tres cuentas que no son del proyecto. Queda el único
+ * canal real, el repositorio.
+ */
+const REPO_URL = 'https://github.com/Pixela-studio/Pixela';
 
 const STYLES = {
-  // Layout y estructura
   container: "w-full flex flex-col space-y-4 md:space-y-5 ipad:space-y-4",
-  socialList: "flex gap-4 md:gap-5 ipad:gap-4",
-
-  // Título y decoración
-  title: "text-white font-bold text-base md:text-lg relative inline-block ipad:text-base",
-  titleUnderline: "absolute -bottom-1 left-0 w-8 h-0.5 bg-[#EC1B69]/50 rounded-full",
-
-  // Enlaces sociales
-  socialLink: "group p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#EC1B69]/30 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 backdrop-blur-sm shadow-lg shadow-black/20 hover:shadow-[#EC1B69]/10 ipad:p-2.5",
-  socialIcon: "text-white/70 group-hover:text-[#EC1B69] transition-colors duration-300 text-lg md:text-xl ipad:text-lg",
+  title: "text-white font-semibold text-base",
+  link: "group inline-flex w-fit items-center gap-3 whitespace-nowrap rounded-full border border-white/10 bg-white/5 py-2.5 pl-3 pr-4 text-sm font-medium text-white/80 transition-colors duration-300 hover:border-pixela-accent/40 hover:text-white",
+  icon: "h-5 w-5 text-white/70 transition-colors duration-300 group-hover:text-pixela-accent",
+  arrow: "h-4 w-4 transition-transform duration-300 ease-out-expo group-hover:-translate-y-0.5 group-hover:translate-x-0.5",
 } as const;
 
-const socialLinks = [
-  { name: 'Instagram', icon: FaInstagram, href: 'https://instagram.com/pixela' },
-  { name: 'LinkedIn', icon: FaLinkedin, href: 'https://linkedin.com/company/pixela' },
-  { name: 'GitHub', icon: FaGithub, href: 'https://github.com/pixela' },
-];
+export const FooterSocialLinks = () => (
+  <div className={STYLES.container}>
+    <h3 className={STYLES.title}>
+      El proyecto
+    </h3>
+    <a
+      href={REPO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={STYLES.link}
+    >
+      <FaGithub className={STYLES.icon} aria-hidden="true" />
+      Código en GitHub
+      <FiArrowUpRight className={STYLES.arrow} aria-hidden="true" />
+      <span className="sr-only">(se abre en una pestaña nueva)</span>
+    </a>
+  </div>
+);
 
-export const FooterSocialLinks = () => {
-  return (
-    <div className={STYLES.container}>
-      <h3 className={STYLES.title}>
-        Conecta con nosotros
-        <div className={STYLES.titleUnderline}></div>
-      </h3>
-      <div className={STYLES.socialList}>
-        {socialLinks.map((social, index) => (
-          <Link
-            key={index}
-            href={social.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={social.name}
-            className={STYLES.socialLink}
-          >
-            <social.icon className={STYLES.socialIcon} />
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-export default FooterSocialLinks; 
+export default FooterSocialLinks;

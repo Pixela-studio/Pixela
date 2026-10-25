@@ -71,7 +71,8 @@ export const DiscoverBackground = () => {
 
       {/* Overlays Lineales para asegurar la transición suave en los bordes extremos */}
       <div className="absolute inset-0 bg-gradient-to-b from-pixela-dark via-transparent to-pixela-dark pointer-events-none z-10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-pixela-dark/80 via-transparent to-pixela-dark/80 pointer-events-none z-10" />
+      {/* Velo más denso a la izquierda, donde va el texto. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-pixela-dark/95 via-pixela-dark/60 to-pixela-dark/40 pointer-events-none z-10" />
     </div>
   );
 };
@@ -141,7 +142,7 @@ const MarqueeContent = memo(
       {images.map((src, idx) => (
         <div
           key={`${src}-${idx}`}
-          className="relative w-[200px] h-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-2xl transition-all duration-500"
+          className="relative w-[200px] h-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-2xl transition duration-500"
         >
           <Image
             src={tmdbImageHelpers.poster(src) || TMDB_PLACEHOLDER.POSTER}

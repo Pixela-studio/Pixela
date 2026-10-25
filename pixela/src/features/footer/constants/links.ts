@@ -16,10 +16,13 @@ export const DISCOVER_LINKS: FooterLink[] = [
   { name: 'Sobre Nosotros', href: '/#about' }
 ];
 
-/** Accesos de cuenta. `/profile` redirige a `/login` si no hay sesión. */
+/**
+ * Accesos de cuenta. `/profile` redirige a `/login` si no hay sesión.
+ * `?tab=library` abre directamente la pestaña Biblioteca del perfil.
+ */
 export const ACCOUNT_LINKS: FooterLink[] = [
   { name: 'Mi perfil', href: '/profile' },
-  { name: 'Mi biblioteca', href: '/profile' },
+  { name: 'Mi biblioteca', href: '/profile?tab=library' },
   { name: 'Iniciar sesión', href: '/login' },
   { name: 'Crear cuenta', href: '/register' }
 ];

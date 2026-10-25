@@ -88,7 +88,13 @@ const nextConfig = {
      * cada visita: una petición al edge por fichero y por carga de página.
      */
     async headers() {
-        return [
+        /*
+         * Las cabeceras de caché largas solo en producción. En `next dev` los
+         * chunks no llevan el hash del contenido en el nombre, así que con
+         * `immutable` el navegador se quedaba con el JS de antes de cada
+         * edición y había que forzar la recarga a mano.
+         */
+        const cacheHeaders = process.env.NODE_ENV !== 'production' ? [] : [
             {
                 // Chunks y fuentes autohospedadas: el hash va en el nombre.
                 source: '/_next/static/:path*',
@@ -106,6 +112,10 @@ const nextConfig = {
                 source: '/:path*.:ext(txt|xml|webmanifest)',
                 headers: [{ key: 'Cache-Control', value: ONE_DAY_SWR }],
             },
+        ];
+
+        return [
+            ...cacheHeaders,
             {
                 /*
                  * La API interna no aporta nada a un buscador y sí atrae

@@ -11,7 +11,7 @@ const STYLES = {
     icon: 'w-5 h-5 text-pixela-accent',
     mainText: 'text-pixela-light/60 font-medium',
     secondaryText: 'text-pixela-light/60 text-sm',
-    searchBadge: 'px-2 py-1 bg-pixela-accent text-white rounded text-xs font-medium shadow-lg shadow-pixela-accent/20',
+    searchBadge: 'px-2 py-1 bg-pixela-accent text-pixela-dark rounded-sm text-xs font-semibold',
     pageInfo: 'text-pixela-light/60',
 } as const;
 

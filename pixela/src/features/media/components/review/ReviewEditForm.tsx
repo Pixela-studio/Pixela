@@ -1,23 +1,22 @@
 "use client";
 
+import { useId } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { FiStar } from 'react-icons/fi';
 import { ReviewEditFormProps } from '@/features/media/types/reviews';
+import { REVIEW_MAX_LENGTH } from '@/lib/constants/reviews';
+import { StarRatingInput } from '@/shared/components/StarRatingInput';
 
 const STYLES = {
   container: "mt-4 space-y-4",
-  stars: {
-    container: "flex items-center gap-2",
-    button: "text-2xl"
-  },
-  textarea: "w-full bg-[#1a1a1a]/70 border border-white/10 rounded-lg p-3 text-white resize-none min-h-[100px] focus:outline-none focus:border-pixela-accent/40",
+  label: "block mb-2 text-sm font-medium text-white/70",
+  // `focus:outline-none` con sustituto: borde de acento y anillo `focus-visible`.
+  textarea: "w-full bg-pixela-surface border border-white/10 rounded-2xl p-4 text-white placeholder:text-white/40 resize-none min-h-[100px] hover:border-white/20 focus:border-pixela-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-pixela-accent/30 transition-[border-color,box-shadow] duration-200 ease-out-expo",
   buttons: {
     container: "flex justify-end gap-2",
-    save: "px-4 py-2 text-sm bg-pixela-accent text-white rounded-lg hover:bg-pixela-accent/80 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
-    cancel: "px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors duration-200"
+    save: "btn btn-primary btn-sm",
+    cancel: "btn btn-ghost btn-sm"
   },
-  error: "text-sm italic text-pixela-accent",
-  ratingValue: "ml-2 text-xs text-yellow-400"
+  error: "text-sm text-red-400",
 } as const;
 
 interface EditFormData {
@@ -26,27 +25,8 @@ interface EditFormData {
 }
 
 /**
- * Componente que muestra la estrella de la reseña
- * @param {boolean} filled - Indica si la estrella está llena
- * @param {boolean} half - Indica si la estrella está media llena
- * @returns {JSX.Element} Componente de estrella de la reseña
- */
-const Star = ({ filled, half }: { filled: boolean; half?: boolean }) => (
-  <span className="relative inline-block w-6 h-6">
-    <FiStar className={`w-6 h-6 absolute top-0 left-0 ${filled ? 'text-yellow-400' : 'text-gray-400'}`} />
-    {half && (
-      <FiStar
-        className="absolute top-0 left-0 w-6 h-6 text-yellow-400"
-        style={{ clipPath: 'inset(0 50% 0 0)' }}
-      />
-    )}
-  </span>
-);
-
-/**
- * Componente que muestra el formulario de edición de una reseña
+ * Formulario de edición en línea de una reseña propia.
  * @param {ReviewEditFormProps} props - Propiedades del componente
- * @returns {JSX.Element} Componente de formulario de edición
  */
 export const ReviewEditForm = ({
   editText,
@@ -54,6 +34,8 @@ export const ReviewEditForm = ({
   onSave,
   onCancel
 }: ReviewEditFormProps) => {
+  const ratingLabelId = useId();
+  const textareaId = useId();
   const { register, handleSubmit, control, formState: { errors, isSubmitting, isValid } } = useForm<EditFormData>({
     defaultValues: {
       text: editText,
@@ -65,68 +47,55 @@ export const ReviewEditForm = ({
   const handleSave = (data: EditFormData) => {
     onSave(data.text, data.rating);
   };
-  
+
   return (
     <form onSubmit={handleSubmit(handleSave)} className={STYLES.container}>
-      <Controller
-        name="rating"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <div className={STYLES.stars.container}>
-            {[1, 2, 3, 4, 5].map((star) => {
-              const starValue = star * 2;
-              const isFull = value >= starValue;
-              const isHalf = value === starValue - 1;
-              return (
-                <span key={star} className="relative group">
-                  {/* Media estrella (izquierda) */}
-                  <button
-                    type="button"
-                    aria-label={`Puntuar con ${star - 0.5} estrellas`}
-                    className="absolute top-0 left-0 z-10 w-1/2 h-full"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => onChange(star * 2 - 1)}
-                  />
-                  {/* Estrella completa (derecha) */}
-                  <button
-                    type="button"
-                    aria-label={`Puntuar con ${star} estrellas`}
-                    className="absolute top-0 right-0 z-10 w-1/2 h-full"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => onChange(star * 2)}
-                  />
-                  <Star filled={isFull} half={isHalf} />
-                </span>
-              );
-            })}
-            <span className={STYLES.ratingValue}>
-              {(value / 2) % 1 === 0 ? (value / 2) : (value / 2).toFixed(1)}/5
-            </span>
-          </div>
+      <div>
+        <span id={ratingLabelId} className={STYLES.label}>Puntuación</span>
+        <Controller
+          name="rating"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <StarRatingInput value={value} onChange={onChange} labelledBy={ratingLabelId} />
+          )}
+        />
+      </div>
+      <div>
+        <label htmlFor={textareaId} className={STYLES.label}>Reseña</label>
+        <textarea
+          id={textareaId}
+          {...register('text', {
+            maxLength: {
+              value: REVIEW_MAX_LENGTH,
+              message: `La reseña no puede superar los ${REVIEW_MAX_LENGTH} caracteres.`,
+            },
+          })}
+          maxLength={REVIEW_MAX_LENGTH}
+          aria-invalid={errors.text ? true : undefined}
+          aria-describedby={errors.text ? `${textareaId}-error` : undefined}
+          className={STYLES.textarea}
+          placeholder="¿Qué te pareció?"
+        />
+        {errors.text && (
+          <p id={`${textareaId}-error`} role="alert" className={STYLES.error}>
+            {errors.text.message}
+          </p>
         )}
-      />
-      <textarea
-        {...register('text', {
-          maxLength: { value: 600, message: `La reseña no puede superar los 600 caracteres.` }
-        })}
-        className={STYLES.textarea}
-        placeholder="Escribe tu reseña..."
-      />
-      {errors.text && <p className={STYLES.error}>{errors.text.message}</p>}
+      </div>
       <div className={STYLES.buttons.container}>
-        <button
-          type="submit"
-          className={STYLES.buttons.save}
-          disabled={!isValid || isSubmitting}
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar'}
-        </button>
         <button
           type="button"
           onClick={onCancel}
           className={STYLES.buttons.cancel}
         >
           Cancelar
+        </button>
+        <button
+          type="submit"
+          className={STYLES.buttons.save}
+          disabled={!isValid || isSubmitting}
+        >
+          {isSubmitting ? 'Guardando…' : 'Guardar'}
         </button>
       </div>
     </form>

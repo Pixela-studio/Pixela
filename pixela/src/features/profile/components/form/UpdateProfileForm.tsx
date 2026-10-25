@@ -34,12 +34,7 @@ const STYLES = {
   // Acciones
   actions: "flex gap-3 mt-6 pt-6 border-t border-white/10",
   button: (variant: "submit" | "cancel") =>
-    clsx(
-      "flex-1 px-6 py-3 rounded-xl font-medium transition-all duration-200",
-      variant === "submit"
-        ? "bg-gradient-to-r from-pixela-accent to-pixela-accent/80 text-white hover:shadow-lg hover:shadow-pixela-accent/20"
-        : "bg-white/5 text-gray-300 hover:bg-white/10",
-    ),
+    clsx("btn flex-1", variant === "submit" ? "btn-primary" : "btn-ghost"),
 } as const;
 
 /**
@@ -171,7 +166,8 @@ export const UpdateProfileForm = ({
             <InputField
               type="text"
               name="name"
-              placeholder="Username"
+              labelText="Nombre"
+              placeholder="Tu nombre"
               register={register("name", {
                 required: "El nombre es requerido",
                 minLength: {
@@ -192,7 +188,8 @@ export const UpdateProfileForm = ({
             <InputField
               type="email"
               name="email"
-              placeholder="Email"
+              labelText="Email"
+              placeholder="tu@email.com"
               register={register("email", {
                 required: "El email es requerido",
                 pattern: {

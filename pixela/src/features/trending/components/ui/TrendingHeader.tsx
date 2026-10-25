@@ -9,29 +9,26 @@ import QuoteSection from "@/features/quotes/components/QuoteSection";
 import { MediaType } from "@/features/trending/types/common";
 import type { TrendingToggleProps } from "@/features/trending/types/components";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import {
+  HEADER_LAYOUT_STYLES,
+  HEADER_TOGGLE_STYLES,
+  HEADER_TYPOGRAPHY_STYLES,
+} from "@/shared/styles/headerStyles";
 
-// Constantes
+// Mismo contenedor y escala que Top Cartelera y Finde en casa
+// (`shared/styles/headerStyles`); Tendencias solo ocupa la pantalla entera.
 const STYLES = {
-  title:
-    "font-black font-outfit tracking-wider uppercase leading-none w-full md:w-auto text-left break-words",
-  titleMobile:
-    "block sm:hidden text-[64px] leading-[0.95] text-pixela-accent text-left pl-4",
-  titleDesktop:
-    "hidden sm:block text-[64px] md:text-[80px] lg:text-[80px] xl:text-[96px] 2xl:text-[112px] min-[1920px]:text-[128px] 2k:text-[100px] text-pixela-accent text-left pl-4 sm:pl-0 lg:whitespace-nowrap [@media(max-height:500px)_and_(orientation:landscape)]:text-[48px]",
-  container:
-    "relative w-full min-h-[100svh] 2k:min-h-[80vh] [@media(max-height:500px)_and_(orientation:landscape)]:min-h-0 bg-pixela-dark flex flex-col py-16 md:py-0 md:pt-20 2k:pt-12 [@media(max-height:500px)_and_(orientation:landscape)]:py-8",
-  content:
-    "flex-grow flex flex-col justify-center md:justify-start relative z-10 md:pb-0 2k:pb-8",
+  ...HEADER_TOGGLE_STYLES,
+  title: `${HEADER_TYPOGRAPHY_STYLES.title} text-left`,
+  subtitle: `${HEADER_LAYOUT_STYLES.subtitle}`,
+  container: HEADER_LAYOUT_STYLES.containerFullScreen,
+  content: HEADER_LAYOUT_STYLES.content,
   contentWrapper: "w-[90%] md:w-[85%] lg:w-[80%] 2k:w-[70%] mx-auto",
-  contentWrapperWithToggle:
-    "relative w-full bg-pixela-dark flex flex-col justify-center overflow-hidden items-stretch gap-8 px-4 mb-8 lg:w-[85%] xl:w-[80%] 2k:w-[70%] lg:mx-auto lg:flex-row lg:items-end lg:justify-between lg:gap-0 lg:px-0 lg:mb-12 lg:overflow-visible lg:bg-transparent lg:relative",
-  toggleContainer: "mb-12 md:mb-10 px-4 md:px-0",
-  toggleWrapper:
-    "flex bg-white/5 backdrop-blur-sm rounded-full p-1 border border-white/10 relative shadow-lg shadow-black/20 w-full sm:w-auto ipad:w-full",
+  contentWrapperWithToggle: HEADER_LAYOUT_STYLES.headerWrapper,
   loadingContainer:
     "relative w-full h-screen bg-pixela-dark flex flex-col justify-center",
   loadingCard:
-    "w-[280px] md:w-[375px] h-[395px] md:h-[528px] bg-gray-800 flex items-center justify-center",
+    "w-[160px] sm:w-[190px] md:w-[210px] xl:w-[230px] aspect-[2/3] bg-pixela-surface animate-pulse",
   loadingText: "text-pixela-light",
 } as const;
 
@@ -45,14 +42,10 @@ const BUTTON_OPTIONS = [
  * @returns {JSX.Element} Título estilizado
  */
 const TrendingTitle = memo(() => (
-  <h2 className={STYLES.title}>
-    <span className={STYLES.titleMobile}>
-      TEN-
-      <br />
-      DENCIAS
-    </span>
-    <span className={STYLES.titleDesktop}>TENDENCIAS</span>
-  </h2>
+  <div>
+    <h2 className={STYLES.title}>Tendencias</h2>
+    <p className={STYLES.subtitle}>Lo que más se está viendo esta semana.</p>
+  </div>
 ));
 
 TrendingTitle.displayName = "TrendingTitle";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import './error-styles.css';
+import { FiLogIn, FiArrowLeft } from 'react-icons/fi';
 import { STYLES } from './_styles';
 
 export default function Error403() {
@@ -21,12 +21,8 @@ export default function Error403() {
 
   return (
     <div className={STYLES.container}>
-      {/* Efectos decorativos de fondo */}
-      <div className={STYLES.decorative.glow}></div>
-      <div className={STYLES.decorative.glow2}></div>
-      
-      {/* Gradiente de fondo */}
-      <div className={STYLES.background.gradient}></div>
+      <div className={STYLES.noise} aria-hidden="true" />
+      <div className={STYLES.vignette} aria-hidden="true" />
       
       <div className={STYLES.content.wrapper}>
         {/* Código de error 403 */}
@@ -36,7 +32,7 @@ export default function Error403() {
         
         {/* Título */}
         <h2 className={STYLES.content.title}>
-          ¡Acceso Denegado!
+          Acceso denegado
         </h2>
         
         {/* Descripción */}
@@ -51,7 +47,7 @@ export default function Error403() {
             &ldquo;Necesitas mostrarme tus manos. Necesitas mostrarme tus manos ahora mismo&rdquo;
           </p>
           <cite className={STYLES.content.quote.attribution}>
-            - True Detective, acceso restringido
+            — True Detective, acceso restringido
           </cite>
         </blockquote>
         
@@ -61,14 +57,16 @@ export default function Error403() {
             onClick={handleLogin}
             className={STYLES.buttons.primary}
           >
-            🔐 Iniciar Sesión
+            <FiLogIn className={STYLES.buttons.icon} aria-hidden="true" />
+            Iniciar sesión
           </button>
           
           <button
             onClick={handleGoBack}
             className={STYLES.buttons.secondary}
           >
-            ← Volver Atrás
+            <FiArrowLeft className={STYLES.buttons.icon} aria-hidden="true" />
+            Volver atrás
           </button>
         </div>
       </div>

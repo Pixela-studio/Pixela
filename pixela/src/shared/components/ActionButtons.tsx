@@ -8,22 +8,22 @@ const STYLES = {
   container: 'absolute top-3 right-3 z-50',
   button: {
     primary: {
-      hero: 'flex items-center gap-2 bg-pixela-accent hover:bg-pixela-accent/90 text-white px-4 py-2 rounded-md transition-all duration-300 text-sm font-medium',
-      default: 'flex-1 bg-pixela-accent hover:bg-pixela-accent/90 text-pixela-light py-2.5 rounded flex items-center justify-center gap-2 font-medium transition-colors'
+      hero: 'btn btn-primary btn-sm',
+      default: 'btn btn-primary btn-sm flex-1'
     },
     secondary: {
-      hero: 'flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md backdrop-blur-sm transition-all duration-300 text-sm font-medium',
-      default: 'w-10 h-10 flex items-center justify-center bg-pixela-dark hover:bg-pixela-dark/80 rounded text-pixela-light transition-colors border border-pixela-accent/40'
+      hero: 'btn btn-ghost btn-sm',
+      default: 'btn btn-ghost btn-sm w-10 px-0'
     },
     favorite: {
-      active: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-lg bg-pixela-accent text-white hover:bg-pixela-accent/90',
-      inactive: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-lg bg-black/40 backdrop-blur-sm text-white hover:bg-black/50'
+      active: 'p-2.5 rounded-sm font-medium transition duration-300 flex items-center gap-2 bg-white text-pixela-dark hover:bg-white/85',
+      inactive: 'p-2.5 rounded-sm font-medium transition duration-300 flex items-center gap-2 bg-pixela-dark/80 text-white hover:bg-pixela-dark'
     }
   },
   icon: {
     hero: 'h-3 w-3',
     default: 'w-3.5 h-3.5',
-    favorite: 'w-4 h-4 transition-all duration-300'
+    favorite: 'w-4 h-4 transition-[color,transform] duration-300'
   }
 } as const;
 
@@ -36,6 +36,10 @@ interface ActionButtonsProps {
   followTitle?: string;
   tmdbId?: number;
   itemType?: 'movie' | 'series';
+  /** Título de la obra: entra en el nombre accesible del botón de favoritos. */
+  mediaTitle?: string;
+  /** Clases extra del contenedor (p. ej. la visibilidad hover/foco/táctil). */
+  className?: string;
 }
 
 /**
@@ -52,7 +56,9 @@ export const ActionButtons = ({
   variant = 'default',
   followTitle,
   tmdbId,
-  itemType
+  itemType,
+  mediaTitle,
+  className
 }: ActionButtonsProps) => {
   const { isFavorited, isLoading, isAuthenticated, toggleFavorite } =
     useFavoriteToggle({ tmdbId, itemType });
@@ -75,10 +81,17 @@ export const ActionButtons = ({
   // Sin estado conocido todavía: no pintamos un icono que luego cambie solo.
   if (isFavorited === null && isAuthenticated) return null;
 
-  const label = isFavorited ? 'Quitar de favoritos' : 'Añadir a favoritos';
+  // Con título, el lector de pantalla distingue un botón de otro en una rejilla.
+  const label = mediaTitle
+    ? isFavorited
+      ? `Quitar «${mediaTitle}» de favoritos`
+      : `Añadir «${mediaTitle}» a favoritos`
+    : isFavorited
+      ? 'Quitar de favoritos'
+      : 'Añadir a favoritos';
 
   return (
-    <div className={STYLES.container}>
+    <div className={clsx(STYLES.container, className)}>
       {onInfoClick && (
         <button
           type="button"

@@ -16,24 +16,24 @@ const STYLES = {
   // Columna de visuales (Mini Hero)
   avatarColumn: "flex flex-col gap-4 w-full lg:w-[400px] flex-shrink-0",
   previewCard:
-    "relative w-full h-[280px] rounded-2xl overflow-hidden bg-[#1A1A1A] group border border-white/5 shadow-2xl",
+    "relative w-full h-[280px] rounded-2xl overflow-hidden bg-pixela-surface group border border-white/5 shadow-2xl",
 
   // Banner Area
   bannerArea: "h-[160px] w-full relative cursor-pointer group/banner",
   bannerImage:
     "w-full h-full object-cover transition-transform duration-700 group-hover/banner:scale-105",
   bannerOverlay:
-    "absolute inset-0 bg-black/20 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px]",
+    "absolute inset-0 bg-black/20 transition duration-300 flex items-center justify-center",
   coverButton:
-    "px-4 py-2 bg-black/60 text-white rounded-full text-sm font-medium border border-white/20 flex items-center gap-2 hover:bg-pixela-accent hover:border-pixela-accent transition-all shadow-lg",
+    "px-4 py-2 bg-black/60 text-white rounded-full text-sm font-medium border border-white/20 flex items-center gap-2 hover:bg-pixela-accent hover:border-pixela-accent transition shadow-lg",
 
   // Avatar Area (Overlapping)
   avatarArea: "absolute left-6 bottom-6 cursor-pointer group/avatar",
   avatarWrapper:
-    "relative w-32 h-32 rounded-full border-4 border-[#1A1A1A] overflow-hidden bg-[#2A2A2A] shadow-xl",
+    "relative w-32 h-32 rounded-full border-4 border-pixela-surface overflow-hidden bg-pixela-raised shadow-xl",
   avatarImage: "w-full h-full object-cover",
   avatarOverlay:
-    "absolute inset-0 bg-black/30 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px]",
+    "absolute inset-0 bg-black/30 transition duration-300 flex items-center justify-center",
   cameraIcon: "text-white w-6 h-6",
 
   // Inputs ocultos
@@ -91,7 +91,7 @@ export const ProfilePreviewCard = ({
                 className={STYLES.avatarImage}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600 text-white text-3xl font-bold">
+              <div className="w-full h-full flex items-center justify-center bg-pixela-raised text-white font-display text-4xl">
                 {name?.charAt(0).toUpperCase() || "?"}
               </div>
             )}
@@ -112,7 +112,7 @@ export const ProfilePreviewCard = ({
       />
       {imageError && <p className={STYLES.error}>{imageError}</p>}
 
-      <p className="text-xs text-gray-500 text-center px-4 font-outfit">
+      <p className="text-xs text-gray-400 text-center px-4">
         Haz clic en la portada o en tu avatar para actualizarlos.
       </p>
     </div>

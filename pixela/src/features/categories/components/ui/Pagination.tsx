@@ -3,12 +3,12 @@ import { PaginationProps } from '@/features/categories/types/pagination';
 
 const STYLES = {
     // Contenedor principal
-    container: 'flex justify-center items-center gap-2 md:gap-3 transition-all duration-300 flex-wrap',
+    container: 'flex justify-center items-center gap-2 md:gap-3 transition duration-300 flex-wrap',
 
     // Botones de página
-    button: 'flex items-center justify-center rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium',
+    button: 'flex items-center justify-center rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium',
     pageButton: 'w-10 h-10 md:w-12 md:h-12 text-base md:text-lg relative',
-    activeButton: 'bg-pixela-accent text-white shadow-xl shadow-pixela-accent/20 scale-105',
+    activeButton: 'bg-pixela-accent text-pixela-dark',
     inactiveButton: 'bg-pixela-dark/30 text-pixela-light/80 border border-pixela-accent/20 hover:bg-pixela-accent/10 hover:border-pixela-accent/40 hover:scale-105',
 
     // Estados de loading
@@ -18,7 +18,7 @@ const STYLES = {
 
     // Elementos de navegación
     ellipsis: 'flex items-center justify-center w-10 h-10 md:w-12 md:h-12 text-pixela-light/60 text-base md:text-lg tracking-widest',
-    navButton: 'w-10 h-10 md:w-12 md:h-12 text-pixela-light/60 hover:text-pixela-accent hover:scale-110 transition-all duration-200',
+    navButton: 'w-10 h-10 md:w-12 md:h-12 text-pixela-light/60 hover:text-pixela-accent hover:scale-110 transition duration-200',
     chevronIcon: 'w-6 h-6 transition-transform duration-200',
     
     // Disabled state improvements

@@ -11,7 +11,7 @@ const STYLES = {
   heroSection: "relative h-[40vh] min-h-[300px] w-full isolate",
   heroBackground: "absolute inset-0 z-0",
   heroGradient:
-    "absolute inset-0 bg-gradient-to-t from-[#0F0F0F] via-[#0F0F0F]/60 to-transparent z-10",
+    "absolute inset-0 bg-gradient-to-t from-pixela-ink via-pixela-ink/60 to-transparent z-10",
   heroContent: "absolute -bottom-16 left-0 w-full z-20",
 
   // Header User Info (Overlapping Hero)
@@ -20,13 +20,13 @@ const STYLES = {
   avatarWrapper: "relative group",
   avatarRing: "hidden",
   avatarContainer:
-    "relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#0F0F0F] shadow-2xl overflow-hidden bg-[#1A1A1A]",
+    "relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-pixela-ink shadow-2xl overflow-hidden bg-pixela-surface",
   userDetails: "flex-1 text-center md:text-left mb-2",
   userName:
-    "text-4xl md:text-5xl font-bold text-white font-outfit mb-2 tracking-tight drop-shadow-lg",
+    "font-display text-5xl md:text-7xl font-normal text-white mb-3 tracking-[-0.03em] leading-[0.95]",
   userBadges: "flex flex-wrap justify-center md:justify-start gap-3",
   badge:
-    "px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md border",
+    "px-3 py-1 rounded-full text-xs font-semibold border",
   badgeAdmin: "bg-pixela-accent/20 border-pixela-accent/50 text-pixela-accent",
   badgeUser: "bg-white/10 border-white/20 text-gray-300",
 } as const;
@@ -37,9 +37,11 @@ export const ProfileHero = ({ user }: ProfileHeroProps) => {
       <div className={STYLES.heroBackground}>
         {/* Dynamic Banner */}
         <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-700"
+          className="absolute inset-0 bg-cover bg-center transition duration-700"
           style={{
-            backgroundImage: `url('${user.cover_url || "https://images.unsplash.com/photo-1574267432553-4b4628081c31?q=80&w=2831&auto=format&fit=crop"}')`,
+            // Sin portada elegida, el negro de sala: antes caía a una foto
+            // genérica de Unsplash que no era de nadie.
+            backgroundImage: user.cover_url ? `url('${user.cover_url}')` : undefined,
             opacity: 0.4,
           }}
         />

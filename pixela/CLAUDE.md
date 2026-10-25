@@ -94,7 +94,7 @@ Every route handler goes through these. Don't hand-roll auth or validation in a 
 
 **Storage / data**
 - Profile photos stored as base64 in `users.photo_url` (TEXT), capped at 512 KB by the Zod schema. Should move to object storage (S3/Cloudinary).
-- No password recovery. The "forgot password" link is rendered disabled on purpose; wire it up once there's email delivery.
+- No password recovery. The login page shows no "forgot password" link at all (a disabled one used to sit there); add it back together with the email flow.
 
 **Pending major upgrades** (skipped in the Bun migration to keep the diff safe)
 - **Prisma 5 → 7**: two majors. Follow https://pris.ly/d/major-version-upgrade. Regenerate client, review query call sites, run migrations against a snapshot first.
@@ -123,7 +123,7 @@ Self-hosted: the production image is `Dockerfile.prod`, deployed with Coolify be
 
 **URLs that are not ours.** `pixela.io` is parked and for sale on Spaceship.com, and `pixela.vercel.app` belongs to an unrelated user. The canonical URL lives in **`src/lib/site.ts`** — `layout.tsx`, `robots.ts` and `sitemap.ts` all import `SITE_URL` from there. Its fallback is `http://localhost:3000`, so production must pass `NEXT_PUBLIC_SITE_URL` as a **build arg** (it is inlined at build time).
 
-Still stale: the footer advertises `pixel@pixela.io`, a mailbox on a domain we do not control. Nobody receives mail sent there.
+The footer no longer advertises `pixel@pixela.io` nor the Instagram/LinkedIn/GitHub accounts that were not ours; it links to the repository only.
 
 ### Environment variables the deploy needs
 

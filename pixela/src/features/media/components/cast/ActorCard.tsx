@@ -49,46 +49,41 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
 
   const contenido = (
     <>
-      <div className="relative aspect-[2/3] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-pixela-surface">
         {hasValidImage ? (
           <Image
             src={actor.foto || ''}
-            alt={actor.nombre}
+            alt=""
             fill
             sizes="(max-width: 640px) 140px, (max-width: 768px) 160px, 180px"
-            className="object-cover"
+            className="object-cover transition-transform duration-700 ease-out-expo [@media(hover:hover)]:group-hover:scale-[1.04]"
             priority={false}
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full bg-gray-800">
+          <div className="flex items-center justify-center w-full h-full bg-pixela-raised">
             <FiUser className="w-1/3 text-gray-400 h-1/3" />
           </div>
         )}
       </div>
-      <div className="p-3">
-        <div className="flex flex-col">
-          <span className="text-xs text-gray-500">Nombre:</span>
-          <h3 className="text-sm font-medium text-white truncate">{actor.nombre}</h3>
-        </div>
+      {/* Nombre y personaje sin rótulos "Nombre:" / "Personaje:": el orden
+          y el peso ya dicen qué es cada cosa, como en unos créditos. */}
+      <div className="pt-3">
+        <h3 className="text-[15px] font-semibold text-white truncate">{actor.nombre}</h3>
         {actor.personaje && (
-          <div className="flex flex-col mt-1">
-            <span className="text-xs text-gray-500">Personaje:</span>
-            <p className="text-xs font-medium text-gray-300 truncate">{actor.personaje}</p>
-          </div>
+          <p className="mt-0.5 text-sm text-gray-400 truncate">{actor.personaje}</p>
         )}
       </div>
     </>
   );
 
   /*
-   * `cursor-pointer` y el `hover:-translate-y-1` solo se aplican cuando hay
-   * enlace: una tarjeta que se levanta al pasar por encima y no lleva a ningún
-   * sitio es peor que una tarjeta quieta.
+   * El zoom de la foto al pasar el ratón solo existe dentro de un `<Link>`
+   * (`group` sin enlace no se activa con el foco ni lleva a ningún sitio).
    */
   const estiloBase = clsx(
-    "block rounded-2xl overflow-hidden group bg-gradient-to-br from-[#181818]/95 to-[#1a1a1a]/95 border border-white/5 shadow-2xl shadow-pixela-accent/5",
-    enlazable && "hover:-translate-y-1 transition-transform duration-300 cursor-pointer",
+    "block rounded-sm",
+    enlazable && "group",
     className
   );
 

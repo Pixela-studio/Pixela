@@ -26,52 +26,50 @@ const isNavLinkActive = (href: string, pathname: string): boolean => {
 };
 
 const STYLES = {
-  // Nav wrapper: cambia márgenes/padding cuando pasa a docked.
-  navBase: 'w-full fixed top-0 left-0 z-50 transition-[margin,padding] duration-300 ease-out',
-  navFloating: 'mt-5 px-4',
-  navDocked: 'mt-0 px-0',
+  // Barra plana (DESIGN.md › Navigation): transparente sobre el hero y con el
+  // negro de sala sólido al hacer scroll. Sin píldora flotante ni vidrio.
+  // El fondo va en el <nav> (no en el contenedor) para cubrir también la
+  // franja de la muesca, que se reserva con safe-area-inset-top.
+  navBase: 'w-full fixed top-0 left-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-colors duration-300 ease-out-expo',
+  navDocked: 'bg-pixela-dark/95',
 
-  // Contenedor visible: en floating es una "píldora" flotante centrada;
-  // en docked ocupa 100% de ancho, rectangular y con más opacidad.
-  // max-w-full (100%) en docked en vez de max-w-none — max-width: none no
-  // interpola en CSS, así que la píldora crecía a saltos.
-  containerBase: 'w-full mx-auto flex items-center backdrop-blur-md transition-[max-width,padding,border-radius,background-color,box-shadow] duration-300 ease-out',
-  containerFloating: 'max-w-[83.333%] p-4 max-sm:px-3 max-sm:w-[calc(100%-2rem)] rounded-[36px] bg-dark-opacity',
-  containerDocked: 'max-w-full py-3 px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 rounded-none bg-pixela-dark/90 border-b border-white/10 shadow-lg shadow-black/30',
+  containerBase: 'w-full mx-auto flex items-center px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 transition-[padding] duration-300 ease-out-expo',
+  containerFloating: 'py-5 lg:py-7 bg-transparent',
+  containerDocked: 'py-3 lg:py-4',
 
-  logo: 'mx-10 sm:mx-2 md:mx-6 lg:mx-10 transition-transform duration-300 hover:scale-[1.02] active:scale-100',
-  logoText: 'text-3xl font-bold font-outfit text-pixela-accent',
-  navLinks: 'hidden lg:flex flex-1 justify-center',
-  navLinksContainer: 'flex space-x-8 lg:space-x-6 xl:space-x-8',
+  logo: 'mr-auto lg:mr-12 rounded-md',
+  logoText: 'font-display italic font-bold text-[28px] lg:text-[30px] leading-none tracking-[-0.02em] text-white',
+  navLinks: 'hidden lg:flex flex-1',
+  navLinksContainer: 'flex gap-7 xl:gap-9',
   // Inactivo atenuado a 65% para que el activo (magenta) destaque; hover
   // devuelve al 100% mientras el underline crece.
-  navLink: 'font-pixela-outfit-sm text-pixela-light/65 relative group transition-colors duration-300 hover:text-pixela-light',
-  navLinkActive: 'text-pixela-accent hover:text-pixela-accent',
-  navLinkUnderline: 'absolute -bottom-1 left-0 w-0 h-0.5 bg-pixela-accent transition-all duration-300 group-hover:w-full',
-  navLinkUnderlineActive: 'w-full',
-  userSection: 'hidden lg:flex mx-10 lg:mx-4 xl:mx-10 items-center',
+  navLink: 'text-[15px] font-medium [font-stretch:112%] text-white/70 relative group py-1 transition-colors duration-200 hover:text-white',
+  navLinkActive: 'text-white',
+  // Se escala en vez de animar `width`: así no fuerza layout en cada frame.
+  navLinkUnderline: 'absolute -bottom-0.5 left-0 w-full h-0.5 bg-pixela-accent origin-left scale-x-0 transition-transform duration-300 ease-out-expo group-hover:scale-x-100',
+  navLinkUnderlineActive: 'scale-x-100',
+  userSection: 'hidden lg:flex ml-auto items-center',
   userContainer: 'flex items-center gap-2',
-  userName: 'text-pixela-light font-pixela-outfit-sm',
+  userName: 'text-pixela-light text-sm',
   button: 'text-pixela-light/80 hover:text-pixela-accent transition-colors duration-300 p-2 rounded-full hover:bg-pixela-dark/30',
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
 
   // Estilos para el menú hamburguesa
-  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 transition-all duration-300 mr-1 ml-auto',
-  mobileMenu: 'fixed inset-0 bg-pixela-dark z-[100] flex flex-col justify-start overflow-y-auto p-6 sm:p-12 pt-24 pb-8 transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+  mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 transition-colors duration-300 mr-1 ml-auto',
+  mobileMenu: 'fixed inset-0 bg-pixela-dark z-[100] flex flex-col justify-start overflow-y-auto p-6 sm:p-12 pt-24 pb-8 transform transition-transform duration-500 ease-out-expo',
   mobileMenuVisible: 'translate-y-0',
   mobileMenuHidden: '-translate-y-full',
   mobileCloseButton: 'absolute top-6 right-6 text-pixela-light hover:text-pixela-accent p-2 transition-transform hover:rotate-90 duration-300',
   mobileNavContainer: 'flex flex-col flex-1 w-full mt-4 sm:mt-8',
-  mobileNavLink: 'group relative font-outfit font-black text-5xl sm:text-6xl text-pixela-light py-5 sm:py-6 border-b border-white/10 flex items-center justify-between w-full overflow-hidden transition-all duration-500 ease-out',
+  mobileNavLink: 'group relative font-display text-5xl sm:text-6xl tracking-[-0.03em] text-pixela-light py-4 sm:py-5 flex items-center justify-between w-full overflow-hidden',
   mobileNavLinkText: 'relative z-10 transition-transform duration-300 group-hover:translate-x-4',
-  mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0',
+  mobileNavLinkArrow: 'relative z-10 opacity-0 -translate-x-4 text-pixela-accent transition-[opacity,transform] duration-300 ease-out-expo group-hover:opacity-100 group-hover:translate-x-0',
   mobileNavLinkHoverBg: 'absolute inset-0 bg-pixela-accent/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out',
   mobileUserSection: 'mt-auto pt-8 w-full',
   mobileUserContainer: 'flex flex-col gap-4 w-full',
-  mobileActionButton: 'group relative flex w-full items-center justify-between px-6 py-5 border-2 border-pixela-light/20 hover:border-pixela-accent bg-transparent transition-all duration-300 overflow-hidden',
-  mobileActionText: 'font-outfit font-bold text-xl text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
+  mobileActionButton: 'group relative flex w-full items-center justify-between rounded-sm px-6 py-4 bg-white/[0.08] hover:bg-white transition-colors duration-300 overflow-hidden',
+  mobileActionText: 'font-semibold text-lg text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
   mobileActionIcon: 'w-6 h-6 text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
-  mobileActionHoverBg: 'absolute inset-0 bg-pixela-accent translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out',
 } as const;
 
 /**
@@ -92,7 +90,6 @@ const MobileActionButton = ({
     onClick={onClick} 
     className={STYLES.mobileActionButton}
   >
-    <div className={STYLES.mobileActionHoverBg} />
     <span className={STYLES.mobileActionText}>
       {userName ? userName : label}
     </span>
@@ -248,7 +245,7 @@ export const Navbar = () => {
   return (
     <>
       <nav
-        className={`${STYLES.navBase} ${isDocked ? STYLES.navDocked : STYLES.navFloating}`}
+        className={`${STYLES.navBase} ${isDocked ? STYLES.navDocked : ''}`}
         role="navigation"
       >
         <div
@@ -377,7 +374,7 @@ export const Navbar = () => {
 
         {/* Sección de usuario para móvil */}
         <div 
-          className={`${STYLES.mobileUserSection} transition-all duration-700 delay-500 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          className={`${STYLES.mobileUserSection} transition-[opacity,transform] duration-700 ease-out-expo delay-500 ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
           <div className={STYLES.mobileUserContainer}>
             {isAuthenticated && user && (
