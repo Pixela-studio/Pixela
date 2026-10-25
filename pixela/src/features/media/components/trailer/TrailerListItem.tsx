@@ -30,11 +30,11 @@ const TrailerListItem = ({
     <button
       onClick={onSelect}
       className={`
-        flex items-stretch rounded-xl overflow-hidden transition duration-200
+        flex items-stretch rounded-sm overflow-hidden border transition-colors duration-200
         ${isLarge ? 'min-h-[100px] h-24' : 'min-h-[80px] h-20'} flex-shrink-0
         ${isSelected
-          ? 'bg-gradient-to-r from-pixela-accent/20 to-pixela-dark/95 border border-pixela-accent/30 shadow-lg shadow-pixela-accent/10'
-          : 'bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 border border-white/5'}
+          ? 'bg-pixela-surface border-white/45'
+          : 'bg-pixela-surface/60 border-white/10 hover:border-white/25'}
       `}
     >
       {/* Miniatura */}
@@ -50,7 +50,7 @@ const TrailerListItem = ({
         <div className="absolute inset-0 flex items-center justify-center">
           <div className={`rounded-full ${isLarge ? 'p-2' : 'p-1.5'} transition duration-200 ${
             isSelected
-              ? 'bg-white/20 backdrop-blur-sm scale-110'
+              ? 'bg-black/60 scale-110'
               : 'bg-black/40'
           }`}>
             <FaPlay className={`${isLarge ? 'w-3 h-3' : 'w-2.5 h-2.5'} ${

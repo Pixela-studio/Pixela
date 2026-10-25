@@ -93,7 +93,8 @@ button,
  */
 @layer components {
   .btn {
-    @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-base font-semibold;
+    @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-6 text-base font-semibold;
+    font-stretch: 112%;
     transition-property: color, background-color, border-color, box-shadow, transform;
     transition-duration: 200ms;
     transition-timing-function: var(--ease-out-expo);
@@ -108,14 +109,15 @@ button,
     @apply pointer-events-none opacity-50;
   }
 
-  /* Texto negro sobre el rosa: blanco sobre #EC1B69 se queda en 4:1 y no
-     llega a AA con 16 px; el negro de sala da 5:1 y se lee como una entrada. */
+  /* Rótulo de crédito: marfil de proyector con texto negro de sala y la
+     esquina casi recta de los pósters. El rosa se queda en el foco, el enlace
+     activo y las insignias. */
   .btn-primary {
-    @apply bg-pixela-accent text-pixela-dark hover:bg-[#F2397F] active:scale-[0.97];
+    @apply bg-white text-pixela-dark hover:bg-white/85 active:scale-[0.97];
   }
 
   .btn-ghost {
-    @apply bg-white/[0.08] text-white hover:bg-white/[0.14] active:scale-[0.97];
+    @apply border border-white/20 bg-transparent text-white hover:border-white/45 hover:bg-white/[0.04] active:scale-[0.97];
   }
 
   /* Títulos de sección: Bodoni a escala de cartón. */

@@ -3,10 +3,11 @@
 import { GalleryTabsProps } from '@/features/media/types/gallery';
 
 const STYLES = {
-  container: "flex border-b border-white/10 mb-6",
-  tab: "py-3 px-6 text-sm font-medium rounded-t-lg transition-colors duration-200",
-  activeTab: "bg-pixela-accent text-pixela-dark border-b-2 border-pixela-accent",
-  inactiveTab: "text-gray-400 hover:text-white hover:bg-pixela-raised/50"
+  // Pestañas con la gramática de la navbar: texto Meta y subrayado rosa de 2 px.
+  container: "flex gap-8 border-b border-white/10 mb-6",
+  tab: "meta-text -mb-px border-b-2 py-3 transition-colors duration-200",
+  activeTab: "border-pixela-accent text-white",
+  inactiveTab: "border-transparent hover:text-white"
 } as const;
 
 export const GalleryTabs = ({ activeTab, onTabChange, backdropsCount, postersCount }: GalleryTabsProps) => {

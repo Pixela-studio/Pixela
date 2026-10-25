@@ -22,20 +22,19 @@ import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
  */
 // En móvil siguen siendo círculos de icono; desde `sm:` llevan una etiqueta
 // corta visible, porque en la beta Carmen no entendía qué hacía cada icono.
-const SECONDARY_BUTTON =
-  "flex h-12 min-w-12 items-center justify-center gap-2 rounded-full border px-3.5 font-medium transition-[color,background-color,border-color,box-shadow] duration-300 sm:px-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink disabled:cursor-not-allowed disabled:opacity-60";
+const SECONDARY_BUTTON = "btn btn-ghost min-w-12 px-3.5 sm:px-5";
 
 const STYLES = {
   container: "flex flex-wrap items-center justify-center gap-3 lg:justify-start",
   favoriteButton: (isFavorited: boolean) =>
     `${SECONDARY_BUTTON} ${
-      isFavorited
-        ? "border-white/20 bg-pixela-accent text-pixela-dark hover:bg-[#F2397F]"
-        : "border-white/15 bg-white/10 text-white hover:bg-white/20"
+      // Marcado: borde encendido y el marcador en rosa, sin competir en
+      // relleno con el primario de al lado.
+      isFavorited ? "border-white/45 [&>svg]:text-pixela-accent" : ""
     }`,
   bookmarkIcon: "h-5 w-5 shrink-0",
   buttonLabel: "sr-only sm:not-sr-only",
-  reviewButton: `${SECONDARY_BUTTON} border-white/15 bg-white/10 text-white hover:bg-white/20`,
+  reviewButton: SECONDARY_BUTTON,
   penIcon: "h-5 w-5 shrink-0",
 };
 

@@ -12,14 +12,7 @@ const STYLES = {
   container: 'p-6 lg:p-8 bg-pixela-surface rounded-2xl',
   header: 'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-8',
   title: 'font-display text-3xl md:text-4xl tracking-[-0.02em] text-white',
-  editButton: clsx(
-    'flex items-center gap-2',
-    'bg-pixela-accent text-pixela-dark',
-    'px-6 py-2 rounded-full',
-    'hover:bg-pixela-accent/80',
-    'transition-colors duration-300',
-    'w-full sm:w-auto justify-center'
-  ),
+  editButton: 'btn btn-primary btn-sm w-full sm:w-auto',
   content: 'flex flex-col gap-6',
   field: 'pb-4 border-b border-white/10 last:border-b-0',
   label: 'text-sm text-gray-400 mb-2',

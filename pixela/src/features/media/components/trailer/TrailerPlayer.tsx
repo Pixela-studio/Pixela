@@ -10,7 +10,7 @@ export function TrailerPlayer({ trailerId }: TrailerPlayerProps) {
   if (!trailerId) return null;
   
   return (
-    <div className="lg:w-2/3 w-full aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-pixela-dark/95 to-pixela-dark/95 border border-white/5 shadow-2xl shadow-pixela-accent/5">
+    <div className="w-full aspect-video overflow-hidden rounded-sm bg-pixela-surface lg:col-span-2">
       <iframe
         width="100%"
         height="100%"

@@ -198,13 +198,9 @@ export const LibraryButton = ({
             : `Añadir «${title}» a mi biblioteca`
         }
         className={clsx(
-          "flex items-center gap-2 whitespace-nowrap rounded-lg px-6 py-3 font-medium transition-[color,background-color,box-shadow] duration-300",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-pixela-ink",
-          "disabled:cursor-not-allowed disabled:opacity-60",
+          "btn",
           // Acción principal de la ficha: relleno sólido para que domine la fila.
-          status
-            ? "bg-white/10 text-white ring-1 ring-inset ring-white/20 hover:bg-white/15"
-            : "bg-pixela-accent text-pixela-dark hover:bg-[#F2397F]",
+          status ? "btn-ghost" : "btn-primary",
           className,
         )}
       >

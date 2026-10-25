@@ -67,7 +67,7 @@ const STYLES = {
   mobileNavLinkHoverBg: 'absolute inset-0 bg-pixela-accent/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out',
   mobileUserSection: 'mt-auto pt-8 w-full',
   mobileUserContainer: 'flex flex-col gap-4 w-full',
-  mobileActionButton: 'group relative flex w-full items-center justify-between rounded-full px-6 py-4 bg-white/[0.08] hover:bg-pixela-accent transition-colors duration-300 overflow-hidden',
+  mobileActionButton: 'group relative flex w-full items-center justify-between rounded-sm px-6 py-4 bg-white/[0.08] hover:bg-white transition-colors duration-300 overflow-hidden',
   mobileActionText: 'font-semibold text-lg text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
   mobileActionIcon: 'w-6 h-6 text-pixela-light group-hover:text-pixela-dark relative z-10 transition-colors duration-300',
 } as const;

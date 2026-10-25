@@ -13,11 +13,11 @@ const STYLES = {
     },
     secondary: {
       hero: 'btn btn-ghost btn-sm',
-      default: 'w-10 h-10 flex items-center justify-center bg-pixela-dark hover:bg-pixela-dark/80 rounded text-pixela-light transition-colors border border-pixela-accent/40'
+      default: 'btn btn-ghost btn-sm w-10 px-0'
     },
     favorite: {
-      active: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 bg-pixela-accent text-pixela-dark hover:bg-[#F2397F]',
-      inactive: 'p-2.5 rounded-lg font-medium transition duration-300 flex items-center gap-2 shadow-lg bg-black/40 backdrop-blur-sm text-white hover:bg-black/50'
+      active: 'p-2.5 rounded-sm font-medium transition duration-300 flex items-center gap-2 bg-white text-pixela-dark hover:bg-white/85',
+      inactive: 'p-2.5 rounded-sm font-medium transition duration-300 flex items-center gap-2 bg-pixela-dark/80 text-white hover:bg-pixela-dark'
     }
   },
   icon: {

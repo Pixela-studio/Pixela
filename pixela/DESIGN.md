@@ -60,17 +60,18 @@ spacing:
   section: "128px"
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
+    backgroundColor: "{colors.light}"
     textColor: "{colors.screen}"
-    rounded: "{rounded.full}"
+    rounded: "{rounded.sm}"
     padding: "0 24px"
     height: "48px"
   button-primary-hover:
-    backgroundColor: "{colors.accent-hover}"
+    backgroundColor: "rgba(244, 237, 226, 0.85)"
   button-ghost:
-    backgroundColor: "rgba(244, 237, 226, 0.08)"
+    backgroundColor: "transparent"
+    borderColor: "rgba(244, 237, 226, 0.20)"
     textColor: "{colors.light}"
-    rounded: "{rounded.full}"
+    rounded: "{rounded.sm}"
     padding: "0 24px"
     height: "48px"
   toggle-active:
@@ -106,7 +107,7 @@ Pixela es una plataforma de cine con la gramática de los títulos de crédito. 
 
 La referencia de producto es una plataforma premium (inmersiva, backdrops a pantalla completa, filas que se recorren con calma); la referencia de lenguaje son los cartones de apertura y cierre de una película (Bodoni, marfil sobre negro, mucho aire, el nombre que vuelve a todo lo ancho al final).
 
-El rosa de Pixela es la luz de "acción": aparece en el botón que hay que pulsar, en el enlace activo, en el foco y en la insignia Top Pixela. Nunca en un título ni en un fondo grande.
+El rosa de Pixela es la luz de "acción": aparece en el enlace activo, en el foco y en la insignia Top Pixela. Nunca en un título ni en un fondo grande.
 
 Se rechaza explícitamente: navbar de vidrio en píldora flotante, degradados decorativos, halos de color, tarjetas con icono como estructura, antetítulos en mayúsculas espaciadas, palabras resaltadas en otro color dentro de un titular, emojis como iconos, grises fríos y el velo que solo aparece con el ratón encima.
 
@@ -123,7 +124,7 @@ Se rechaza explícitamente: navbar de vidrio en píldora flotante, degradados de
 Negros cálidos de sala, marfil de proyector y un rosa reservado a la acción.
 
 ### Primary
-- **Rosa acción** (`#EC1B69`, `pixela-accent`; hover `#F2397F`): botón primario, subrayado del enlace activo, anillo de foco, insignia Top Pixela, página activa de la paginación y código de la 404. El texto sobre el rosa es **negro de sala**: blanco sobre `#EC1B69` da 4:1 y no llega a AA a 16 px; el negro da 5:1.
+- **Rosa acción** (`#EC1B69`, `pixela-accent`; hover `#F2397F`): subrayado del enlace activo y de las pestañas, anillo de foco, insignia Top Pixela, página activa de la paginación y código de la 404. El texto sobre el rosa es **negro de sala**: blanco sobre `#EC1B69` da 4:1 y no llega a AA a 16 px; el negro da 5:1.
 
 ### Neutral
 - **Tinta** (`#070605`, `pixela-ink`): el plano más hondo. Ficha, actor, login y footer.
@@ -178,16 +179,17 @@ La profundidad viene del tono y de la imagen. Los planos tinta → sala → buta
 
 ## Shapes
 
-- **Píldora** (`rounded-full`): botones, inputs, toggles y filtros.
-- **Casi recta** (`rounded-sm`, 2 px): pósters, fotos de reparto, miniaturas e insignias.
+- **Píldora** (`rounded-full`): inputs, toggles y filtros.
+- **Casi recta** (`rounded-sm`, 2 px): botones, pósters, fotos de reparto, miniaturas, tráilers e insignias.
 - **Panel** (`rounded-2xl`): diálogos, paneles del perfil, tarjeta de login y toasts.
 
 ## Components
 
 ### Buttons
 `.btn` + `.btn-primary` / `.btn-ghost` (+ `.btn-sm`) en `globals.css`.
-- **Primario:** rosa con texto negro de sala, 48 px, Archivo 600; hover `#F2397F`; `active:scale-[0.97]`.
-- **Secundario:** marfil al 8 % sin borde ni vidrio; hover al 14 %.
+- **Primario:** rótulo de crédito. Marfil con texto negro de sala, esquina de 2 px, 48 px, Archivo 600 en `wdth 112`; hover marfil al 85 %; `active:scale-[0.97]`. El rosa relleno se descartó en la reforma: con la didona y el marfil leía como una tienda, no como un cartón.
+- **Secundario:** fondo transparente con borde marfil al 20 %; hover borde al 45 %. Un secundario "activo" (favorito marcado) enciende el borde y el icono en rosa, sin relleno.
+- **Pestañas** (Galería): texto Meta con subrayado rosa de 2 px, como la navbar.
 - Sin flechas "→" añadidas al texto. Un solo primario por vista.
 
 ### Pósters
@@ -247,6 +249,9 @@ Selección en rosa al 40 %, `caret-color` rosa, scrollbar pasillo sobre sala, `c
 ---
 
 ## Historial
+
+### Octubre de 2026: botones en marfil
+Primario marfil recto y secundario con borde en lugar de la píldora rosa. También salen el halo rosa del botón de volver arriba, el degradado de los tráilers y el hueco a la derecha cuando solo hay uno, y el esqueleto de la ficha copia el layout real.
 
 ### Octubre de 2026: reforma "Fundido a negro"
 Sustituye a la dirección "Sala de proyección": Outfit Black en mayúsculas rosas, navbar en píldora de vidrio y pósters a sangre con el título solo al pasar el ratón. Las capturas de antes y después están en `docs/design/reforma/`.

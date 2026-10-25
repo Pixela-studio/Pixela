@@ -9,7 +9,12 @@ const STYLES = {
   container: {
     base: "mt-12 mb-24",
     title: "title-card mb-8 text-5xl md:text-6xl",
-    content: "flex flex-col gap-6 lg:flex-row"
+    // Rejilla de tres columnas: el reproductor ocupa dos y la tercera lleva la
+    // lista o, si solo hay un tráiler, su pie (así no queda un hueco a la derecha).
+    content: "grid gap-6 lg:grid-cols-3",
+    caption: "hidden lg:flex lg:flex-col lg:justify-end lg:pb-2",
+    captionTitle: "font-semibold text-white [overflow-wrap:anywhere]",
+    captionMeta: "meta-text mt-1"
   }
 } as const;
 
@@ -36,11 +41,18 @@ export function TrailersSection({ trailers }: TrailersSectionProps) {
       
       <div className={STYLES.container.content}>
         <TrailerPlayer trailerId={selectedTrailerId || youtubeTrailers[0]?.key || ''} />
-        <TrailerList 
-          trailers={youtubeTrailers} 
-          selectedTrailerId={selectedTrailerId || youtubeTrailers[0]?.key || ''} 
-          onSelectTrailer={setSelectedTrailerId} 
-        />
+        {youtubeTrailers.length > 1 ? (
+          <TrailerList
+            trailers={youtubeTrailers}
+            selectedTrailerId={selectedTrailerId || youtubeTrailers[0]?.key || ''}
+            onSelectTrailer={setSelectedTrailerId}
+          />
+        ) : (
+          <div className={STYLES.container.caption}>
+            <p className={STYLES.container.captionTitle}>{youtubeTrailers[0].nombre}</p>
+            <p className={STYLES.container.captionMeta}>{youtubeTrailers[0].tipo || 'Tráiler'} · YouTube</p>
+          </div>
+        )}
       </div>
     </div>
   );
