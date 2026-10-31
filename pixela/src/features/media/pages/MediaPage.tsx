@@ -16,6 +16,8 @@ import { GallerySection } from "@/features/media/components/gallery/GallerySecti
 import { ReviewSection } from "@/features/media/components/review/ReviewSection";
 import { TechnicalSheet } from "@/features/media/components/details/TechnicalSheet";
 import { SimilarSection } from "@/features/media/components/details/SimilarSection";
+import { EpisodesSection } from "@/features/media/components/episodes/EpisodesSection";
+import type { Serie } from "@/features/media/types/content";
 
 interface MediaPageProps {
   media: Media;
@@ -125,6 +127,8 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
             providers={media.proveedores || []}
             watchUrl={media.proveedoresUrl}
           />
+          {/* Temporadas y capítulos vistos */}
+          {media.tipo === "serie" && <EpisodesSection serie={media as Serie} />}
           {/* Reparto */}
           <CastSection actors={media.actores} />
           {/* Trailers */}

@@ -24,6 +24,8 @@ export interface Serie extends Media {
   /** «En emisión», «Finalizada», «Cancelada»… */
   estado?: string;
   proximoEpisodio?: { fecha: string; temporada: number; episodio: number };
+  /** Temporadas emitidas o anunciadas, sin «Especiales» (la 0). */
+  listaTemporadas?: Array<{ numero: number; nombre: string; episodios: number; fecha: string }>;
   creadores?: Creator[];
   poster_path?: string;
   name?: string;

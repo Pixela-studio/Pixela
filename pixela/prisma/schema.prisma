@@ -30,6 +30,8 @@ model User {
   reviews       Review[]
   libraryItems  LibraryItem[]
   lists         List[]
+  diaryEntries  DiaryEntry[]
+  episodeWatches EpisodeWatch[]
 
   @@map("users")
 }
@@ -138,4 +140,44 @@ model ListItem {
   @@unique([listId, itemType, tmdbId])
   @@index([listId, position])
   @@map("list_items")
+}
+
+/// Diario de visionado: cada vez que alguien ve algo, con fecha. A diferencia
+/// de la reseña (una por título) aquí puede haber varias entradas del mismo
+/// título: los revisionados que pedía Javi.
+model DiaryEntry {
+  id        Int      @id @default(autoincrement()) @map("diary_entry_id")
+  userId    Int      @map("user_id")
+  itemType  ItemType @map("item_type")
+  tmdbId    BigInt   @map("tmdb_id")
+  watchedOn DateTime @map("watched_on") @db.Date
+  /// Nota de 0 a 10, como las reseñas. Opcional: apuntar que se vio basta.
+  rating    Decimal? @db.Decimal(3, 1)
+  note      String?  @db.VarChar(500)
+  rewatch   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, watchedOn])
+  @@index([userId, itemType, tmdbId])
+  @@map("diary_entries")
+}
+
+/// Capítulos vistos de una serie: el seguimiento por episodio que pedían
+/// Tomás y, en la ronda 1, Marcos y Diego.
+model EpisodeWatch {
+  id        Int      @id @default(autoincrement()) @map("episode_watch_id")
+  userId    Int      @map("user_id")
+  /// Id de TMDB de la serie.
+  tmdbId    BigInt   @map("tmdb_id")
+  season    Int
+  episode   Int
+  watchedAt DateTime @default(now()) @map("watched_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId, season, episode])
+  @@index([userId, tmdbId])
+  @@map("episode_watches")
 }

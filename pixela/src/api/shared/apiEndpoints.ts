@@ -54,6 +54,12 @@ export const API_ENDPOINTS = {
     SESSIONS: `${API_BASE_URL}/users/me/sessions`,
   },
 
+  /** Diario de visionado. */
+  DIARY: `${API_BASE_URL}/diary`,
+
+  /** Capítulos vistos de una serie. */
+  EPISODES: `${API_BASE_URL}/episodes`,
+
   /** Listas con nombre. */
   LISTS: `${API_BASE_URL}/lists`,
 

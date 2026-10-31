@@ -21,6 +21,8 @@ export interface LibraryItem {
 }
 
 export interface LibraryItemWithDetails extends LibraryItem {
+  /** Solo series: capítulos marcados como vistos. */
+  episodes_watched?: number;
   title: string;
   poster_path: string | null;
   overview: string;

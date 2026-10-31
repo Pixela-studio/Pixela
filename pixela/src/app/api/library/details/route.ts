@@ -38,7 +38,16 @@ export async function GET(request: Request) {
       orderBy: { updatedAt: "desc" },
     });
 
-    const summaries = await enrichWithTmdb(libraryItems);
+    const [summaries, episodeCounts] = await Promise.all([
+      enrichWithTmdb(libraryItems),
+      // Capítulos vistos por serie, para que la biblioteca diga por dónde va.
+      prisma.episodeWatch.groupBy({
+        by: ["tmdbId"],
+        where: { userId: guard.user.id },
+        _count: { _all: true },
+      }),
+    ]);
+    const watchedBySeries = new Map(episodeCounts.map((row) => [String(row.tmdbId), row._count._all]));
 
     return NextResponse.json({
       success: true,
@@ -53,6 +62,8 @@ export async function GET(request: Request) {
           item_type: item.itemType,
           status: item.status,
           updated_at: item.updatedAt,
+          episodes_watched:
+            item.itemType === "series" ? watchedBySeries.get(String(item.tmdbId)) ?? 0 : undefined,
           ...summary,
         };
       }),

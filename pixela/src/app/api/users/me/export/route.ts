@@ -7,7 +7,8 @@ import { apiError, handleRouteError } from "@/lib/api/responses";
  * Descarga de todos los datos de la cuenta (derecho de acceso y portabilidad,
  * arts. 15 y 20 del RGPD).
  *
- * Un JSON con las cuatro tablas del usuario. Nunca incluye el hash de la
+ * Un JSON con todo lo del usuario: cuenta, favoritos, biblioteca, reseñas,
+ * listas, diario y capítulos vistos. Nunca incluye el hash de la
  * contraseña ni la versión de sesión: no son datos "suyos" sino mecanismos de
  * seguridad, y el fichero puede acabar en cualquier carpeta de descargas.
  */
@@ -42,6 +43,26 @@ export async function GET() {
             createdAt: true,
             updatedAt: true,
           },
+        },
+        lists: {
+          select: {
+            name: true,
+            description: true,
+            visibility: true,
+            createdAt: true,
+            items: {
+              select: { itemType: true, tmdbId: true, position: true, note: true, addedAt: true },
+              orderBy: { position: "asc" },
+            },
+          },
+        },
+        diaryEntries: {
+          select: { itemType: true, tmdbId: true, watchedOn: true, rating: true, note: true, rewatch: true },
+          orderBy: { watchedOn: "asc" },
+        },
+        episodeWatches: {
+          select: { tmdbId: true, season: true, episode: true, watchedAt: true },
+          orderBy: [{ tmdbId: "asc" }, { season: "asc" }, { episode: "asc" }],
         },
       },
     });
@@ -83,6 +104,33 @@ export async function GET() {
         is_public: r.isPublic,
         created_at: r.createdAt,
         updated_at: r.updatedAt,
+      })),
+      lists: user.lists.map((list) => ({
+        name: list.name,
+        description: list.description,
+        visibility: list.visibility,
+        created_at: list.createdAt,
+        items: list.items.map((item) => ({
+          item_type: item.itemType,
+          tmdb_id: item.tmdbId.toString(),
+          position: item.position,
+          note: item.note,
+          added_at: item.addedAt,
+        })),
+      })),
+      diary: user.diaryEntries.map((entry) => ({
+        item_type: entry.itemType,
+        tmdb_id: entry.tmdbId.toString(),
+        watched_on: entry.watchedOn.toISOString().slice(0, 10),
+        rating: entry.rating === null ? null : Number(entry.rating),
+        note: entry.note,
+        rewatch: entry.rewatch,
+      })),
+      episodes_watched: user.episodeWatches.map((watch) => ({
+        tmdb_id: watch.tmdbId.toString(),
+        season: watch.season,
+        episode: watch.episode,
+        watched_at: watch.watchedAt,
       })),
     };
 

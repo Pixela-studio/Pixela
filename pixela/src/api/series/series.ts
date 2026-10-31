@@ -32,6 +32,7 @@ interface ExtendedSerieResponse extends ApiSerie {
   origin_country?: string[];
   vote_count?: number;
   status?: string;
+  seasons?: Array<{ season_number: number; name?: string; episode_count?: number; air_date?: string | null }>;
   episode_run_time?: number[];
   last_episode_to_air?: { runtime?: number | null } | null;
   next_episode_to_air?: {
@@ -118,6 +119,14 @@ export async function getSerieById(id: string): Promise<Serie> {
       rawSerie.last_episode_to_air?.runtime ??
       undefined,
     estado: seriesStatus(rawSerie.status),
+    listaTemporadas: (rawSerie.seasons ?? [])
+      .filter((season) => season.season_number > 0 && (season.episode_count ?? 0) > 0)
+      .map((season) => ({
+        numero: season.season_number,
+        nombre: season.name ?? `Temporada ${season.season_number}`,
+        episodios: season.episode_count ?? 0,
+        fecha: season.air_date ?? '',
+      })),
     proximoEpisodio:
       next?.air_date && next.season_number && next.episode_number
         ? { fecha: next.air_date, temporada: next.season_number, episodio: next.episode_number }

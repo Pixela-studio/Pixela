@@ -166,3 +166,40 @@ export const addListItemSchema = z.object({
 export const reorderListSchema = z.object({
   item_ids: z.array(resourceIdSchema).min(1).max(500),
 });
+
+/* ── Diario y capítulos ──────────────────────────────────────────────────── */
+
+/** Fecha `AAAA-MM-DD`, no futura y no anterior a 1900. */
+const watchedOnSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha no válida")
+  .refine((value) => {
+    const date = new Date(`${value}T12:00:00Z`);
+    return !Number.isNaN(date.getTime()) && date.getUTCFullYear() >= 1900 && date.getTime() <= Date.now() + 86_400_000;
+  }, "La fecha no puede ser futura");
+
+export const createDiaryEntrySchema = z.object({
+  tmdb_id: tmdbIdSchema,
+  item_type: itemTypeSchema,
+  watched_on: watchedOnSchema,
+  rating: z.coerce
+    .number()
+    .min(0)
+    .max(10)
+    .transform((value) => Math.round(value * 10) / 10)
+    .nullable()
+    .optional(),
+  note: z.string().trim().max(500, "La nota es demasiado larga").optional(),
+  /** Si no se indica, se deduce: revisionado si ya hay otra entrada del título. */
+  rewatch: z.boolean().optional(),
+  /** Marcar además el título como «Completado» en la biblioteca. */
+  mark_completed: z.boolean().optional(),
+});
+
+export const episodeToggleSchema = z.object({
+  tmdb_id: tmdbIdSchema,
+  season: z.coerce.number().int().min(0).max(200),
+  /** Uno o varios capítulos de la misma temporada (marcar la temporada entera). */
+  episodes: z.array(z.coerce.number().int().min(1).max(5000)).min(1).max(500),
+  watched: z.boolean(),
+});

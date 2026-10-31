@@ -12,7 +12,8 @@ import { LibraryButton } from "@/features/media/components/actions/LibraryButton
 import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { AddToListDialog } from "@/features/lists/components/AddToListDialog";
-import { FiList } from "react-icons/fi";
+import { FiCalendar, FiList } from "react-icons/fi";
+import { LogViewingDialog } from "@/features/diary/components/LogViewingDialog";
 
 /*
  * Jerarquía de la fila de acciones.
@@ -67,18 +68,20 @@ export const ActionButtons = ({
   });
 
   const [showListsDialog, setShowListsDialog] = useState(false);
+  const [showDiaryDialog, setShowDiaryDialog] = useState(false);
 
-  const handleLists = () => {
+  /** Abre un diálogo que necesita cuenta o manda al login con vuelta aquí. */
+  const requireAccount = (message: string, open: () => void) => {
     if (!isAuthenticated) {
-      toast.info("Inicia sesión para guardar títulos en tus listas", {
-        title: "Autenticación requerida",
-        duration: 3000,
-      });
+      toast.info(message, { title: "Autenticación requerida", duration: 3000 });
       router.push(loginHrefForHere());
       return;
     }
-    setShowListsDialog(true);
+    open();
   };
+
+  const handleLists = () =>
+    requireAccount("Inicia sesión para guardar títulos en tus listas", () => setShowListsDialog(true));
 
   const handleReview = () => {
     if (!isAuthenticated) {
@@ -133,6 +136,18 @@ export const ActionButtons = ({
         </button>
 
         <button
+          onClick={() => requireAccount("Inicia sesión para llevar tu diario", () => setShowDiaryDialog(true))}
+          className={STYLES.reviewButton}
+          type="button"
+          aria-label={`Apuntar «${title}» en tu diario`}
+        >
+          <FiCalendar aria-hidden="true" className={STYLES.penIcon} />
+          <span aria-hidden="true" className={STYLES.buttonLabel}>
+            Lo he visto
+          </span>
+        </button>
+
+        <button
           onClick={handleLists}
           className={STYLES.reviewButton}
           type="button"
@@ -146,6 +161,14 @@ export const ActionButtons = ({
 
         <ShareButton title={title} className={STYLES.reviewButton} />
       </div>
+
+      <LogViewingDialog
+        isOpen={showDiaryDialog}
+        onClose={() => setShowDiaryDialog(false)}
+        tmdbId={tmdbId}
+        itemType={itemType}
+        title={title}
+      />
 
       <AddToListDialog
         isOpen={showListsDialog}

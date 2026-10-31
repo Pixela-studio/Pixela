@@ -261,7 +261,10 @@ export const ProfileLibrary = () => {
               </div>
               {/* Controles fuera del enlace: un control dentro de otro no se
                   puede alcanzar bien con el teclado ni con un lector. */}
-              <p className="text-xs text-gray-400">{statusDate(item)}</p>
+              <p className="text-xs text-gray-400">
+                {statusDate(item)}
+                {item.episodes_watched ? ` · ${item.episodes_watched} ${item.episodes_watched === 1 ? "capítulo visto" : "capítulos vistos"}` : ""}
+              </p>
               <div className="flex items-center gap-2">
                 <label className="sr-only" htmlFor={`library-status-${item.id}`}>
                   Estado de «{item.title}»

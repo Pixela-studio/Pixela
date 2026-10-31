@@ -247,6 +247,56 @@ export async function proxyDetails(type: PixelaMediaType, rawId: string) {
   }
 }
 
+interface TmdbSeasonResponse {
+  season_number?: number;
+  name?: string;
+  episodes?: Array<{
+    episode_number: number;
+    name?: string;
+    air_date?: string | null;
+    runtime?: number | null;
+    overview?: string;
+  }>;
+}
+
+/**
+ * GET /tv/{id}/season/{n} — capítulos de una temporada, para marcarlos como
+ * vistos. Solo los campos que pinta la lista: el detalle de TMDB trae además
+ * reparto invitado y equipo por capítulo, que pesan mucho y no se usan.
+ */
+export async function proxySeason(rawId: string, rawSeason: string) {
+  const id = parseTmdbId(rawId);
+  const season = Number.parseInt(rawSeason, 10);
+  if (id === null || !Number.isInteger(season) || season < 0 || season > 200) {
+    return apiError("Identificador inválido", 400);
+  }
+
+  try {
+    const data = await fetchFromTmdb<TmdbSeasonResponse>(`/tv/${id}/season/${season}`);
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          season: data.season_number ?? season,
+          name: data.name ?? `Temporada ${season}`,
+          episodes: (data.episodes ?? []).map((episode) => ({
+            episode: episode.episode_number,
+            name: episode.name ?? "",
+            air_date: episode.air_date ?? null,
+            runtime: episode.runtime ?? null,
+          })),
+        },
+      },
+      { headers: CDN_CACHE_HEADERS },
+    );
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("404")) {
+      return apiError("Temporada no encontrada", 404);
+    }
+    return handleRouteError("Failed to fetch season", error, { id, season });
+  }
+}
+
 /** GET /{movie|tv}/{id}/images */
 export async function proxyImages(type: PixelaMediaType, rawId: string) {
   const id = parseTmdbId(rawId);

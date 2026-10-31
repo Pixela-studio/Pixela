@@ -39,8 +39,8 @@ export default function PrivacidadPage() {
           </li>
           <li>
             <strong>Lo que haces en Pixela:</strong> los títulos que marcas como favoritos, tu
-            biblioteca (pendiente, viendo, vista o abandonada) y tus reseñas, con la nota, el texto y
-            la fecha.
+            biblioteca (pendiente, viendo, vista o abandonada), tus listas, tu diario de visionado,
+            los capítulos que marcas como vistos y tus reseñas, con la nota, el texto y la fecha.
           </li>
         </ul>
         <p>
@@ -63,7 +63,9 @@ export default function PrivacidadPage() {
           cualquiera, tenga cuenta o no. Te lo recordamos cada vez que escribes una.
         </p>
         <p>
-          <strong>Tus favoritos, tu biblioteca y tu correo son privados.</strong> Solo los ves tú.
+          <strong>Tus favoritos, tu biblioteca, tu diario y tu correo son privados.</strong> Solo los
+          ves tú. Tus listas son privadas salvo que elijas compartirlas con enlace o hacerlas
+          públicas; entonces se ven con tu nombre.
         </p>
       </LegalSection>
 
@@ -92,8 +94,9 @@ export default function PrivacidadPage() {
 
       <LegalSection id="plazo" title="Cuánto tiempo">
         <p>
-          Mientras tengas la cuenta. Cuando la eliminas se borran de inmediato tu usuario, tus
-          favoritos, tu biblioteca y tus reseñas, y las fichas donde reseñaste dejan de mostrarte.
+          Mientras tengas la cuenta. Cuando la eliminas se borra de inmediato todo: tu usuario,
+          favoritos, biblioteca, listas, diario, capítulos vistos y reseñas, y las fichas donde
+          reseñaste dejan de mostrarte.
         </p>
       </LegalSection>
 
