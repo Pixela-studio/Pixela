@@ -19,6 +19,10 @@ model User {
   /// Cuándo aceptó las condiciones y declaró tener la edad mínima. Nulo en
   /// cuentas anteriores a la casilla.
   termsAcceptedAt DateTime? @map("terms_accepted_at")
+  /// Se incrementa para invalidar todas las sesiones abiertas: cambio de
+  /// contraseña o "cerrar sesión en todos los dispositivos". Cada JWT lleva la
+  /// versión con la que se emitió y `auth.ts` lo rechaza si ya no coincide.
+  tokenVersion  Int       @default(0) @map("token_version")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 

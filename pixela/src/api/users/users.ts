@@ -51,9 +51,22 @@ export const usersAPI = {
      * Elimina un usuario
      * @param {number} userId - ID del usuario a eliminar
      */
-    async delete(userId: number): Promise<void> {
+    async delete(userId: number, currentPassword?: string): Promise<void> {
         await fetchFromAPI(API_ENDPOINTS.USERS.DELETE.replace(':id', String(userId)), {
             method: 'DELETE',
+            // Borrar la propia cuenta exige la contraseña; un admin borrando a
+            // otro usuario no manda cuerpo.
+            ...(currentPassword !== undefined && {
+                body: JSON.stringify({ current_password: currentPassword }),
+            }),
         });
-    }
+    },
+
+    /** Cierra la sesión en todos los dispositivos (incluido este). */
+    async revokeSessions(): Promise<void> {
+        await fetchFromAPI(API_ENDPOINTS.USERS.SESSIONS, { method: 'DELETE' });
+    },
+
+    /** URL de descarga del JSON con todos los datos de la cuenta. */
+    exportUrl: API_ENDPOINTS.USERS.EXPORT,
 };

@@ -34,6 +34,7 @@ import { ProfileClientProps } from "@/features/profile/types/profileTypes";
 import { useProfileStats } from "@/features/profile/hooks/useProfileStats";
 import { ProfileHero } from "./layout/ProfileHero";
 import { ProfileStatsBar } from "./layout/ProfileStatsBar";
+import { AccountDataPanel } from "./layout/AccountDataPanel";
 
 const STYLES = {
   // Contenedores principales
@@ -327,6 +328,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                 user={{ ...user, user_id: user.user_id }}
                 onEdit={() => setIsEditing(true)}
               />
+              <AccountDataPanel userId={user.user_id} />
             </div>
           )}
 

@@ -10,6 +10,7 @@ import {
   validationError,
 } from "@/lib/api/responses";
 import { resourceIdSchema } from "@/lib/api/schemas";
+import { reviewPathsOf, revalidatePaths } from "@/lib/api/reviewsQuery";
 import { emailSchema, nameSchema, passwordSchema } from "@/lib/validation/account";
 
 const BCRYPT_ROUNDS = 12;
@@ -58,6 +59,10 @@ interface UpdateUserData {
   isAdmin?: boolean;
   password?: string;
 }
+
+const deleteUserSchema = z.object({
+  current_password: z.string().max(128).optional(),
+});
 
 export async function PUT(
   request: Request,
@@ -159,13 +164,17 @@ export async function PUT(
       updateData.password = await bcrypt.hash(password, BCRYPT_ROUNDS);
     }
 
+    // Cambiar la contraseña cierra todas las sesiones abiertas, también las de
+    // otros dispositivos: `auth.ts` rechaza los tokens con la versión anterior.
+    const revokeSessions = Boolean(password);
+
     if (Object.keys(updateData).length === 0) {
       return apiError("No hay cambios que aplicar", 400);
     }
 
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: updateData,
+      data: revokeSessions ? { ...updateData, tokenVersion: { increment: 1 } } : updateData,
       select: {
         id: true,
         name: true,
@@ -177,6 +186,11 @@ export async function PUT(
         updatedAt: true,
       },
     });
+
+    // El nombre y la foto salen en las reseñas de las fichas cacheadas.
+    if (updateData.name !== undefined || updateData.photoUrl !== undefined) {
+      revalidatePaths(await reviewPathsOf(id));
+    }
 
     return NextResponse.json({
       success: true,
@@ -217,14 +231,35 @@ export async function DELETE(
     return apiError("No tienes permiso para eliminar este perfil", 403);
   }
 
+  // El cuerpo es opcional: un admin que borra a otro usuario no manda nada.
+  let currentPassword: string | undefined;
+  if (request.headers.get("content-type")?.includes("application/json")) {
+    const body = await parseJsonBody(request);
+    if (!body.ok) return body.response;
+    const parsed = deleteUserSchema.safeParse(body.data);
+    if (!parsed.success) return validationError(parsed.error);
+    currentPassword = parsed.data.current_password;
+  }
+
   try {
     const target = await prisma.user.findUnique({
       where: { id },
-      select: { isAdmin: true },
+      select: { isAdmin: true, password: true },
     });
 
     if (!target) {
       return apiError("Usuario no encontrado", 404);
+    }
+
+    // Borrar la propia cuenta es irreversible: se pide la contraseña, como al
+    // cambiar el email o la contraseña.
+    if (currentUserId === id && target.password) {
+      if (!currentPassword) {
+        return apiError("Escribe tu contraseña para eliminar la cuenta", 400);
+      }
+      if (!(await bcrypt.compare(currentPassword, target.password))) {
+        return apiError("La contraseña no es correcta", 403);
+      }
     }
 
     // No dejar la plataforma sin ningún administrador.
@@ -235,7 +270,13 @@ export async function DELETE(
       }
     }
 
+    // Las rutas se leen antes de borrar: el borrado en cascada se lleva las
+    // reseñas y con ellas la lista de fichas que hay que invalidar.
+    const reviewPaths = await reviewPathsOf(id);
+
     await prisma.user.delete({ where: { id } });
+
+    revalidatePaths(reviewPaths);
 
     return NextResponse.json({ success: true });
   } catch (error) {

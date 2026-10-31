@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { Review } from "@/api/reviews/types";
@@ -89,4 +90,23 @@ export async function getMediaReviewsSafe(
     });
     return [];
   }
+}
+
+/**
+ * Fichas donde un usuario tiene reseñas.
+ *
+ * Las fichas son ISR y llevan dentro el nombre y la foto del autor de cada
+ * reseña. Si el autor cambia de nombre o de foto, o borra la cuenta, hay que
+ * invalidarlas; si no, siguen mostrando lo de antes hasta una hora.
+ */
+export async function reviewPathsOf(userId: number): Promise<string[]> {
+  const rows = await prisma.review.findMany({
+    where: { userId },
+    select: { tmdbId: true, itemType: true },
+  });
+  return rows.map((row) => mediaPathFor(row.tmdbId, row.itemType));
+}
+
+export function revalidatePaths(paths: string[]): void {
+  for (const path of new Set(paths)) revalidatePath(path);
 }

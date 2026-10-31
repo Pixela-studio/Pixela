@@ -34,7 +34,11 @@ function LoginForm() {
       });
 
       if (res?.error) {
-        setError('Estas credenciales no coinciden con nuestros registros.');
+        setError(
+          res.code === 'rate_limited'
+            ? 'Demasiados intentos seguidos. Espera unos minutos antes de volver a probar.'
+            : 'Estas credenciales no coinciden con nuestros registros.',
+        );
         return;
       }
 

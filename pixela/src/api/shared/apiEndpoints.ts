@@ -50,6 +50,8 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE_URL}/users`,
     UPDATE: `${API_BASE_URL}/users/:id`,
     DELETE: `${API_BASE_URL}/users/:id`,
+    EXPORT: `${API_BASE_URL}/users/me/export`,
+    SESSIONS: `${API_BASE_URL}/users/me/sessions`,
   },
 
   FAVORITES: {
