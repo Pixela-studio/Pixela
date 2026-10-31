@@ -1,71 +1,43 @@
 import { Pelicula } from '@/features/media/types/content';
 import { fetchTmdbDetail, parseTmdbId } from '@/lib/api/tmdbDetails';
 import { mapPeliculaFromApi } from './mapper/mapPelicula'; 
-import type {
-  ApiImage, ApiProvider, ApiTrailer, ApiPelicula, ApiActor
-} from './types';
-
-interface CrewMember {
-  id: number;
-  name: string;
-  profile_path: string | null;
-  job: string;
-}
-
-interface Creator {
-  id: number;
-  nombre: string;
-  foto?: string;
-}
+import type { ApiImage, ApiPelicula, ApiActor } from './types';
+import {
+  countryNames,
+  crewOf,
+  directorsOf,
+  languageName,
+  mapRegionProviders,
+  mapSimilar,
+  mapVideos,
+  movieCertification,
+  type RawCrewMember,
+  type RawRegionProviders,
+  type RawVideo,
+} from '@/api/shared/tmdbDetailExtras';
 
 interface ExtendedPeliculaResponse extends ApiPelicula {
+  original_title?: string;
+  original_language?: string;
+  production_countries?: Array<{ iso_3166_1?: string }>;
+  vote_count?: number;
   credits?: {
     cast: ApiActor[];
-    crew: CrewMember[];
+    crew: RawCrewMember[];
   };
   videos?: {
-    results: ApiTrailer[];
+    results: RawVideo[];
   };
   'watch/providers'?: {
-    results: {
-      ES?: {
-        flatrate?: ApiProvider[];
-        rent?: ApiProvider[];
-        buy?: ApiProvider[];
-      };
-    };
+    results: { ES?: RawRegionProviders };
   };
+  release_dates?: Parameters<typeof movieCertification>[0];
+  similar?: { results?: Parameters<typeof mapSimilar>[0] };
   images?: {
     backdrops: ApiImage[];
     posters: ApiImage[];
   };
 }
-
-const deduplicateProviders = (providers: ApiProvider[]): ApiProvider[] => {
-  const seen = new Set<number>();
-  return providers.filter(provider => {
-    if (!provider.provider_id) return false;
-    
-    if (seen.has(provider.provider_id)) {
-      return false;
-    }
-    seen.add(provider.provider_id);
-    return true;
-  });
-};
-
-const extractDirector = (crew: CrewMember[]): Creator | undefined => {
-  const director = crew.find(member => member.job === 'Director');
-  
-  if (!director) return undefined;
-  
-  return {
-    id: director.id,
-    nombre: director.name,
-    foto: director.profile_path || undefined
-  };
-};
-
 
 /**
  * Obtiene la película por ID junto con datos adicionales
@@ -96,30 +68,38 @@ export async function getPeliculaById(id: string): Promise<Pelicula> {
     throw new Error('Movie not found or invalid data');
   }
   const actores = rawPelicula.credits?.cast || [];
-  const trailers = rawPelicula.videos?.results || [];
-  
-  const providersData = rawPelicula['watch/providers']?.results?.ES;
-  const allProviders: ApiProvider[] = providersData ? [
-    ...(providersData.flatrate || []),
-    ...(providersData.rent || []),
-    ...(providersData.buy || [])
-  ] : [];
-  
-  const proveedores = deduplicateProviders(allProviders);
-  
-  const imagenes = {
-    backdrops: rawPelicula.images?.backdrops || [],
-    posters: rawPelicula.images?.posters || []
-  };
-  
-  const creador = extractDirector(rawPelicula.credits?.crew || []);
+  const crew = rawPelicula.credits?.crew;
+  const directores = directorsOf(crew);
+  const { proveedores, proveedoresUrl } = mapRegionProviders(
+    rawPelicula['watch/providers']?.results?.ES,
+  );
+  const tituloOriginal = rawPelicula.original_title?.trim();
+  const titulo = rawPelicula.title?.trim();
 
-  return mapPeliculaFromApi({
+  const pelicula = mapPeliculaFromApi({
     ...rawPelicula,
     actores,
-    trailers,
-    proveedores,
-    imagenes,
-    creador
+    imagenes: {
+      backdrops: rawPelicula.images?.backdrops || [],
+      posters: rawPelicula.images?.posters || [],
+    },
+    creador: directores[0]
+      ? { id: Number(directores[0].id), nombre: directores[0].nombre, foto: directores[0].foto }
+      : undefined,
   });
+
+  return {
+    ...pelicula,
+    directores,
+    trailers: mapVideos(rawPelicula.videos?.results, rawPelicula.original_language),
+    proveedores,
+    proveedoresUrl,
+    clasificacion: movieCertification(rawPelicula.release_dates),
+    tituloOriginal: tituloOriginal && tituloOriginal !== titulo ? tituloOriginal : undefined,
+    idiomaOriginal: languageName(rawPelicula.original_language),
+    paises: countryNames((rawPelicula.production_countries ?? []).map((c) => c.iso_3166_1)),
+    votos: rawPelicula.vote_count,
+    equipo: crewOf(crew),
+    similares: mapSimilar(rawPelicula.similar?.results, 'pelicula'),
+  };
 }

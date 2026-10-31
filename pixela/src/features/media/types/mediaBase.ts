@@ -47,4 +47,32 @@ export interface Media {
     backdrops: Wallpaper[];
     posters: Wallpaper[];
   };
+  /** Calificación por edades en España: «TP», «7», «12», «16», «18». */
+  clasificacion?: string;
+  /** Solo si difiere del título en castellano. */
+  tituloOriginal?: string;
+  /** Nombre del idioma original en castellano («japonés»). */
+  idiomaOriginal?: string;
+  paises?: string[];
+  votos?: number;
+  /** Guion, fotografía, música, montaje y producción. */
+  equipo?: CrewCredit[];
+  /** Página «Dónde ver» del título en TMDB para España. */
+  proveedoresUrl?: string;
+  similares?: SimilarTitle[];
+}
+
+export interface CrewCredit {
+  id: number;
+  nombre: string;
+  oficio: string;
+}
+
+export interface SimilarTitle {
+  id: string;
+  titulo: string;
+  poster: string;
+  puntuacion: number;
+  fecha: string;
+  tipo: MediaType;
 } 

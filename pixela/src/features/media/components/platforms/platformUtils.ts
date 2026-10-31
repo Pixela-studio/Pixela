@@ -30,11 +30,13 @@ export const PLATFORM_URLS: Record<string, string> = {
 };
 
 /**
- * Función para obtener la URL de una plataforma de streaming
- * @param {WatchProvider} provider - Proveedor de streaming
- * @returns {string} URL de la plataforma de streaming
+ * URL de una plataforma de streaming.
+ *
+ * Si no está en la tabla, se usa `fallbackUrl` (la página «Dónde ver» del
+ * título en TMDB). Antes se inventaba `https://www.<nombre>.com`: «Movistar Plus+
+ * Ficción Total» acababa en un dominio que no existe o, peor, en uno ajeno.
  */
-export function getPlatformUrl(provider: WatchProvider): string {
+export function getPlatformUrl(provider: WatchProvider, fallbackUrl?: string): string | undefined {
     
   // Normalizar el nombre para comparación (minúsculas, sin espacios)
   const normalizedName = provider.nombre.toLowerCase().replace(/\s+/g, '');
@@ -50,14 +52,5 @@ export function getPlatformUrl(provider: WatchProvider): string {
     }
   }
   
-  // Como último recurso, construir URL directa
-  return `https://www.${normalizedName}.com`;
-}
-
-/**
- * Función para abrir una plataforma de streaming
- */
-export function openPlatform(provider: WatchProvider): void {
-  const url = getPlatformUrl(provider);
-  window.open(url, "_blank", "noopener,noreferrer");
+  return fallbackUrl;
 } 

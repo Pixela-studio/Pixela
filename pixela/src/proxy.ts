@@ -110,8 +110,9 @@ const CSP_DIRECTIVES = [
   "img-src 'self' data: blob: https://image.tmdb.org https://img.youtube.com https://placehold.co https://via.placeholder.com https://images.unsplash.com https://i.pravatar.cc https://picsum.photos",
   "font-src 'self' data:",
   "connect-src 'self' https://api.themoviedb.org",
-  // Reproductor de trailers embebido.
-  "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
+  // Reproductor de tráilers: solo el modo de privacidad mejorada, que es el
+  // único que carga `TrailerPlayer` (y solo al pulsar play).
+  "frame-src https://www.youtube-nocookie.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

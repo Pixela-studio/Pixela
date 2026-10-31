@@ -28,7 +28,9 @@ const TrailerListItem = ({
 }: TrailerListItemProps) => {
   return (
     <button
+      type="button"
       onClick={onSelect}
+      aria-pressed={isSelected}
       className={`
         flex items-stretch rounded-sm overflow-hidden border transition-colors duration-200
         ${isLarge ? 'min-h-[100px] h-24' : 'min-h-[80px] h-20'} flex-shrink-0
@@ -39,10 +41,15 @@ const TrailerListItem = ({
     >
       {/* Miniatura */}
       <div className={`relative ${isLarge ? 'w-36' : 'w-28'} h-full flex-shrink-0`}>
+        {/* `unoptimized`: sin él la URL pasaba por `/_next/image`, que no
+            tiene `img.youtube.com` permitido. Cada miniatura salía rota y
+            además costaba una invocación del servidor. */}
         <Image
-          src={`https://img.youtube.com/vi/${trailer.key}/default.jpg`}
-          alt={trailer.nombre || 'Video thumbnail'}
+          src={`https://img.youtube.com/vi/${trailer.key}/mqdefault.jpg`}
+          alt=""
           fill
+          unoptimized
+          sizes="144px"
           className={`object-cover transition duration-300 ${
             isSelected ? 'brightness-110 contrast-110' : 'brightness-90'
           }`}
@@ -68,7 +75,7 @@ const TrailerListItem = ({
           {trailer.nombre || `Trailer ${index !== undefined ? index + 1 : ''}`}
         </p>
         <p className={`${isLarge ? 'text-sm mt-1.5' : 'text-xs mt-1'} text-gray-400 truncate`}>
-          {trailer.tipo || 'Video'}
+          {[trailer.tipo || 'Vídeo', trailer.idioma].filter(Boolean).join(' · ')}
         </p>
       </div>
     </button>

@@ -52,12 +52,5 @@ export const useMediaStore = create<MediaState>((set) => ({
   selectedGalleryImage: null,
   setSelectedGalleryImage: (image) => set({ selectedGalleryImage: image }),
 
-  /**
-   * Control de Trailers
-   * @property {string | null} selectedTrailerId - ID del trailer seleccionado
-   * @property {function} setSelectedTrailerId - Función para actualizar el trailer seleccionado
-   */
-  selectedTrailerId: null,
-  setSelectedTrailerId: (trailerId) => set({ selectedTrailerId: trailerId }),
 
 })); 

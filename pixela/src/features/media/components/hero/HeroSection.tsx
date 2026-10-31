@@ -61,7 +61,7 @@ export function HeroSection({ media, onPosterClick, title, refreshReviews, userR
           />
 
           <div className={STYLES.content}>
-            <MediaTitle title={media.titulo} />
+            <MediaTitle title={media.titulo} originalTitle={media.tituloOriginal} />
             <MediaMetadata media={media} />
             <GenresList genres={media.generos} />
             <CreatorInfo media={media} />

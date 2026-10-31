@@ -26,11 +26,13 @@ interface TmdbResponse {
  */
 export async function getWeekendMovies(limit: number): Promise<WeekendMovie[]> {
   try {
-    // Usamos discover para filtrar por disponibilidad en streaming (ES)
+    // Solo lo incluido en alguna suscripción de España, como ya hacían las
+    // series. Con `flatrate|rent|buy` la fila de «Finde en casa» colaba
+    // películas de alquiler sin decirlo: lo que se ve sin pagar más, no.
     const data = await fetchFromTmdb<TmdbResponse>("discover/movie", {
       sort_by: "popularity.desc",
       watch_region: "ES",
-      with_watch_monetization_types: "flatrate|rent|buy",
+      with_watch_monetization_types: "flatrate",
     });
 
     return data.results

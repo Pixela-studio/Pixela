@@ -1,6 +1,8 @@
 import { Media } from './mediaBase';
 import { Creator } from './people';
 
+export type { CrewCredit, SimilarTitle } from './mediaBase';
+
 /**
  * Serie
  * @interface Serie
@@ -17,6 +19,11 @@ import { Creator } from './people';
 export interface Serie extends Media {
   temporadas: number;
   episodios: number;
+  /** Minutos por episodio; TMDB la deja vacía en muchas series recientes. */
+  duracionEpisodio?: number;
+  /** «En emisión», «Finalizada», «Cancelada»… */
+  estado?: string;
+  proximoEpisodio?: { fecha: string; temporada: number; episodio: number };
   creadores?: Creator[];
   poster_path?: string;
   name?: string;
@@ -37,7 +44,12 @@ export interface Serie extends Media {
  * @property {string} overview - Resumen de la película
  */
 export interface Pelicula extends Media {
-  duracion: number;
+  /**
+   * Opcional: TMDB no la trae en muchos títulos antiguos o raros, y exigirla
+   * convertía esas fichas en un 404.
+   */
+  duracion?: number;
+  directores?: Creator[];
   poster_path?: string;
   title?: string;
   vote_average?: number;

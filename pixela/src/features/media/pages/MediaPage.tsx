@@ -14,6 +14,8 @@ import { CastSection } from "@/features/media/components/cast/CastSection";
 import { TrailersSection } from "@/features/media/components/trailer/TrailersSection";
 import { GallerySection } from "@/features/media/components/gallery/GallerySection";
 import { ReviewSection } from "@/features/media/components/review/ReviewSection";
+import { TechnicalSheet } from "@/features/media/components/details/TechnicalSheet";
+import { SimilarSection } from "@/features/media/components/details/SimilarSection";
 
 interface MediaPageProps {
   media: Media;
@@ -116,13 +118,20 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
       <div className="relative z-10 pb-40">
         <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 flex flex-col gap-16 md:gap-24">
           {/* Proveedores de Streaming */}
-          <StreamingProviders providers={media.proveedores || []} />
+          <StreamingProviders
+            providers={media.proveedores || []}
+            watchUrl={media.proveedoresUrl}
+          />
           {/* Reparto */}
           <CastSection actors={media.actores} />
           {/* Trailers */}
           <TrailersSection trailers={media.trailers} />
           {/* Galería */}
           <GallerySection media={media} />
+          {/* Ficha técnica */}
+          <TechnicalSheet media={media} />
+          {/* Similares */}
+          <SimilarSection items={media.similares ?? []} />
           {/* Reseñas */}
           <ReviewSection
             tmdbId={tmdbId}
