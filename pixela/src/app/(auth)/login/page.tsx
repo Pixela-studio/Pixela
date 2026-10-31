@@ -18,6 +18,7 @@ function LoginForm() {
   // `proxy.ts` y los botones que piden cuenta mandan aquí con la ruta de origen.
   const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
   const justRegistered = searchParams.get('registered') === 'true';
+  const justReset = searchParams.get('reset') === 'true';
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -57,6 +58,15 @@ function LoginForm() {
         <h1 className="title-card text-5xl md:text-6xl">Iniciar sesión</h1>
         <p className="mt-2 text-white/70">Bienvenido a Pixela.</p>
       </header>
+
+      {justReset && (
+        <p
+          role="status"
+          className="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2"
+        >
+          Contraseña cambiada. Entra con la nueva.
+        </p>
+      )}
 
       {justRegistered && (
         <p
@@ -107,9 +117,12 @@ function LoginForm() {
       </div>
 
       <div className="flex flex-col items-center gap-3 pt-2 text-sm">
-        {/* "¿Olvidaste tu contraseña?" se quitó: no hay recuperación por email y
-            un texto deshabilitado que parece enlace no ayuda a nadie (además
-            explicaba el motivo solo en `title`). Volverá con la ruta real. */}
+        <Link
+          href="/recuperar"
+          className="text-white/70 underline-offset-4 transition-colors duration-200 hover:text-white hover:underline"
+        >
+          ¿Has olvidado tu contraseña?
+        </Link>
         <div className="text-white/70">
           ¿No tienes cuenta?
           <Link

@@ -32,6 +32,7 @@ model User {
   lists         List[]
   diaryEntries  DiaryEntry[]
   episodeWatches EpisodeWatch[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -180,4 +181,20 @@ model EpisodeWatch {
   @@unique([userId, tmdbId, season, episode])
   @@index([userId, tmdbId])
   @@map("episode_watches")
+}
+
+/// Enlaces de «He olvidado mi contraseña». Se guarda el hash SHA-256 del
+/// token, nunca el token: quien lea la base de datos no puede usarlos.
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement()) @map("password_reset_token_id")
+  userId    Int       @map("user_id")
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }

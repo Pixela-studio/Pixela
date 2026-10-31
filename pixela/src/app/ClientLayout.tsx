@@ -20,7 +20,9 @@ export default function ClientLayout({
   const pathname = usePathname();
   useLiteModeClass();
   const isAuthPage =
-    pathname?.startsWith("/login") || pathname?.startsWith("/register");
+    pathname?.startsWith("/login") ||
+    pathname?.startsWith("/register") ||
+    pathname?.startsWith("/recuperar");
 
   // Resetear scroll al tope en cada cambio de ruta.
   // Se hace aquí (layout global) y no en el componente destino porque el layout
