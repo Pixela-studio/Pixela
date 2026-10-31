@@ -54,6 +54,9 @@ export const API_ENDPOINTS = {
     SESSIONS: `${API_BASE_URL}/users/me/sessions`,
   },
 
+  /** Plataformas de streaming de España, para «Mis plataformas». */
+  PROVIDERS: `${API_BASE_URL}/tmdb/providers`,
+
   /** Búsqueda global: películas, series y personas en una consulta. */
   SEARCH: `${API_BASE_URL}/search`,
 

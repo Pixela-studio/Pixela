@@ -1,4 +1,7 @@
+'use client';
+
 import { PlatformCard } from './PlatformCard';
+import { useMyPlatforms } from '@/hooks/useMyPlatforms';
 import { StreamingProvidersProps } from '@/features/media/types/platforms';
 import type { WatchProvider } from '@/features/media/types';
 
@@ -15,7 +18,13 @@ const GROUPS: Array<{ tipo: NonNullable<WatchProvider['tipo']>; titulo: string; 
  * la película estaba en su suscripción o le iba a costar cuatro euros.
  */
 export function StreamingProviders({ providers, watchUrl }: StreamingProvidersProps) {
+  const { ids: myPlatforms } = useMyPlatforms();
+
   if (!providers || providers.length === 0) return null;
+
+  const mine = providers.filter(
+    (provider) => (provider.tipo ?? 'flatrate') === 'flatrate' && myPlatforms.includes(Number(provider.id)),
+  );
 
   // Datos antiguos sin tipo: se tratan como incluidos para no perderlos.
   const byKind = (tipo: WatchProvider['tipo']) =>
@@ -26,6 +35,15 @@ export function StreamingProviders({ providers, watchUrl }: StreamingProvidersPr
       <h2 id="donde-ver-title" className="title-card mb-8 text-5xl md:text-6xl">
         Dónde verla
       </h2>
+      {/* Con «Mis plataformas» elegidas, la respuesta a «¿la tengo?» va
+          primero, sin tener que leer la lista. */}
+      {myPlatforms.length > 0 && (
+        <p className="mb-6 text-base text-white" role="status">
+          {mine.length > 0
+            ? `Incluida en tu ${mine.map((provider) => provider.nombre).join(', ')}.`
+            : 'No está incluida en ninguna de tus plataformas.'}
+        </p>
+      )}
       <div className="flex flex-col gap-8">
         {GROUPS.map(({ tipo, titulo, nota }) => {
           const list = byKind(tipo);
@@ -42,6 +60,7 @@ export function StreamingProviders({ providers, watchUrl }: StreamingProvidersPr
                     key={`${tipo}-${provider.id || provider.nombre}`}
                     provider={provider}
                     fallbackUrl={watchUrl}
+                    isMine={tipo === 'flatrate' && myPlatforms.includes(Number(provider.id))}
                   />
                 ))}
               </div>

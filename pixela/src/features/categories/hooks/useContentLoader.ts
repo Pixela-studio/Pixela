@@ -3,6 +3,7 @@ import { Category } from "@/api/categories/categories";
 import { Pelicula, Serie } from "@/features/media/types/content";
 import { fetchFromAPI } from "@/api/shared/apiHelpers";
 import { describeSearchError, searchAll, type SearchTitle } from "@/api/search/search";
+import { hasActiveFilters, toDiscoverParams, type CatalogFilters } from "@/features/categories/filters";
 
 /**
  * Respuesta estándar de la API para contenido paginado.
@@ -42,14 +43,37 @@ interface ContentState {
   searchQuery: string;
 }
 
+/** Filtros del panel y las plataformas elegidas, para explorar con `/discover`. */
+export interface DiscoverOptions {
+  filters: CatalogFilters;
+  platformIds: readonly number[];
+}
+
 interface ContentActions {
-  loadContent: (category: Category | null, page: number) => Promise<void>;
+  loadContent: (category: Category | null, page: number, discover?: DiscoverOptions) => Promise<void>;
   resetContent: () => void;
   searchContent: (query: string, page?: number) => Promise<void>;
 }
 
-const buildApiEndpoint = (category: Category | null, page: number, mediaType: "movies" | "series") =>
-  `${category ? `/${mediaType}/genre/${category.id}` : `/${mediaType}/discover`}?page=${page}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`;
+const buildApiEndpoint = (
+  category: Category | null,
+  page: number,
+  mediaType: "movies" | "series",
+  discover?: DiscoverOptions,
+) => {
+  // Con filtros, todo va por `/discover`: el endpoint de género no los admite.
+  if (discover && hasActiveFilters(discover.filters)) {
+    const params = new URLSearchParams(
+      toDiscoverParams(discover.filters, mediaType, {
+        genreId: category?.id,
+        platformIds: discover.platformIds,
+      }),
+    );
+    params.set("page", String(page));
+    return `/${mediaType}/discover?${params.toString()}`;
+  }
+  return `${category ? `/${mediaType}/genre/${category.id}` : `/${mediaType}/discover`}?page=${page}&limit=${PAGINATION_CONFIG.ITEMS_PER_PAGE}`;
+};
 
 const buildSearchEndpoint = (query: string, page: number, mediaType: "movies" | "series") =>
   `/${mediaType}/search?query=${encodeURIComponent(query)}&page=${page}`;
@@ -128,7 +152,7 @@ export const useContentLoader = (
   }, []);
 
   const loadContent = useCallback(
-    async (category: Category | null, page: number): Promise<void> => {
+    async (category: Category | null, page: number, discover?: DiscoverOptions): Promise<void> => {
       if (!isValidPage(page)) return;
       const isCurrent = beginRequest();
       setSearchQuery("");
@@ -138,10 +162,10 @@ export const useContentLoader = (
         const wantSeries = selectedMediaType !== "movies";
         const [movieResult, seriesResult] = await Promise.all([
           wantMovies
-            ? fetchFromAPI<ApiResponse<Pelicula[]>>(buildApiEndpoint(category, page, "movies"))
+            ? fetchFromAPI<ApiResponse<Pelicula[]>>(buildApiEndpoint(category, page, "movies", discover))
             : null,
           wantSeries
-            ? fetchFromAPI<ApiResponse<Serie[]>>(buildApiEndpoint(category, page, "series"))
+            ? fetchFromAPI<ApiResponse<Serie[]>>(buildApiEndpoint(category, page, "series", discover))
             : null,
         ]);
         if (!isCurrent()) return;

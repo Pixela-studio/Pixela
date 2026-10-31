@@ -10,7 +10,7 @@ import { PlatformCardProps } from '@/features/media/types/platforms';
  * @param {PlatformCardProps} props - Propiedades del componente
  * @returns {JSX.Element} Enlace a la plataforma de streaming
  */
-export function PlatformCard({ provider, fallbackUrl }: PlatformCardProps) {
+export function PlatformCard({ provider, fallbackUrl, isMine = false }: PlatformCardProps) {
   const name = provider.nombre || String(provider.id || 'Plataforma');
   const href = getPlatformUrl(provider, fallbackUrl);
 
@@ -19,8 +19,9 @@ export function PlatformCard({ provider, fallbackUrl }: PlatformCardProps) {
     ? provider.logo
     : formatImageUrl(provider.logo);
 
-  const className =
-    "p-3 rounded-2xl flex items-center gap-3 bg-pixela-surface border border-white/10 select-none";
+  const className = `p-3 rounded-2xl flex items-center gap-3 bg-pixela-surface border select-none ${
+    isMine ? 'border-white/60' : 'border-white/10'
+  }`;
 
   const content = (
     <>
@@ -43,6 +44,7 @@ export function PlatformCard({ provider, fallbackUrl }: PlatformCardProps) {
         )}
       </div>
       <span className="font-medium text-white truncate">{name}</span>
+      {isMine && <span className="text-xs font-semibold text-pixela-accent">La tienes</span>}
     </>
   );
 

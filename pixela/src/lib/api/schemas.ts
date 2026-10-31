@@ -96,7 +96,11 @@ export const ALLOWED_DISCOVER_PARAMS = new Set([
   "without_genres",
   "with_original_language",
   "with_watch_providers",
+  "with_watch_monetization_types",
   "watch_region",
+  // Edad recomendada (solo películas en TMDB): filtro «Para ver en familia».
+  "certification_country",
+  "certification.lte",
   "primary_release_year",
   "primary_release_date.gte",
   "primary_release_date.lte",
