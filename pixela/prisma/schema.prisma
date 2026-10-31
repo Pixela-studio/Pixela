@@ -16,6 +16,9 @@ model User {
   coverImage    String?   @map("cover_image") @db.Text
   emailVerified DateTime? @map("email_verified_at")
   isAdmin       Boolean   @default(false) @map("is_admin")
+  /// Cuándo aceptó las condiciones y declaró tener la edad mínima. Nulo en
+  /// cuentas anteriores a la casilla.
+  termsAcceptedAt DateTime? @map("terms_accepted_at")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
