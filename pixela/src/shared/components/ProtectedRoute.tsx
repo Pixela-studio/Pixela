@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useSyncExternalStore } from 'react';
 import { useSession } from 'next-auth/react';
 import Error403 from '@/app/errors/error-403';
 
@@ -22,21 +22,36 @@ const STYLES = {
  *
  * Es una capa de experiencia de usuario, no de seguridad: la autorización real
  * la aplican las route handlers con `requireUser` / `requireAdmin`, y
- * `middleware.ts` evita que se llegue a renderizar sin cookie de sesión.
+ * `proxy.ts` evita que se llegue a renderizar sin cookie de sesión.
  *
  * Se ha eliminado el efecto que leía `forceLogout` de `localStorage` y disparaba
  * un `setTimeout` de redirección: competía con los temporizadores del Navbar y
  * del store, y podía expulsar de la página a un usuario perfectamente válido si
  * la bandera quedaba huérfana de un cierre de sesión anterior.
  */
+const noopSubscribe = () => () => {};
+
+/**
+ * `false` en el servidor y durante la hidratación; `true` después.
+ *
+ * En el servidor `providers.tsx` fija la sesión a `null` (no ve la cookie
+ * pista), así que `status` es `"unauthenticated"` y aquí se pintaba la 403; en
+ * el cliente con sesión el `status` arranca en `"loading"` y se pintaba el
+ * spinner. Las dos versiones no coincidían y React tiraba la hidratación de
+ * todo `/profile`. Hasta hidratar se pinta siempre el estado de carga.
+ */
+const useHydrated = () =>
+  useSyncExternalStore(noopSubscribe, () => true, () => false);
+
 export function ProtectedRoute({
   children,
   requireAuth = true,
   requireAdmin = false
 }: ProtectedRouteProps) {
   const { data: session, status } = useSession();
+  const hydrated = useHydrated();
 
-  if (status === 'loading') {
+  if (!hydrated || status === 'loading') {
     return (
       <div className={STYLES.loadingContainer}>
         <div className={STYLES.loadingContent}>
