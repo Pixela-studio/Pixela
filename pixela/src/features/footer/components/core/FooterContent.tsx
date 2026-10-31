@@ -3,7 +3,8 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import FooterSocialLinks from '../content/FooterSocialLinks';
-import { DISCOVER_LINKS, ACCOUNT_LINKS } from '@/features/footer/constants/links';
+import { DISCOVER_LINKS, ACCOUNT_LINKS, LEGAL_LINKS } from '@/features/footer/constants/links';
+import { CONTACT_EMAIL, SITE_LOCATION } from '@/lib/site';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const STYLES = {
@@ -24,6 +25,7 @@ const STYLES = {
   contactGroup: "flex flex-col group",
   contactLabel: "text-gray-400 text-sm",
   contactText: "text-white",
+  contactLink: "text-white underline-offset-4 hover:underline break-all",
 
   // Navegación y enlaces
   linksContainer: "grid grid-cols-2 gap-25 md:contents ipad:contents",
@@ -87,7 +89,13 @@ export const FooterContent = () => {
             <div className={STYLES.contactContainer}>
               <div className={STYLES.contactGroup}>
                 <span className={STYLES.contactLabel}>Ubicación</span>
-                <span className={STYLES.contactText}>Málaga, España</span>
+                <span className={STYLES.contactText}>{SITE_LOCATION}</span>
+              </div>
+              <div className={STYLES.contactGroup}>
+                <span className={STYLES.contactLabel}>Contacto</span>
+                <a href={`mailto:${CONTACT_EMAIL}`} className={STYLES.contactLink}>
+                  {CONTACT_EMAIL}
+                </a>
               </div>
             </div>
           </div>
@@ -149,11 +157,20 @@ export const FooterContent = () => {
         <div className={STYLES.copyrightSection} ref={copyrightRef}>
           <div className={STYLES.copyrightContainer}>
             <p className={STYLES.copyrightText}>
-              © {CURRENT_YEAR} Pixela.io. Todos los derechos reservados.
+              © {CURRENT_YEAR} Pixela. Todos los derechos reservados.
             </p>
-            {/* Los enlaces a /cookies y /accesibilidad apuntaban a rutas que no
-                existen. Hasta que haya páginas legales reales, mejor no
-                prometer una que devuelve 404. */}
+            <nav aria-label="Textos legales" className={STYLES.copyrightLinks}>
+              {LEGAL_LINKS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={false}
+                  className={STYLES.copyrightLink}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
             <p className={STYLES.copyrightText}>
               Datos de películas y series por{' '}
               <a

@@ -20,3 +20,18 @@ const DEFAULT_SITE_URL = "http://localhost:3000";
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL
 ).replace(/\/$/, "");
+
+/**
+ * Responsables del sitio y buzón de contacto.
+ *
+ * Los citan el aviso legal, la política de privacidad y el pie. El buzón
+ * anterior, `pixel@pixela.io`, era de un dominio que no es del proyecto: nadie
+ * recibía lo que se mandaba allí, así que los derechos de privacidad no tenían
+ * dónde ejercerse.
+ */
+export const SITE_OWNERS = "Pablo Gil Díaz y Ruyi Xia Ye";
+export const CONTACT_EMAIL = "pabloinfodesign95@gmail.com";
+export const SITE_LOCATION = "Málaga, España";
+
+/** Fecha de la última revisión de los textos legales, en formato ISO. */
+export const LEGAL_UPDATED_AT = "2026-10-30";

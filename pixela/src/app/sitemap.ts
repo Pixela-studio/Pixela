@@ -26,5 +26,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.6,
     },
+    ...["/aviso-legal", "/privacidad", "/cookies"].map((path) => ({
+      url: `${SITE_URL}${path}`,
+      changeFrequency: "yearly" as const,
+      priority: 0.2,
+    })),
   ];
 }
