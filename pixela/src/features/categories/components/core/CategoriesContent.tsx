@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import type { OrderedItem } from "@/features/categories/hooks/useContentLoader";
 import Image from "next/image";
 import Link from "next/link";
 import { Pelicula, Serie } from "@/features/media/types/content";
@@ -32,7 +33,7 @@ const STYLES = {
 
   // Estados (Vacío y Error)
   emptyState: "text-center text-gray-400 py-12",
-  errorState: "text-center text-red-500 py-12",
+  errorState: "flex flex-col items-center text-center text-red-400 py-12",
 
   // Barra de Búsqueda
   searchContainer: "relative mb-8",
@@ -332,8 +333,13 @@ const useFilteredContent = (
   movies: Pelicula[],
   series: Serie[],
   searchTerm: string,
+  ordered: OrderedItem[] | null,
 ) => {
   return useMemo(() => {
+    // Con búsqueda, el orden es el de relevancia de TMDB. Reordenar por nota
+    // mandaba el título buscado al fondo detrás de otros con mejor media.
+    if (ordered) return ordered;
+
     const movieContent = movies.map((movie) => ({
       ...movie,
       mediaType: "movie" as const,
@@ -359,7 +365,7 @@ const useFilteredContent = (
         );
       })
       .sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
-  }, [movies, series, searchTerm]);
+  }, [movies, series, searchTerm, ordered]);
 };
 
 /**
@@ -377,13 +383,15 @@ const ContentGrid = memo(
     movies,
     series,
     searchTerm,
+    ordered,
   }: {
     movies: Pelicula[];
     series: Serie[];
     searchTerm: string;
+    ordered: OrderedItem[] | null;
   }) => {
     const [visibleItems, setVisibleItems] = useState(BATCH_SIZE);
-    const filteredContent = useFilteredContent(movies, series, searchTerm);
+    const filteredContent = useFilteredContent(movies, series, searchTerm, ordered);
     const hasMore = visibleItems < filteredContent.length;
 
     useEffect(() => {
@@ -781,6 +789,8 @@ const CategoriesContent = memo(
     mediaType,
     currentPage,
     totalPages,
+    ordered,
+    onRetry,
   }: CategoriesContentProps) => {
     const {
       register,
@@ -839,9 +849,6 @@ const CategoriesContent = memo(
 
     const hasContent = movies.length > 0 || series.length > 0;
 
-    if (error) {
-      return <div className={STYLES.errorState}>{error}</div>;
-    }
 
     return (
       <div className={`${STYLES.mainContainer}`}>
@@ -882,7 +889,19 @@ const CategoriesContent = memo(
           </form>
         )}
 
-        {mediaType !== "random" && loading ? (
+        {/* El error ya no sustituye a toda la vista: el buscador sigue ahí
+            para corregir la consulta, el mensaje está en castellano y se
+            puede reintentar. */}
+        {error ? (
+          <div role="alert" className={STYLES.errorState}>
+            <p>{error}</p>
+            {onRetry && (
+              <button type="button" onClick={onRetry} className="btn btn-ghost btn-sm mt-4">
+                Reintentar
+              </button>
+            )}
+          </div>
+        ) : mediaType !== "random" && loading ? (
           <div className="relative">
             <ContentSkeleton />
           </div>
@@ -894,6 +913,18 @@ const CategoriesContent = memo(
           </div>
         ) : (
           <>
+            {mediaType === "all" && searchQuery.trim() && (
+              <p className="mb-4 text-sm text-gray-400">
+                ¿Buscas a una persona?{" "}
+                <Link
+                  href={`/buscar?q=${encodeURIComponent(searchQuery.trim())}`}
+                  prefetch={false}
+                  className="text-white underline underline-offset-4"
+                >
+                  Ver todos los resultados, con actores y directores
+                </Link>
+              </p>
+            )}
             {mediaType !== "random" && hasContent && (
               <ItemCounter
                 moviesCount={movies.length}
@@ -913,7 +944,7 @@ const CategoriesContent = memo(
                   mediaType={mediaType}
                 />
               ) : (
-                <ContentGrid movies={movies} series={series} searchTerm={""} />
+                <ContentGrid movies={movies} series={series} searchTerm={""} ordered={ordered ?? null} />
               )}
             </div>
           </>

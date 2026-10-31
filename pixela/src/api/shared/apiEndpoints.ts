@@ -54,6 +54,9 @@ export const API_ENDPOINTS = {
     SESSIONS: `${API_BASE_URL}/users/me/sessions`,
   },
 
+  /** Búsqueda global: películas, series y personas en una consulta. */
+  SEARCH: `${API_BASE_URL}/search`,
+
   FAVORITES: {
     LIST: `${API_BASE_URL}/favorites`,
     ADD: `${API_BASE_URL}/favorites`,

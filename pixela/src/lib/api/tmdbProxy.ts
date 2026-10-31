@@ -125,6 +125,51 @@ export async function proxySearch(request: Request, type: PixelaMediaType) {
   }
 }
 
+interface TmdbMultiResult {
+  media_type?: "movie" | "tv" | "person";
+  [key: string]: unknown;
+}
+
+/**
+ * GET /api/search — `search/multi`: películas, series y personas en una sola
+ * consulta, en el orden de relevancia de TMDB.
+ *
+ * Con «Todo», Categorías lanzaba dos búsquedas (película y serie) por cada
+ * pulsación: gastaba el doble de cupo, ordenaba por nota en vez de relevancia
+ * y no encontraba personas. Se marca `media_type` y se descarta lo que no es
+ * ninguno de los tres (colecciones, etc.).
+ */
+export async function proxyMultiSearch(request: Request) {
+  const limited = enforceRateLimit(request, SEARCH_LIMIT);
+  if (limited) return limited;
+
+  const { searchParams } = new URL(request.url);
+
+  const parsedQuery = searchQuerySchema.safeParse(searchParams.get("query") ?? "");
+  if (!parsedQuery.success) {
+    return apiError(parsedQuery.error.issues[0].message, 400);
+  }
+
+  try {
+    const data = await fetchFromTmdb<Omit<TmdbListResponse, "results"> & { results?: TmdbMultiResult[] }>(
+      "/search/multi",
+      {
+        query: parsedQuery.data,
+        page: pageSchema.parse(searchParams.get("page") ?? "1"),
+        include_adult: false,
+      },
+    );
+    return listResponse({
+      ...data,
+      results: (data.results ?? []).filter(
+        (item) => item.media_type === "movie" || item.media_type === "tv" || item.media_type === "person",
+      ),
+    });
+  } catch (error) {
+    return handleRouteError("Failed to multi-search", error);
+  }
+}
+
 /** GET /trending/{movie|tv}/week */
 export async function proxyTrending(request: Request, type: PixelaMediaType) {
   const { searchParams } = new URL(request.url);
