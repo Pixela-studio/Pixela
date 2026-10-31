@@ -17,7 +17,7 @@ const STYLES = {
   logoPane:
     'flex justify-center sm:order-last sm:h-full sm:items-center sm:border-l sm:border-white/10 sm:bg-pixela-ink/60',
   logoLink: 'group flex flex-col items-center gap-4 rounded-2xl p-2',
-  logo: 'w-16 sm:w-24 h-auto transition-transform duration-500 ease-out-expo group-hover:scale-105',
+  logo: 'w-14 sm:w-20 h-auto transition-transform duration-500 ease-out-expo group-hover:scale-105',
   wordmark: 'font-display italic font-bold text-4xl sm:text-5xl tracking-[-0.02em] text-white',
   formPane: 'flex items-center justify-center sm:px-6 sm:py-12',
 } as const;
@@ -44,8 +44,8 @@ export const LoginLayout = ({ children }: LoginLayoutProps) => {
             <Image
               src="/img/pixela-mark.svg"
               alt=""
-              width={113}
-              height={94}
+              width={206}
+              height={216}
               className={STYLES.logo}
               unoptimized
               priority
