@@ -51,10 +51,18 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+/** Borra lo personal y las páginas guardadas, salvo la de «Sin conexión». */
+async function clearPrivate() {
+  await caches.delete(PRIVATE_CACHE);
+  const pages = await caches.open(PAGES_CACHE);
+  const keys = await pages.keys();
+  await Promise.all(
+    keys.filter((key) => new URL(key.url).pathname !== OFFLINE_URL).map((key) => pages.delete(key)),
+  );
+}
+
 self.addEventListener("message", (event) => {
-  if (event.data === "clear-private") {
-    event.waitUntil(Promise.all([caches.delete(PRIVATE_CACHE), caches.delete(PAGES_CACHE)]));
-  }
+  if (event.data === "clear-private") event.waitUntil(clearPrivate());
 });
 
 async function trimCache(name, max) {
@@ -67,7 +75,7 @@ async function networkFirst(request, cacheName) {
   try {
     const response = await fetch(request);
     if (response.status === 401) {
-      await caches.delete(PRIVATE_CACHE);
+      await clearPrivate();
     } else if (response.ok) {
       const cache = await caches.open(cacheName);
       await cache.put(request, response.clone());

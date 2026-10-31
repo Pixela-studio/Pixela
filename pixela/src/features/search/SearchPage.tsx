@@ -103,8 +103,6 @@ export function SearchPage() {
       return;
     }
     void runSearch(urlQuery, 1);
-    // `runSearch` es estable en lo que importa: solo usa setters y la ref.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlQuery]);
 
   const people = results.filter((item): item is SearchPerson => item.kind === "person");
