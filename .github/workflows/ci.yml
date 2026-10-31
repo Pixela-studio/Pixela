@@ -1,0 +1,42 @@
+# Comprobaciones de cada push y pull request: tipos, lint y tests.
+#
+# No hace `next build`: el build necesita TMDB_API_KEY (lib/tmdb.ts falla al
+# cargar sin ella) y ese secreto vive en Coolify, no en GitHub.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pixela
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.8
+
+      - name: Instalar dependencias
+        run: bun install --frozen-lockfile
+
+      - name: Generar el cliente de Prisma
+        run: bunx prisma generate
+
+      - name: Tipos
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Tests
+        run: bun run test
