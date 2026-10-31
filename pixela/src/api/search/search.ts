@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "../shared/apiEndpoints";
 import { ApiError, fetchFromAPI, parseApiErrorMessage } from "../shared/apiHelpers";
+import { DEPARTMENTS } from "@/lib/departments";
 
 /** Resultado de `search/multi` tal como lo devuelve TMDB. */
 interface RawMultiResult {
@@ -62,23 +63,6 @@ export interface SearchPage {
   totalPages: number;
   totalResults: number;
 }
-
-/** Oficios de TMDB (`known_for_department`) en castellano. */
-export const DEPARTMENTS: Record<string, string> = {
-  Acting: "Interpretación",
-  Directing: "Dirección",
-  Writing: "Guion",
-  Production: "Producción",
-  Camera: "Fotografía",
-  Editing: "Montaje",
-  Sound: "Sonido",
-  Art: "Dirección de arte",
-  "Costume & Make-Up": "Vestuario y maquillaje",
-  "Visual Effects": "Efectos visuales",
-  Crew: "Equipo",
-  Lighting: "Iluminación",
-  Creator: "Creación",
-};
 
 function normalize(item: RawMultiResult): SearchResult {
   if (item.media_type === "person") {

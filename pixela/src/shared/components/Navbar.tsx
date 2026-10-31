@@ -51,7 +51,7 @@ const STYLES = {
   navLinkUnderlineActive: 'scale-x-100',
   userSection: 'hidden lg:flex ml-auto items-center',
   userContainer: 'flex items-center gap-2',
-  userName: 'text-pixela-light text-sm',
+  userName: 'whitespace-nowrap text-pixela-light text-sm',
   button: 'text-pixela-light/80 hover:text-pixela-accent transition-colors duration-300 p-2 rounded-full hover:bg-pixela-dark/30',
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
   searchLink: 'flex items-center gap-2 rounded-full p-2 text-[15px] font-medium [font-stretch:112%] text-pixela-light/80 transition-colors duration-300 hover:text-white lg:mr-4',

@@ -10,19 +10,29 @@ export interface ActorDetails {
   place_of_birth: string | null;
   known_for_department: string;
   combined_credits?: {
-    cast: {
-      id: number;
-      title?: string;
-      name?: string;
-      media_type: 'movie' | 'tv';
-      character: string;
-      poster_path: string | null;
-      backdrop_path?: string | null;
-      release_date?: string;
-      first_air_date?: string;
-      vote_average: number;
-    }[];
+    cast: ActorCredit[];
+    /** Trabajos detrás de la cámara: dirección, guion, producción… */
+    crew?: CrewCredit[];
   };
+}
+
+export interface ActorCredit {
+  id: number;
+  title?: string;
+  name?: string;
+  media_type: 'movie' | 'tv';
+  character: string;
+  poster_path: string | null;
+  backdrop_path?: string | null;
+  release_date?: string;
+  first_air_date?: string;
+  vote_average: number;
+  vote_count?: number;
+}
+
+export interface CrewCredit extends Omit<ActorCredit, 'character'> {
+  department: string;
+  job: string;
 }
 
 export async function getActorDetails(id: string): Promise<ActorDetails> {

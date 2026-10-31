@@ -32,7 +32,7 @@ export const CreatorInfo = ({ media }: CreatorInfoProps) => {
       <h3 className={STYLES.title}>{isSerie ? 'Creada por' : 'Dirección'}</h3>
       <div className={STYLES.creatorsWrapper}>
         {people.map((person) => (
-          <CreatorAvatar key={person.id} photo={person.foto} name={person.nombre} />
+          <CreatorAvatar key={person.id} photo={person.foto} name={person.nombre} personId={person.id} />
         ))}
       </div>
     </div>

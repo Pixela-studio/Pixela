@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { checkRateLimit, getClientIp } from "@/lib/api/rateLimit";
 
 /**
  * Proxy de seguridad (antes `middleware.ts`; Next 16 renombró la convención).
@@ -15,6 +16,19 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /** Rutas que requieren sesión para renderizarse. */
 const PROTECTED_PREFIXES = ["/profile"];
+
+/**
+ * Límite por IP para las fichas de títulos y personas.
+ *
+ * Desde la ronda 2 del beta test, el reparto, la filmografía, los similares y
+ * el buscador enlazan a cualquier ficha (con `nofollow` fuera de la allowlist).
+ * `nofollow` lo respetan los buscadores, no los rastreadores maleducados, y
+ * cada ficha nueva es una entrada ISR y una salida a TMDB. 150 fichas cada diez
+ * minutos no las alcanza una persona y sí cortan un recorrido automatizado. Las
+ * navegaciones del cliente (`?_rsc=`) cuentan igual, por eso el margen.
+ */
+const DETAIL_PREFIXES = ["/movies/", "/series/", "/actor/"];
+const DETAIL_LIMIT = { name: "detail-pages", limit: 150, windowMs: 10 * 60 * 1000 };
 
 /**
  * User-agents rechazados con 403 antes de tocar nada.
@@ -183,6 +197,19 @@ export default function proxy(request: NextRequest) {
 
   if (isBlockedAgent(request.headers.get("user-agent"))) {
     return blockedResponse();
+  }
+
+  if (DETAIL_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    const quota = checkRateLimit(getClientIp(request), DETAIL_LIMIT);
+    if (!quota.allowed) {
+      return new NextResponse("Demasiadas fichas seguidas. Espera unos minutos.", {
+        status: 429,
+        headers: {
+          "Retry-After": String(quota.retryAfterSeconds),
+          "Content-Type": "text/plain; charset=utf-8",
+        },
+      });
+    }
   }
 
   const needsAuth = PROTECTED_PREFIXES.some(
