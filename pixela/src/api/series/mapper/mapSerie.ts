@@ -120,8 +120,12 @@ export function mapSerieFromApi(apiData: ApiSerie): Serie {
     creadores.push(...apiData.created_by.map(mapCreator));
   }
 
-  const generos = Array.isArray(apiData.generos)
-    ? apiData.generos.map((g) => typeof g === 'string' ? g : g.nombre || g.name || '')
+  // TMDB manda `genres`; ver el mismo arreglo en `mapPelicula`.
+  const rawGenres = apiData.generos ?? apiData.genres;
+  const generos = Array.isArray(rawGenres)
+    ? rawGenres
+        .map((g: string | { nombre?: string; name?: string }) => typeof g === 'string' ? g : g.nombre || g.name || '')
+        .filter(Boolean)
     : [];
 
   return {

@@ -154,6 +154,8 @@ export interface ApiSerie {
   fecha?: string;
   first_air_date?: string;
   generos?: Array<string | { nombre?: string; name?: string }>;
+  /** Lo que devuelve TMDB; `generos` es la forma ya mapeada. */
+  genres?: Array<{ id?: number; name?: string }>;
   poster_path?: string;
   poster?: string;
   backdrop_path?: string;

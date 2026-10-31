@@ -84,11 +84,16 @@ export function mapPeliculaFromApi(movieData: ApiPelicula): Pelicula {
   const titulo = movieData.nombre || movieData.titulo || movieData.title || '';
   const sinopsis = movieData.descripcion || movieData.sinopsis || movieData.overview || '';
   const fecha = movieData.fecha_estreno || movieData.fecha || movieData.release_date || '';
-  const generos = movieData.generos 
-    ? (Array.isArray(movieData.generos) 
-        ? movieData.generos.map((g: string | { nombre?: string; name?: string }) => 
-            typeof g === 'string' ? g : g.nombre || g.name || '')
-        : [String(movieData.generos)])
+  // TMDB manda `genres`; `generos` solo llega si alguien ya lo mapeó. Leyendo
+  // solo `generos`, la ficha se quedaba siempre sin géneros.
+  const rawGenres = movieData.generos ?? movieData.genres;
+  const generos = rawGenres
+    ? (Array.isArray(rawGenres)
+        ? rawGenres
+            .map((g: string | { nombre?: string; name?: string }) =>
+              typeof g === 'string' ? g : g.nombre || g.name || '')
+            .filter(Boolean)
+        : [String(rawGenres)])
     : [];
   const poster = formatImageUrl(movieData.poster_path || movieData.poster || '');
   const backdrop = formatImageUrl(movieData.backdrop_path || movieData.backdrop || '');

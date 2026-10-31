@@ -10,6 +10,7 @@ import { toast } from "@/lib/toast";
 import { loginHrefForHere } from "@/lib/authRedirect";
 import { LibraryButton } from "@/features/media/components/actions/LibraryButton";
 import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
+import { ShareButton } from "@/shared/components/ShareButton";
 
 /*
  * Jerarquía de la fila de acciones.
@@ -114,6 +115,8 @@ export const ActionButtons = ({
             Reseñar
           </span>
         </button>
+
+        <ShareButton title={title} className={STYLES.reviewButton} />
       </div>
 
       <ReviewModal

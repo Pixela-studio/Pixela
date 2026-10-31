@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getMovieData } from './movieService';
 import { isAllowedMovie } from '@/lib/api/tmdbAllowlist';
+import { buildMediaMetadata } from './mediaSocialMetadata';
 
 /**
  * `noindex` para lo que no está en la allowlist del catálogo.
@@ -39,13 +40,7 @@ export async function generateMetadata(
     ]);
 
     return {
-      title: `${pelicula.titulo} | Pixela`,
-      description: pelicula.sinopsis,
-      openGraph: {
-        title: `${pelicula.titulo} | Pixela`,
-        description: pelicula.sinopsis,
-        images: [pelicula.poster],
-      },
+      ...buildMediaMetadata(pelicula, `/movies/${id}`),
       ...(isAllowed ? {} : { robots: NOINDEX }),
     };
   } catch (error) {
