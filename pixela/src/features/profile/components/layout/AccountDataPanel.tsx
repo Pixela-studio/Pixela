@@ -9,6 +9,7 @@ import { parseApiErrorMessage } from '@/api/shared/apiHelpers';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { clearOfflineData } from '@/lib/offline';
 
 const STYLES = {
   container: 'mt-8 p-6 lg:p-8 bg-pixela-surface rounded-2xl',
@@ -57,6 +58,7 @@ export const AccountDataPanel = ({ userId }: AccountDataPanelProps) => {
       await usersAPI.revokeSessions();
       // El token de este navegador también queda invalidado: se cierra aquí
       // para no dejar una interfaz de usuario con una sesión que ya no vale.
+      clearOfflineData();
       await signOut({ callbackUrl: '/login' });
     } catch (error) {
       logger.error('Error revoking sessions', error);
@@ -75,6 +77,7 @@ export const AccountDataPanel = ({ userId }: AccountDataPanelProps) => {
     setPasswordError(null);
     try {
       await usersAPI.delete(userId, password);
+      clearOfflineData();
       await signOut({ callbackUrl: '/' });
     } catch (error) {
       logger.error('Error deleting account', error);

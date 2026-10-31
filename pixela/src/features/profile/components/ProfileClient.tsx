@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { clearOfflineData } from "@/lib/offline";
 import { UserResponse } from "@/api/auth/types";
 import { User } from "@/api/users/types";
 import { ProfileFormData } from "@/features/profile/types/profileTypes";
@@ -180,6 +181,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     if (!redirecting) return;
 
     const timer = setTimeout(() => {
+      clearOfflineData();
       void signOut({ callbackUrl: "/login" });
     }, 1500);
 

@@ -27,6 +27,7 @@ const DISALLOWED_PATHS = [
   "/login",
   "/register",
   "/recuperar",
+  "/sin-conexion",
   // Las combinaciones de género × página × tipo son infinitas: un rastreador
   // puede generar miles de URLs distintas a partir de los query params.
   "/categories?",
