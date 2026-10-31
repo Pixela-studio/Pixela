@@ -241,8 +241,9 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                 </Link>
                 <p className="text-xs text-gray-400">
                   {review.created_at
-                    ? new Date(review.created_at).toLocaleDateString()
+                    ? new Date(review.created_at).toLocaleDateString("es-ES")
                     : ""}
+                  {review.is_public === false && " · Solo tú la ves"}
                 </p>
               </div>
 

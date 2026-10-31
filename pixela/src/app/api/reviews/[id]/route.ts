@@ -11,7 +11,7 @@ import {
   validationError,
 } from "@/lib/api/responses";
 import { resourceIdSchema, updateReviewSchema } from "@/lib/api/schemas";
-import { mediaPathFor } from "@/lib/api/reviewsQuery";
+import { avatarUrlFor, mediaPathFor } from "@/lib/api/reviewsQuery";
 
 interface TmdbMediaDetails {
   title?: string;
@@ -52,9 +52,10 @@ export async function PUT(
         ...(parsed.data.review !== undefined
           ? { review: parsed.data.review ?? null }
           : {}),
+        ...(parsed.data.is_public !== undefined ? { isPublic: parsed.data.is_public } : {}),
       },
       include: {
-        user: { select: { name: true, photoUrl: true } },
+        user: { select: { name: true, photoUrl: true, updatedAt: true } },
       },
     });
 
@@ -87,11 +88,12 @@ export async function PUT(
         id: updatedReview.id,
         user_id: updatedReview.userId,
         user_name: updatedReview.user.name,
-        photo_url: updatedReview.user.photoUrl,
+        photo_url: avatarUrlFor(updatedReview.userId, updatedReview.user.photoUrl, updatedReview.user.updatedAt),
         tmdb_id: Number(updatedReview.tmdbId),
         item_type: updatedReview.itemType,
         rating: Number(updatedReview.rating),
         review: updatedReview.review,
+        is_public: updatedReview.isPublic,
         created_at: updatedReview.createdAt.toISOString(),
         updated_at: updatedReview.updatedAt.toISOString(),
         title: tmdbData?.title ?? tmdbData?.name ?? "Sin título",

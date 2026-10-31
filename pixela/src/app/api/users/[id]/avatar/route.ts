@@ -26,7 +26,7 @@ export async function GET(
 
   try {
     const user = await prisma.user.findFirst({
-      where: { id: parsedId.data, reviews: { some: {} } },
+      where: { id: parsedId.data, reviews: { some: { isPublic: true } } },
       select: { photoUrl: true },
     });
 

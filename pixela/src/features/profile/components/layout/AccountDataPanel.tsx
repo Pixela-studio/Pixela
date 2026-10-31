@@ -93,7 +93,8 @@ export const AccountDataPanel = ({ userId }: AccountDataPanelProps) => {
         <Link href="/privacidad" prefetch={false} className={STYLES.link}>
           política de privacidad
         </Link>
-        . Tus reseñas son públicas; tus favoritos, tu biblioteca y tu email, no.
+        . Tus reseñas son públicas salvo las que marques como «Solo para mí»; tus favoritos, tu
+        biblioteca y tu email, no.
       </p>
 
       <div className={STYLES.list}>

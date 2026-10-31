@@ -73,8 +73,11 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
    * `undefined` sin sesión: el modal no se abre sin ella.
    */
   const userId = useAuthStore((state) => state.user?.user_id);
+  // Si no está en la lista, puede ser «solo para mí»: el HTML cacheado de la
+  // ficha no las lleva. Con `undefined` el modal la busca al abrirse en vez de
+  // dar por hecho que no hay ninguna (y sobrescribirla al guardar).
   const userReview = useMemo(
-    () => (userId ? reviews.find((review) => review.user_id === userId) ?? null : undefined),
+    () => (userId ? reviews.find((review) => review.user_id === userId) : undefined),
     [reviews, userId],
   );
 

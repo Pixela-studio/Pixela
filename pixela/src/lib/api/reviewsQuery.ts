@@ -31,21 +31,28 @@ export function mediaPathFor(tmdbId: number | bigint, itemType: ItemType): strin
  * la ficha. Se sirven aparte desde `/api/users/[id]/avatar`, con la fecha de
  * actualización como versión para poder cachearlas.
  */
-function avatarUrlFor(userId: number, photoUrl: string | null, updatedAt: Date): string | undefined {
+export function avatarUrlFor(userId: number, photoUrl: string | null, updatedAt: Date): string | undefined {
   if (!photoUrl) return undefined;
   if (photoUrl.startsWith("https://")) return photoUrl;
   if (!photoUrl.startsWith("data:image/")) return undefined;
   return `/api/users/${userId}/avatar?v=${updatedAt.getTime()}`;
 }
 
+/**
+ * Reseñas de un título: las públicas y, si se pasa `viewerId`, también las
+ * «solo para mí» de esa persona. La ficha ISR llama sin `viewerId`: su HTML es
+ * el mismo para todos y no puede llevar nada privado.
+ */
 export async function getMediaReviews(
   tmdbId: number,
   itemType: ItemType,
+  viewerId?: number,
 ): Promise<Review[]> {
   const reviews = await prisma.review.findMany({
     where: {
       tmdbId: BigInt(tmdbId),
       itemType,
+      OR: [{ isPublic: true }, ...(viewerId ? [{ userId: viewerId }] : [])],
     },
     orderBy: { createdAt: "desc" },
     include: {
@@ -63,6 +70,7 @@ export async function getMediaReviews(
     item_type: review.itemType,
     rating: Number(review.rating),
     review: review.review ?? "",
+    is_public: review.isPublic,
     created_at: review.createdAt.toISOString(),
     updated_at: review.updatedAt.toISOString(),
   }));

@@ -58,9 +58,9 @@ export default function PrivacidadPage() {
 
       <LegalSection id="publico" title="Qué es público y qué no">
         <p>
-          <strong>Tus reseñas son públicas.</strong> Aparecen en la ficha del título con tu nombre de
-          usuario y tu foto, y las puede leer cualquiera, tenga cuenta o no. Te lo recordamos cada
-          vez que escribes una.
+          <strong>Tus reseñas son públicas</strong>, salvo las que marques como «Solo para mí».
+          Aparecen en la ficha del título con tu nombre de usuario y tu foto, y las puede leer
+          cualquiera, tenga cuenta o no. Te lo recordamos cada vez que escribes una.
         </p>
         <p>
           <strong>Tus favoritos, tu biblioteca y tu correo son privados.</strong> Solo los ves tú.

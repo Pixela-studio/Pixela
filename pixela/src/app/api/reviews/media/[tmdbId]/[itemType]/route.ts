@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { apiError, handleRouteError } from "@/lib/api/responses";
 import { itemTypeSchema, tmdbIdSchema } from "@/lib/api/schemas";
 import { getMediaReviews } from "@/lib/api/reviewsQuery";
+import { auth } from "@/auth";
 
 /**
  * GET /api/reviews/media/:tmdbId/:itemType — reseñas públicas de un título.
@@ -33,7 +34,14 @@ export async function GET(
   }
 
   try {
-    const data = await getMediaReviews(parsedTmdbId.data, parsedItemType.data);
+    // Con sesión se añaden las «solo para mí» de quien pregunta.
+    const session = await auth();
+    const viewerId = Number.parseInt(session?.user?.id ?? "", 10);
+    const data = await getMediaReviews(
+      parsedTmdbId.data,
+      parsedItemType.data,
+      Number.isInteger(viewerId) && viewerId > 0 ? viewerId : undefined,
+    );
     return NextResponse.json({ success: true, data });
   } catch (error) {
     return handleRouteError("Failed to fetch media reviews", error);

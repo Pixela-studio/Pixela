@@ -27,6 +27,8 @@ export interface Review {
     updated_at: string;
     title?: string;
     poster_path?: string;
+    /** `false` = «solo para mí». */
+    is_public?: boolean;
 }
 
 /**
@@ -42,4 +44,6 @@ export interface CreateReview {
     tmdb_id: number;
     rating: number;
     review: string;
+    /** `false` = «solo para mí». */
+    is_public?: boolean;
 }

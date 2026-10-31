@@ -53,6 +53,8 @@ model Review {
   tmdbId    BigInt   @map("tmdb_id")
   rating    Decimal  @db.Decimal(3, 1)
   review    String?  @db.Text
+  /// `false` = «solo para mí»: no sale en la ficha ni para nadie más.
+  isPublic  Boolean  @default(true) @map("is_public")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

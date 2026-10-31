@@ -107,6 +107,11 @@ export const ReviewCard = ({
                 )}
               </span>
               <span className={STYLES.user.name}>{review.user_name || 'Usuario'}</span>
+              {review.is_public === false && (
+                <span className="rounded-sm border border-white/30 px-1.5 py-0.5 text-xs text-white/80">
+                  Solo tú la ves
+                </span>
+              )}
             </div>
             {!isEditing && (
               <span className="flex items-center">

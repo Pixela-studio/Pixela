@@ -57,13 +57,15 @@ export const createReviewSchema = z.object({
     .max(REVIEW_MAX_LENGTH, `La reseña no puede exceder los ${REVIEW_MAX_LENGTH} caracteres`)
     .optional()
     .nullable(),
+  /** «Solo para mí». Por defecto, pública. */
+  is_public: z.boolean().optional(),
 });
 
 export const updateReviewSchema = createReviewSchema
-  .pick({ rating: true, review: true })
+  .pick({ rating: true, review: true, is_public: true })
   .partial()
   .refine(
-    (data) => data.rating !== undefined || data.review !== undefined,
+    (data) => data.rating !== undefined || data.review !== undefined || data.is_public !== undefined,
     { message: "No hay nada que actualizar" },
   );
 
