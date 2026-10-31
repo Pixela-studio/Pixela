@@ -525,11 +525,12 @@ timeline
 </td>
 <td align="center" width="260">
 <a href="https://www.linkedin.com/in/ruyi-xia-ye-b19853189/">
-<img src="https://ui-avatars.com/api/?name=Ruyi+Xia&size=220&background=EC1B69&color=FFFFFF&bold=true&rounded=true" width="110" alt="Ruyi Xia Ye" /><br/>
+<img src="https://github.com/rxy94.png" width="110" style="border-radius:50%" alt="Ruyi Xia Ye" /><br/>
 <b>Ruyi Xia Ye</b>
 </a><br/>
 <sub>Full Stack Developer</sub><br/><br/>
 <a href="https://www.linkedin.com/in/ruyi-xia-ye-b19853189/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
+<a href="https://github.com/rxy94"><img src="https://img.shields.io/badge/GitHub-181818?style=flat-square&logo=github&logoColor=white" alt="GitHub" /></a>
 </td>
 </tr>
 </table>
