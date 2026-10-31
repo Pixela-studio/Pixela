@@ -23,6 +23,7 @@ import {
   WATCH_STATUS_LABELS,
 } from "../../hooks/useLibraryStatus";
 import { toast } from "@/lib/toast";
+import { loginHrefForHere } from "@/lib/authRedirect";
 import clsx from "clsx";
 
 interface LibraryButtonProps {
@@ -177,7 +178,7 @@ export const LibraryButton = ({
         title: "Autenticación requerida",
         duration: 3000,
       });
-      router.push("/login");
+      router.push(loginHrefForHere());
       return;
     }
     setIsOpen(!isOpen);

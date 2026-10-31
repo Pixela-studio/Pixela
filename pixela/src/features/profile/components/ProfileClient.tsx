@@ -181,6 +181,8 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
 
   const handleSubmitProfile = async (data: ProfileFormData) => {
     const isChangingPassword = Boolean(data.password?.trim());
+    const isChangingEmail =
+      data.email.trim().toLowerCase() !== user.email.trim().toLowerCase();
 
     try {
       const payload: Partial<UserResponse> & { current_password?: string } = {
@@ -193,9 +195,9 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           data.cover_url !== undefined ? data.cover_url : user.cover_url,
       };
 
-      if (isChangingPassword) {
-        payload.password = data.password;
-        // La API exige la contraseña actual para cambiar la propia.
+      if (isChangingPassword) payload.password = data.password;
+      // La API exige la contraseña actual para cambiar el email o la contraseña.
+      if (isChangingPassword || isChangingEmail) {
         payload.current_password = data.current_password;
       }
 

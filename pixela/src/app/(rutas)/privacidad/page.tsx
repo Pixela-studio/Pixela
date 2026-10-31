@@ -101,7 +101,7 @@ export default function PrivacidadPage() {
         <p>
           Puedes acceder a tus datos, corregirlos, borrarlos, llevártelos, oponerte a su tratamiento
           o pedir que se limite. Casi todo lo puedes hacer tú desde{' '}
-          <Link href="/profile?tab=settings" prefetch={false}>
+          <Link href="/profile" prefetch={false}>
             tu perfil
           </Link>
           :

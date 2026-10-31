@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 import { mainNavLinks } from '@/links/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useSectionNavigation } from '@/hooks/useSectionNavigation';
+import { loginHrefForHere } from '@/lib/authRedirect';
 
 /**
  * Returns whether the current pathname matches this nav link.
@@ -198,7 +199,7 @@ export const Navbar = () => {
       router.push('/profile');
       setMobileMenuOpen(false);
     } else {
-      router.push('/login');
+      router.push(loginHrefForHere());
     }
   };
 

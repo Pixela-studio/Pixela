@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { ReviewModal } from "@/features/media/components/review/ReviewModal";
 import { ActionButtonsProps } from "@/features/media/types/actions";
 import { toast } from "@/lib/toast";
+import { loginHrefForHere } from "@/lib/authRedirect";
 import { LibraryButton } from "@/features/media/components/actions/LibraryButton";
 import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
 
@@ -66,7 +67,7 @@ export const ActionButtons = ({
         title: "Autenticación requerida",
         duration: 3000,
       });
-      router.push("/login");
+      router.push(loginHrefForHere());
       return;
     }
     setShowReviewModal(true);

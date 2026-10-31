@@ -12,6 +12,13 @@ import { InputField } from "@/features/profile/components/form/InputField";
 import { BannerSelectorModal } from "../layout/BannerSelectorModal";
 import { resizeImage } from "@/lib/image";
 import { ProfilePreviewCard } from "./ProfilePreviewCard";
+import {
+  NAME_HINT,
+  PASSWORD_HINT,
+  validateEmail,
+  validateName,
+  validatePassword,
+} from "@/lib/validation/account";
 
 /**
  * Estilos constantes para el componente UpdateProfileForm
@@ -36,13 +43,6 @@ const STYLES = {
   button: (variant: "submit" | "cancel") =>
     clsx("btn flex-1", variant === "submit" ? "btn-primary" : "btn-ghost"),
 } as const;
-
-/**
- * Regex para validar el email y la contraseña
- */
-const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-const STRONG_PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 /**
  * Componente de formulario para actualizar el perfil de usuario
@@ -70,6 +70,10 @@ export const UpdateProfileForm = ({
   });
 
   const password = watch("password");
+  const email = watch("email");
+  const emailChanged =
+    (email ?? "").trim().toLowerCase() !== (initialData.email ?? "").trim().toLowerCase();
+  const needsCurrentPassword = Boolean(password?.trim()) || emailChanged;
   const [profileImage, setProfileImage] = useState<string | undefined>(
     initialData.photo_url,
   );
@@ -126,10 +130,8 @@ export const UpdateProfileForm = ({
     };
 
     // Solo añadir password si el usuario la ha escrito
-    if (data.password && data.password.trim()) {
-      formData.password = data.password;
-      formData.current_password = data.current_password;
-    }
+    if (data.password && data.password.trim()) formData.password = data.password;
+    if (needsCurrentPassword) formData.current_password = data.current_password;
 
     onSubmit(formData as ProfileFormData);
   };
@@ -169,17 +171,10 @@ export const UpdateProfileForm = ({
               labelText="Nombre"
               placeholder="Tu nombre"
               register={register("name", {
-                required: "El nombre es requerido",
-                minLength: {
-                  value: 3,
-                  message: "El nombre debe tener al menos 3 caracteres",
-                },
-                maxLength: {
-                  value: 50,
-                  message: "El nombre no puede exceder los 50 caracteres",
-                },
+                validate: (value) => validateName(value) ?? true,
               })}
               icon={<FiUser className={STYLES.inputIcon} />}
+              helperText={NAME_HINT}
               error={errors.name}
             />
           </div>
@@ -191,11 +186,7 @@ export const UpdateProfileForm = ({
               labelText="Email"
               placeholder="tu@email.com"
               register={register("email", {
-                required: "El email es requerido",
-                pattern: {
-                  value: EMAIL_REGEX,
-                  message: "Formato de email inválido",
-                },
+                validate: (value) => validateEmail(value) ?? true,
               })}
               icon={<FiMail className={STYLES.inputIcon} />}
               error={errors.email}
@@ -208,25 +199,20 @@ export const UpdateProfileForm = ({
               name="password"
               placeholder="Nueva contraseña"
               register={register("password", {
-                minLength: {
-                  value: 8,
-                  message: "La contraseña debe tener al menos 8 caracteres",
-                },
-                pattern: {
-                  value: STRONG_PASSWORD_REGEX,
-                  message:
-                    "Debe incluir mayúscula, minúscula, número y símbolo.",
-                },
+                // Las mismas reglas que al registrarse: antes aquí se exigían
+                // mayúscula, número y uno de siete símbolos concretos.
+                validate: (value) => (value ? validatePassword(value) ?? true : true),
               })}
               icon={<IoKeyOutline className={STYLES.inputIcon} />}
-              helperText="Deja este campo vacío si no deseas cambiar tu contraseña actual"
+              helperText={`Déjala vacía para no cambiarla. ${PASSWORD_HINT}`}
               error={errors.password}
             />
           </div>
 
-          {/* Solo aparece cuando se está fijando una contraseña nueva: la API
-              exige demostrar que se conoce la actual antes de sustituirla. */}
-          {password && password.trim() !== "" && (
+          {/* Aparece al cambiar la contraseña o el email: la API exige
+              demostrar que se conoce la actual antes de tocar cualquiera de
+              los dos, que son los que dan acceso a la cuenta. */}
+          {needsCurrentPassword && (
             <div className={STYLES.fieldGroup}>
               <InputField
                 type="password"
@@ -234,7 +220,7 @@ export const UpdateProfileForm = ({
                 placeholder="Contraseña actual"
                 register={register("current_password", {
                   validate: (value) => {
-                    if (password?.trim() && !value?.trim()) {
+                    if (needsCurrentPassword && !value?.trim()) {
                       return "Introduce tu contraseña actual para confirmar el cambio";
                     }
                     return true;

@@ -10,6 +10,7 @@ import {
   validationError,
 } from "@/lib/api/responses";
 import { resourceIdSchema } from "@/lib/api/schemas";
+import { emailSchema, nameSchema, passwordSchema } from "@/lib/validation/account";
 
 const BCRYPT_ROUNDS = 12;
 
@@ -38,27 +39,14 @@ const imageSourceSchema = z
   );
 
 const userUpdateSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder los 50 caracteres")
-    .regex(
-      /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*$/,
-      "El nombre solo puede contener letras, números y los caracteres . _ - (sin espacios ni caracteres especiales)",
-    )
-    .optional(),
-  email: z.string().trim().toLowerCase().email("Email inválido").optional(),
+  name: nameSchema.optional(),
+  email: emailSchema.optional(),
   photo_url: imageSourceSchema.optional(),
   cover_url: imageSourceSchema.optional(),
   is_admin: z
     .preprocess((value) => (typeof value === "string" ? value === "true" : value), z.boolean())
     .optional(),
-  password: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .max(128, "La contraseña es demasiado larga")
-    .optional(),
+  password: passwordSchema.optional(),
   current_password: z.string().max(128).optional(),
 });
 
@@ -116,7 +104,43 @@ export async function PUT(
       updateData.isAdmin = is_admin;
     }
 
-    if (email) {
+    /*
+     * Cambiar el correo o la contraseña de la propia cuenta exige la contraseña
+     * actual. Antes solo la pedía la contraseña: con una sesión robada bastaba
+     * cambiar el correo para quedarse la cuenta, y con recuperación por correo
+     * eso sería definitivo.
+     */
+    const current = await prisma.user.findUnique({
+      where: { id },
+      select: { email: true, password: true },
+    });
+    if (!current) {
+      return apiError("Usuario no encontrado", 404);
+    }
+
+    const emailChanges = Boolean(email) && email !== current.email;
+
+    if ((emailChanges || password) && currentUserId === id) {
+      if (!current.password) {
+        return apiError("Esta cuenta no tiene contraseña configurada", 400);
+      }
+
+      if (!current_password) {
+        return apiError(
+          emailChanges
+            ? "Escribe tu contraseña actual para cambiar el email"
+            : "Debes indicar tu contraseña actual",
+          400,
+        );
+      }
+
+      const matches = await bcrypt.compare(current_password, current.password);
+      if (!matches) {
+        return apiError("La contraseña actual no es correcta", 403);
+      }
+    }
+
+    if (email && emailChanges) {
       const emailOwner = await prisma.user.findUnique({
         where: { email },
         select: { id: true },
@@ -132,28 +156,6 @@ export async function PUT(
     }
 
     if (password) {
-      // Cambiar la contraseña propia exige demostrar que se conoce la actual.
-      // Sin esto, una sesión secuestrada bastaba para expulsar al dueño de su cuenta.
-      if (currentUserId === id) {
-        const account = await prisma.user.findUnique({
-          where: { id },
-          select: { password: true },
-        });
-
-        if (!account?.password) {
-          return apiError("Esta cuenta no tiene contraseña configurada", 400);
-        }
-
-        if (!current_password) {
-          return apiError("Debes indicar tu contraseña actual", 400);
-        }
-
-        const matches = await bcrypt.compare(current_password, account.password);
-        if (!matches) {
-          return apiError("La contraseña actual no es correcta", 403);
-        }
-      }
-
       updateData.password = await bcrypt.hash(password, BCRYPT_ROUNDS);
     }
 

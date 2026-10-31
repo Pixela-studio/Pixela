@@ -7,13 +7,7 @@ import Link from 'next/link';
 import { TextInput } from '@/features/auth/components/TextInput';
 import { RoundedButton } from '@/features/auth/components/RoundedButton';
 import { VscMail, VscLock } from 'react-icons/vsc';
-
-/** Solo se aceptan rutas internas: evita un open redirect vía `?callbackUrl=`. */
-const safeCallbackUrl = (raw: string | null): string => {
-  if (!raw) return '/';
-  if (!raw.startsWith('/') || raw.startsWith('//')) return '/';
-  return raw;
-};
+import { registerHref, safeCallbackUrl } from '@/lib/authRedirect';
 
 function LoginForm() {
   const router = useRouter();
@@ -21,7 +15,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // `middleware.ts` redirige aquí con la ruta original cuando falta sesión.
+  // `proxy.ts` y los botones que piden cuenta mandan aquí con la ruta de origen.
   const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
   const justRegistered = searchParams.get('registered') === 'true';
 
@@ -115,7 +109,7 @@ function LoginForm() {
         <div className="text-white/70">
           ¿No tienes cuenta?
           <Link
-            href="/register"
+            href={registerHref(callbackUrl)}
             className="ml-1.5 font-semibold text-pixela-accent underline-offset-4 transition-colors duration-200 hover:underline"
           >
             Registrarse
