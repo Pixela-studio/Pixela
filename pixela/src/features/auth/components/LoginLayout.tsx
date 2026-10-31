@@ -44,7 +44,7 @@ export const LoginLayout = ({ children }: LoginLayoutProps) => {
             <Image
               src="/img/pixela-mark.svg"
               alt=""
-              width={198}
+              width={206}
               height={216}
               className={STYLES.logo}
               unoptimized

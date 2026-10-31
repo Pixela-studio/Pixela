@@ -28,8 +28,7 @@ export const metadata: Metadata = {
    * Ni `manifest` ni `icons` se declaran a mano:
    *
    * - El manifiesto lo genera `app/manifest.ts` y Next inyecta el `<link>`.
-   * - `app/favicon.ico` lo enlaza Next por convención. Los demás iconos van
-   *   en `icons`, más abajo.
+   * - El icono lo resuelve `app/favicon.ico` por convención.
    *
    * Antes se apuntaba a `/manifest.json` y `/apple-touch-icon.png`, dos ficheros
    * que no existen en `public/`. El navegador los pedía en cada visita y cada
@@ -51,16 +50,9 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "website",
   },
+  // Ahora sí existe: lo usan iOS al añadir a la pantalla de inicio y algunos
+  // lectores de enlaces.
   icons: {
-    /*
-     * Favicon SVG: el fuste del símbolo pasa de tinta a marfil con el tema
-     * oscuro. Hay que declararlo aquí: con `icons` escrito a mano, Next deja de
-     * enlazar `app/icon.svg` por convención (el `favicon.ico` sí lo sigue
-     * enlazando, y queda para Safari, que no admite favicon SVG).
-     */
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    // Ahora sí existe: lo usan iOS al añadir a la pantalla de inicio y algunos
-    // lectores de enlaces.
     apple: "/icons/apple-touch-icon.png",
   },
   other: {
