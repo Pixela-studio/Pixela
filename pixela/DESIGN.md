@@ -185,14 +185,16 @@ La profundidad viene del tono y de la imagen. Los planos tinta → sala → buta
 
 ## Logo
 
-**Símbolo "Cartón"** (`public/img/pixela-mark.svg`): dos bloques rosas inclinados 15°, la misma inclinación que la cursiva de Bodoni. El fuste alto y el bloque corto que cuelga de su techo dibujan una P sin decirla. Es la evolución del símbolo anterior, que tenía los mismos dos bloques: conserva la forma y el rosa, y pierde el degradado y las esquinas de píldora.
+**Símbolo "Cartón"** (`public/img/pixela-mark.svg`): un fuste marfil y un bloque rosa más corto colgado de su techo, los dos inclinados 15°, la inclinación de la cursiva de Bodoni. Juntos dibujan una P sin escribirla. El fuste es la luz del proyector y el bloque rosa es la pieza encendida, así que el símbolo cumple la regla del rótulo por sí solo. Viene del símbolo anterior, dos bloques rosas con degradado: conserva la forma y el rosa, y pierde el degradado y las esquinas de píldora.
 
-- **Construcción** (lienzo 256): fuste de 216 de alto, bloque corto de 136 (el 63 %), los dos de 64 de ancho con un hueco de 20, y esquinas de 4, casi rectas como los pósters. El maestro está recortado a su caja (`viewBox="25 20 206 216"`); el espacio de respeto lo pone quien lo usa.
-- **Color:** rosa acción plano (`#EC1B69`), sin degradado. Sobre sala, marfil o negro. En monocromo, el símbolo entero en un solo color.
-- **Con el nombre:** el símbolo va solo y el nombre se escribe en HTML en Bodoni Moda cursiva (navbar, login, footer). No hay logotipo en SVG con texto.
-- **Tamaños pequeños:** el `favicon.ico` de 16 px usa un corte propio con el hueco a 34 y los bloques a 58, para que no se cierre. Los de 32 y 48 px usan el maestro.
-- **Iconos de la app** (`public/icons/`): el símbolo sobre negro de sala al 52 % del alto; el maskable, al 42 % para quedar dentro de la zona segura de Android.
-- Láminas de conceptos y del kit en `docs/design/logo/`.
+- **Construcción** (lienzo 256): fuste de 66 × 216, hueco de 20 y bloque de 54 × 136 (el 63 % del alto). El bloque es un poco más estrecho que el fuste para que el trazo vertical mande, como en una didona. Esquinas de 4, casi rectas como los pósters. El maestro está recortado a su caja (`viewBox="29 20 198 216"`); el espacio de respeto lo pone quien lo usa.
+- **Color:** sobre sala o tinta, fuste marfil (`#F4EDE2`) y bloque rosa (`#EC1B69`). Sobre marfil, fuste negro de sala (`#0D0A08`) y bloque rosa. En una sola tinta, el símbolo entero en rosa, en negro o en marfil. Nunca el fuste en rosa y el bloque en otro color: el rosa es la parte pequeña.
+- **Con el nombre:** el símbolo va solo y el nombre se escribe en HTML en Bodoni Moda cursiva (navbar, login, footer). Fuste y nombre comparten marfil e inclinación. No hay logotipo en SVG con texto.
+- **Tamaños pequeños:** a 16-32 px se usa un corte propio con el hueco a 32 y los bloques a 62 y 58, para que no se cierre.
+  - `app/icon.svg`: favicon con el fuste en tinta, que pasa a marfil con `prefers-color-scheme: dark`.
+  - `app/favicon.ico` (16/32/48): todo en rosa, porque no sabe el color de la pestaña. Es el que usa Safari.
+- **Iconos de la app** (`public/icons/`): el símbolo, marfil y rosa, sobre negro de sala al 52 % del alto. El maskable va al 42 % para quedar dentro de la zona segura de Android.
+- Láminas de conceptos, variantes y kit en `docs/design/logo/`.
 
 **Regla del cartón aplicada al logo.** El símbolo no lleva degradados, sombras, halos ni contorno. Si no se ve, se cambia el fondo, no el símbolo.
 
@@ -264,7 +266,11 @@ Selección en rosa al 40 %, `caret-color` rosa, scrollbar pasillo sobre sala, `c
 ## Historial
 
 ### Octubre de 2026: símbolo "Cartón"
-Los dos bloques del símbolo, redibujados en plano: sin degradado, esquinas casi rectas y la inclinación de la cursiva de Bodoni. Se rehacen con él el favicon (con corte propio a 16 px), los iconos de la app y el maskable. Se exploraron también una P didona con un píxel rosa en el ojo y una i con el punto en rosa (`docs/design/logo/conceptos.png`).
+Los dos bloques del símbolo, redibujados en plano: sin degradado, esquinas casi rectas y la inclinación de la cursiva de Bodoni. El fuste pasa a marfil y solo el bloque corto queda en rosa, porque un símbolo entero en rosa era la mancha rosa más grande de la pantalla. Se rehacen con él el favicon (SVG que sigue el tema, más un `.ico` rosa), los iconos de la app y el maskable.
+
+Descartes:
+- Una P didona con un píxel rosa en el ojo y una i con el punto en rosa (`docs/design/logo/conceptos.png`).
+- Un bloque corto fino, como un trazo fino de didona. Perdía la P y se leía como `‖` (`docs/design/logo/variantes.png`).
 
 ### Octubre de 2026: botones en marfil
 Primario marfil recto y secundario con borde en lugar de la píldora rosa. También salen el halo rosa del botón de volver arriba, el degradado de los tráilers y el hueco a la derecha cuando solo hay uno, y el esqueleto de la ficha copia el layout real.
