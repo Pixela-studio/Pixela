@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { WatchStatus } from "@/api/library/types";
+import { WatchStatus, type LibraryItemWithDetails } from "@/api/library/types";
+import { libraryAPI } from "@/api/library/library";
+import { toast } from "@/lib/toast";
 import { useLibraryItems } from "../../hooks/useLibraryItems";
 import {
   FiLoader,
@@ -9,6 +11,7 @@ import {
   FiPlay,
   FiStopCircle,
   FiGrid,
+  FiTrash2,
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
@@ -35,9 +38,76 @@ const STATUS_COLORS = {
   [WatchStatus.DROPPED]: "bg-red-500/20 text-red-400 border-red-500/50",
 };
 
+/** Los mismos nombres que los filtros de arriba y que la ficha. */
+const STATUS_LABEL = Object.fromEntries(
+  STATUS_FILTERS.filter((filter) => filter.id !== "ALL").map((filter) => [filter.id, filter.label]),
+) as Record<WatchStatus, string>;
+
+const SHORT_DATE = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", year: "numeric" });
+
+/** «Completado el 3 oct 2026» / «Desde el 1 sept 2026»: la base de datos ya lo sabía. */
+const statusDate = (item: LibraryItemWithDetails) => {
+  const date = SHORT_DATE.format(new Date(item.updated_at));
+  return item.status === WatchStatus.COMPLETED ? `Completado el ${date}` : `Desde el ${date}`;
+};
+
 export const ProfileLibrary = () => {
-    const { items, loading, error } = useLibraryItems();
+    const { items: loadedItems, loading, error } = useLibraryItems();
     const [activeFilter, setActiveFilter] = useState<string>("ALL");
+    /*
+     * Cambios hechos aquí encima de lo cargado: estado nuevo o quitado (con
+     * margen para deshacer). Antes la biblioteca del perfil solo se podía
+     * mirar: para cambiar un estado o quitar algo había que ir a cada ficha.
+     */
+    const [statusEdits, setStatusEdits] = useState<Record<number, WatchStatus>>({});
+    const [hidden, setHidden] = useState<ReadonlySet<number>>(new Set());
+
+    const items = useMemo(
+      () =>
+        loadedItems
+          .filter((item) => !hidden.has(item.id))
+          .map((item) => (statusEdits[item.id] ? { ...item, status: statusEdits[item.id] } : item))
+          // Lo último que se tocó, primero.
+          .sort((a, b) => b.updated_at.localeCompare(a.updated_at)),
+      [loadedItems, hidden, statusEdits],
+    );
+
+    const setItemHidden = (id: number, value: boolean) =>
+      setHidden((prev) => {
+        const next = new Set(prev);
+        if (value) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+
+    const changeStatus = async (item: LibraryItemWithDetails, status: WatchStatus) => {
+      const previous = item.status;
+      setStatusEdits((prev) => ({ ...prev, [item.id]: status }));
+      try {
+        await libraryAPI.updateStatus(item.id, status);
+        toast.success(`«${item.title}»: ${STATUS_LABEL[status].toLowerCase()}.`);
+      } catch {
+        setStatusEdits((prev) => ({ ...prev, [item.id]: previous }));
+        toast.error("No se pudo cambiar el estado. Inténtalo de nuevo.");
+      }
+    };
+
+    const removeItem = (item: LibraryItemWithDetails) => {
+      setItemHidden(item.id, true);
+      toast.undoable({
+        title: "Quitado de tu biblioteca",
+        message: `«${item.title}» ya no está en tu biblioteca.`,
+        onUndo: () => setItemHidden(item.id, false),
+        onCommit: async () => {
+          try {
+            await libraryAPI.removeItem(item.id);
+          } catch {
+            setItemHidden(item.id, false);
+            toast.error("No se pudo quitar. Inténtalo de nuevo.");
+          }
+        },
+      });
+    };
 
     const filteredItems =
       activeFilter === "ALL"
@@ -133,14 +203,14 @@ export const ProfileLibrary = () => {
             <EmptyState
               icon={<FiGrid />}
               title={`Nada marcado como «${STATUS_FILTERS.find((f) => f.id === activeFilter)?.label}»`}
-              description="Cambia el estado de un título desde su ficha para verlo aquí."
+              description="Cambia el estado de cualquier título desde aquí mismo o desde su ficha."
             />
           )
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-fade-in">
             {filteredItems.map((item) => (
+              <div key={item.id} className="flex flex-col gap-2">
               <div
-                key={item.id}
                 className="relative group aspect-[2/3] rounded-xl overflow-hidden bg-pixela-surface border border-white/5 transition-[transform,border-color,box-shadow] duration-300 ease-out-expo hover:scale-105 hover:border-white/20 hover:shadow-xl hover:shadow-black/50"
               >
                 <Link
@@ -188,6 +258,35 @@ export const ProfileLibrary = () => {
                     </div>
                   </div>
                 </Link>
+              </div>
+              {/* Controles fuera del enlace: un control dentro de otro no se
+                  puede alcanzar bien con el teclado ni con un lector. */}
+              <p className="text-xs text-gray-400">{statusDate(item)}</p>
+              <div className="flex items-center gap-2">
+                <label className="sr-only" htmlFor={`library-status-${item.id}`}>
+                  Estado de «{item.title}»
+                </label>
+                <select
+                  id={`library-status-${item.id}`}
+                  value={item.status}
+                  onChange={(e) => void changeStatus(item, e.target.value as WatchStatus)}
+                  className="h-9 min-w-0 flex-1 rounded-full border border-white/10 bg-pixela-surface px-3 text-sm text-white focus:border-pixela-accent/60 focus:outline-none"
+                >
+                  {Object.values(WatchStatus).map((status) => (
+                    <option key={status} value={status}>
+                      {STATUS_LABEL[status]}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => removeItem(item)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/70 hover:border-red-500/50 hover:text-red-400"
+                  aria-label={`Quitar «${item.title}» de la biblioteca`}
+                >
+                  <FiTrash2 className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
               </div>
             ))}
           </div>
