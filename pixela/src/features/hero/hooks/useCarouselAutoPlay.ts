@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from "react";
 import { useHeroStore } from "@/features/hero/store/heroStore";
 import { prefersReducedMotion } from "@/lib/motion";
+import { useLiteMode } from "@/hooks/useLiteMode";
 
 /**
  * Hook personalizado para manejar la lógica del carrusel automático
@@ -9,12 +10,14 @@ import { prefersReducedMotion } from "@/lib/motion";
  */
 export const useCarouselAutoPlay = (imagesLength: number) => {
   const { isPlaying, nextImage, currentImageIndex, setIsPlaying } = useHeroStore();
+  const { lite } = useLiteMode();
 
-  // Con movimiento reducido el carrusel arranca en pausa; el botón de
-  // reproducir sigue ahí para quien quiera el pase automático.
+  // Con movimiento reducido o en modo ligero el carrusel arranca en pausa: cada
+  // pase descarga otra imagen a pantalla completa. El botón de reproducir
+  // sigue ahí para quien quiera el pase automático.
   useEffect(() => {
-    if (prefersReducedMotion()) setIsPlaying(false);
-  }, [setIsPlaying]);
+    if (prefersReducedMotion() || lite) setIsPlaying(false);
+  }, [setIsPlaying, lite]);
 
   const handleNextImage = useCallback(() => {
     nextImage(imagesLength);

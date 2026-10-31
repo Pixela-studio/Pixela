@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import clsx from "clsx";
 import { useHeroStore } from "@/features/hero/store/heroStore";
+import { useLiteMode } from "@/hooks/useLiteMode";
 import { ImageCarouselProps, HeroImage } from "@/features/hero/types/content";
 
 const STYLES = {
@@ -42,8 +43,6 @@ const STYLES = {
     // Monocromo cálido de copia antigua: escala de grises con un punto de
     // sepia, a juego con el marfil del texto.
     base: "w-full h-full object-cover grayscale contrast-[1.08] brightness-[0.85] sepia-[0.12]",
-    mobile: "block md:hidden", // Visible solo en móvil
-    desktop: "hidden md:block", // Visible solo en escritorio
   },
 
   // Grano de peli sobre la imagen. Reutiliza .noise-effect (opacity 0.04)
@@ -72,9 +71,12 @@ const VisualOverlays = () => (
 );
 
 /**
- * Componente que renderiza una imagen optimizada para el carrusel
- * Configurado para máxima velocidad de carga como primera impresión
- * Renderiza versiones distintas para móvil (poster) y escritorio (backdrop)
+ * Imagen de una diapositiva: póster vertical en móvil y backdrop en escritorio.
+ *
+ * Es un único `<picture>` con `getImageProps`: el navegador descarga solo la
+ * variante que va a mostrar. Antes eran dos `<Image>`, uno escondido con CSS,
+ * y los dos llevaban `priority` en la primera diapositiva: en el móvil de
+ * Tomás se precargaba también el backdrop de escritorio que nunca veía.
  */
 const OptimizedHeroImage = ({
   image,
@@ -83,48 +85,33 @@ const OptimizedHeroImage = ({
   image: HeroImage;
   index: number;
 }) => {
-  return (
-    <div className={STYLES.image.container}>
-      {/* Versión Móvil (Poster Vertical) */}
-      <div className={clsx("relative w-full h-full", STYLES.image.mobile)}>
-        <Image
-          src={image.poster}
-          alt={`Hero poster image ${index + 1}`}
-          className={STYLES.image.base}
-          style={{
-            objectPosition: "center",
-            objectFit: "cover",
-          }}
-          width={1000}
-          height={1500}
-          priority={index === 0}
-          quality={100}
-          sizes="(max-width: 768px) 100vw, 1px"
-          loading={index === 0 ? "eager" : "lazy"}
-          unoptimized={false}
-        />
-      </div>
+  const isFirst = index === 0;
+  const common = {
+    alt: "",
+    className: STYLES.image.base,
+    priority: isFirst,
+    sizes: "100vw",
+  } as const;
+  const {
+    props: { srcSet: mobileSrcSet },
+  } = getImageProps({ ...common, src: image.poster, width: 1000, height: 1500 });
+  const { props: desktopProps } = getImageProps({
+    ...common,
+    src: image.backdrop,
+    width: 3000,
+    height: 2000,
+  });
 
-      {/* Versión Escritorio (Backdrop Horizontal) */}
-      <div className={clsx("relative w-full h-full", STYLES.image.desktop)}>
-        <Image
-          src={image.backdrop}
-          alt={`Hero backdrop image ${index + 1}`}
-          className={STYLES.image.base}
-          style={{
-            objectPosition: "center",
-            objectFit: "cover",
-          }}
-          width={3000}
-          height={2000}
-          priority={index === 0}
-          quality={100}
-          sizes="(min-width: 769px) 100vw, 1px"
-          loading={index === 0 ? "eager" : "lazy"}
-          unoptimized={false}
-        />
-      </div>
-    </div>
+  return (
+    <picture className={STYLES.image.container}>
+      <source media="(max-width: 767px)" srcSet={mobileSrcSet ?? image.poster} />
+      {/* eslint-disable-next-line jsx-a11y/alt-text -- `alt=""` viene en las props: es decorativa, el título está en el texto del hero. */}
+      <img
+        {...desktopProps}
+        loading={isFirst ? "eager" : "lazy"}
+        style={{ objectPosition: "center", objectFit: "cover", width: "100%", height: "100%" }}
+      />
+    </picture>
   );
 };
 
@@ -134,6 +121,7 @@ const OptimizedHeroImage = ({
  */
 export const ImageCarousel = ({ images }: ImageCarouselProps) => {
   const { currentImageIndex } = useHeroStore();
+  const { lite } = useLiteMode();
 
   // En caso de que no haya imágenes, mostrar fondo mínimo
   if (!images || images.length === 0) {
@@ -152,29 +140,38 @@ export const ImageCarousel = ({ images }: ImageCarouselProps) => {
     );
   }
 
+  /*
+   * Solo se montan la diapositiva visible, la que sale (para el fundido) y la
+   * siguiente (para que esté descargada cuando le toque). Antes se montaban
+   * todas: estaban dentro del viewport, así que `loading="lazy"` no frenaba
+   * nada y una visita con 3G bajaba siete u ocho imágenes a pantalla completa.
+   */
+  const total = images.length;
+  const isMounted = (index: number) =>
+    index === currentImageIndex ||
+    // En modo ligero, ni la anterior ni la siguiente: una sola imagen.
+    (!lite && index === (currentImageIndex + 1) % total) ||
+    (!lite && index === (currentImageIndex - 1 + total) % total);
+
   return (
     <div className={STYLES.carousel.base}>
-      {images.map((image, index) => (
-        <div
-          key={image.id || index}
-          className={clsx(
-            STYLES.carousel.imageContainer.base,
-            index === currentImageIndex
-              ? STYLES.carousel.imageContainer.fadeIn
-              : STYLES.carousel.imageContainer.fadeOut,
-          )}
-          aria-hidden={index !== currentImageIndex}
-          role="tabpanel"
-        >
-          {/* 
-             Renderizar solo si es la imagen actual O la anterior/siguiente (optimización),
-             o renderizar todas si son pocas (mejor para transiciones suaves).
-             PixelA tiene pocas imágenes en el hero, renderizamos todas pero con lazy loading
-             excepto la prioritaria.
-          */}
-          <OptimizedHeroImage image={image} index={index} />
-        </div>
-      ))}
+      {images.map((image, index) =>
+        isMounted(index) ? (
+          <div
+            key={image.id || index}
+            className={clsx(
+              STYLES.carousel.imageContainer.base,
+              index === currentImageIndex
+                ? STYLES.carousel.imageContainer.fadeIn
+                : STYLES.carousel.imageContainer.fadeOut,
+            )}
+            aria-hidden={index !== currentImageIndex}
+            role="tabpanel"
+          >
+            <OptimizedHeroImage image={image} index={index} />
+          </div>
+        ) : null,
+      )}
       <VisualOverlays />
     </div>
   );

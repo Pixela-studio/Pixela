@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "@/shared/components/Navbar";
 import { ToastContainer } from "@/shared/components/ToastContainer";
 import Footer from "@/features/footer/Footer";
+import { useLiteModeClass } from "@/hooks/useLiteMode";
 
 /**
  * Componente que maneja el layout del cliente
@@ -17,6 +18,7 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  useLiteModeClass();
   const isAuthPage =
     pathname?.startsWith("/login") || pathname?.startsWith("/register");
 

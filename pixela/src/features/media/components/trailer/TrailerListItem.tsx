@@ -3,6 +3,7 @@
 import { FaPlay } from "react-icons/fa";
 import { Trailer } from '@/features/media/types/trailer';
 import Image from 'next/image';
+import { useLiteMode } from '@/hooks/useLiteMode';
 
 /**
  * Propiedades del componente TrailerListItem
@@ -26,6 +27,7 @@ const TrailerListItem = ({
   index,
   isLarge = false
 }: TrailerListItemProps) => {
+  const { lite } = useLiteMode();
   return (
     <button
       type="button"
@@ -44,7 +46,7 @@ const TrailerListItem = ({
         {/* `unoptimized`: sin él la URL pasaba por `/_next/image`, que no
             tiene `img.youtube.com` permitido. Cada miniatura salía rota y
             además costaba una invocación del servidor. */}
-        <Image
+        {!lite && <Image
           src={`https://img.youtube.com/vi/${trailer.key}/mqdefault.jpg`}
           alt=""
           fill
@@ -53,7 +55,7 @@ const TrailerListItem = ({
           className={`object-cover transition duration-300 ${
             isSelected ? 'brightness-110 contrast-110' : 'brightness-90'
           }`}
-        />
+        />}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className={`rounded-full ${isLarge ? 'p-2' : 'p-1.5'} transition duration-200 ${
             isSelected

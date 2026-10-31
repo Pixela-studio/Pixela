@@ -137,6 +137,23 @@ button,
  * `opacity-0` con `animation-fill-mode: forwards`, y `animation: none` las
  * dejaría invisibles para siempre.
  */
+/*
+ * Modo ligero (`useLiteMode`): sin grano ni animaciones, como con movimiento
+ * reducido. La clase la pone `ClientLayout`.
+ */
+html.lite body::after,
+html.lite .noise-effect {
+  display: none;
+}
+
+html.lite *,
+html.lite *::before,
+html.lite *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

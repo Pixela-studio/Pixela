@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { FaPlay } from 'react-icons/fa';
 import { TrailerPlayerProps } from '@/features/media/types/trailer';
+import { useLiteMode } from '@/hooks/useLiteMode';
 
 /**
  * Reproductor de tráiler con fachada.
@@ -16,6 +17,9 @@ import { TrailerPlayerProps } from '@/features/media/types/trailer';
  */
 export function TrailerPlayer({ trailer }: TrailerPlayerProps) {
   const [playing, setPlaying] = useState(false);
+  // En modo ligero ni siquiera la miniatura: un fondo liso y el aviso de que
+  // el vídeo gasta datos.
+  const { lite } = useLiteMode();
 
   if (!trailer.key) return null;
 
@@ -43,7 +47,8 @@ export function TrailerPlayer({ trailer }: TrailerPlayerProps) {
               (320 px, ~15 KB) basta en el móvil; `maxresdefault` solo donde el
               reproductor es grande. Ambas son 16:9, sin las franjas de
               `hqdefault`, que queda de respaldo si no existe la grande. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {!lite && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={`https://img.youtube.com/vi/${trailer.key}/mqdefault.jpg`}
             srcSet={`https://img.youtube.com/vi/${trailer.key}/mqdefault.jpg 320w, https://img.youtube.com/vi/${trailer.key}/maxresdefault.jpg 1280w`}
@@ -58,6 +63,12 @@ export function TrailerPlayer({ trailer }: TrailerPlayerProps) {
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
           />
+          )}
+          {lite && (
+            <span className="absolute bottom-4 left-0 right-0 text-center text-sm text-white/70">
+              Modo ligero: el vídeo se carga al pulsar y consume datos.
+            </span>
+          )}
           <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white text-pixela-dark transition-transform duration-200 ease-out-expo group-active:scale-95 [@media(hover:hover)]:group-hover:scale-105">
             <FaPlay className="ml-1 h-5 w-5" aria-hidden="true" />
           </span>
