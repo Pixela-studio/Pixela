@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
   },
 
   FAVORITES: {
+    LIST: `${API_BASE_URL}/favorites`,
     ADD: `${API_BASE_URL}/favorites`,
     DELETE: `${API_BASE_URL}/favorites/:id`,
     DETAILS: `${API_BASE_URL}/favorites/details`,

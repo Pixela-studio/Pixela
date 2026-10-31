@@ -34,7 +34,9 @@ const STYLES = {
       isFavorited ? "border-white/45 [&>svg]:text-pixela-accent" : ""
     }`,
   bookmarkIcon: "h-5 w-5 shrink-0",
-  buttonLabel: "sr-only sm:not-sr-only",
+  // Visible también en el móvil: solo con el icono, el marcador de favoritos
+  // y «Añadir a mi lista» parecían el mismo botón.
+  buttonLabel: "",
   reviewButton: SECONDARY_BUTTON,
   penIcon: "h-5 w-5 shrink-0",
 };

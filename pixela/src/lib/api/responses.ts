@@ -55,5 +55,5 @@ export function handleRouteError(
   meta?: Record<string, unknown>,
 ) {
   logger.error(context, error, meta);
-  return apiError("Error interno del servidor", 500);
+  return apiError("Algo ha fallado en nuestro servidor. Inténtalo de nuevo en unos minutos.", 500);
 }

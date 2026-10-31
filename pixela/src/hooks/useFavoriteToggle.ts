@@ -47,7 +47,7 @@ export function useFavoriteToggle({ tmdbId, itemType }: UseFavoriteToggleOptions
     let active = true;
 
     favoritesAPI
-      .listWithDetails()
+      .listIds()
       .then((favorites) => {
         if (!active) return;
         const match = favorites.find(

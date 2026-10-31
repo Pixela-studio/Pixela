@@ -9,6 +9,41 @@ import {
 } from "@/lib/api/responses";
 import { createFavoriteSchema } from "@/lib/api/schemas";
 
+/**
+ * GET /api/favorites — solo los ids de los favoritos del usuario.
+ *
+ * Es lo que necesita el marcador de cada tarjeta para saber si está activo.
+ * Antes usaba `/api/favorites/details`, que además resuelve en TMDB los datos
+ * de todos los favoritos: una salida a TMDB por favorito para responder a
+ * «¿este título está marcado?».
+ */
+export async function GET() {
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
+  try {
+    const favorites = await prisma.favorite.findMany({
+      where: { userId: guard.user.id },
+      select: { id: true, userId: true, tmdbId: true, itemType: true },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: favorites.map((favorite) => ({
+          id: favorite.id,
+          user_id: favorite.userId,
+          tmdb_id: Number(favorite.tmdbId),
+          item_type: favorite.itemType,
+        })),
+      },
+      { headers: { "Cache-Control": "private, no-store" } },
+    );
+  } catch (error) {
+    return handleRouteError("Failed to list favorites", error, { userId: guard.user.id });
+  }
+}
+
 export async function POST(request: Request) {
   const guard = await requireUser();
   if (!guard.ok) return guard.response;

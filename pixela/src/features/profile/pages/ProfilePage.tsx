@@ -6,6 +6,24 @@ import { authAPI } from "@/api/auth/auth";
 import { ProfileError } from "@/features/profile/components";
 import { FiLoader } from "react-icons/fi";
 import { ProfileClient } from "../components/ProfileClient";
+import { ApiError } from "@/api/shared/apiHelpers";
+
+/**
+ * Qué decir según por qué falló. «Error de carga» no ayudaba a decidir si
+ * reintentar, volver a entrar o esperar.
+ */
+function describeLoadError(error: unknown): string {
+  if (error instanceof ApiError && error.status === 401) {
+    return "Tu sesión ha caducado o se cerró en otro dispositivo. Vuelve a iniciar sesión.";
+  }
+  if (error instanceof ApiError && error.status >= 500) {
+    return "Nuestro servidor no ha podido leer tu perfil. Suele arreglarse en unos minutos: prueba a reintentar.";
+  }
+  if (error instanceof TypeError) {
+    return "No hay conexión con Pixela. Comprueba tu conexión y reintenta.";
+  }
+  return "No se pudo cargar tu perfil. Prueba a reintentar.";
+}
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserResponse | null>(null);
@@ -44,7 +62,7 @@ export default function ProfilePage() {
           updated_at: userData.updated_at || new Date().toISOString(),
         });
       })
-      .catch(() => setError("Error de carga"))
+      .catch((err: unknown) => setError(describeLoadError(err)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -55,8 +73,8 @@ export default function ProfilePage() {
   );
 
   if (loading) return loader;
-  if (error) return <ProfileError message={error || "Error desconocido"} />;
-  if (!user) return <ProfileError message="No hay datos" />;
+  if (error) return <ProfileError message={error} />;
+  if (!user) return <ProfileError />;
 
   // ProfileClient lee `?tab=` con useSearchParams; el App Router exige un
   // límite de Suspense alrededor para no forzar el renderizado en cliente de
