@@ -49,7 +49,12 @@ export const StarRatingInput = ({
   const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const shown = hovered ?? value ?? 0;
   const tabbable = value ?? 1;
-  const starSize = size === 'sm' ? 'h-5 w-5' : 'h-7 w-7';
+  // Con el dedo, cada media estrella necesita una zona de toque utilizable:
+  // a 28 px las mitades medían 14 px y era casi imposible acertar.
+  const starSize =
+    size === 'sm'
+      ? 'h-5 w-5'
+      : 'h-7 w-7 [@media(pointer:coarse)]:h-11 [@media(pointer:coarse)]:w-11';
 
   const select = (next: number) => {
     const clamped = Math.min(MAX_VALUE, Math.max(1, next));

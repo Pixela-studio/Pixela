@@ -95,6 +95,9 @@ export const ReviewCard = ({
                     alt={review.user_name || 'Avatar'}
                     width={32}
                     height={32}
+                    // Sale de nuestra API o de una URL https del usuario: no
+                    // hay nada que ganar pasándola por el optimizador de Next.
+                    unoptimized
                     className={STYLES.user.avatar.image}
                   />
                 ) : (

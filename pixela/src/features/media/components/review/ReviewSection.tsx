@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FiAlertCircle } from 'react-icons/fi';
 import { Review } from '@/api/reviews/types';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -9,6 +11,7 @@ import { ReviewCard } from './ReviewCard';
 import { ReviewSectionProps } from '@/features/media/types/reviews';
 import { ReviewsSkeleton } from '@/app/components/skeletons';
 import { toast } from '@/lib/toast';
+import { loginHref } from '@/lib/authRedirect';
 
 const STYLES = {
   section: {
@@ -22,7 +25,9 @@ const STYLES = {
     errorIcon: "w-6 h-6 mr-2",
     empty: "flex flex-col items-center justify-center py-12 text-gray-400",
     emptyIcon: "w-8 h-8 mb-2",
-    emptyText: "text-base"
+    emptyText: "text-base",
+    loginPrompt: "mb-8 text-base text-gray-400",
+    loginLink: "text-white underline underline-offset-4 hover:text-pixela-accent"
   },
   reviews: {
     container: "space-y-8"
@@ -42,6 +47,7 @@ export function ReviewSection({ reviews, mediaTitle, loading, error, refreshRevi
   /** Reseñas borradas en la vista pero aún dentro del margen para deshacer. */
   const [hiddenIds, setHiddenIds] = useState<ReadonlySet<number>>(new Set());
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const pathname = usePathname();
 
   const setHidden = (id: number, hidden: boolean) =>
     setHiddenIds((prev) => {
@@ -117,18 +123,11 @@ export function ReviewSection({ reviews, mediaTitle, loading, error, refreshRevi
     });
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className={STYLES.section.container}>
-        <h2 className={STYLES.section.title}>Reseñas</h2>
-        <div className={STYLES.states.empty}>
-          <FiAlertCircle className={STYLES.states.emptyIcon} />
-          <p className={STYLES.states.emptyText}>Inicia sesión para ver y escribir reseñas.</p>
-        </div>
-      </div>
-    );
-  }
-
+  /*
+   * Las reseñas se leen sin sesión. Antes se ocultaban tras «Inicia sesión
+   * para verlas» aunque ya venían dentro del HTML cacheado de la ficha: la
+   * interfaz daba una privacidad que no existía y escondía la comunidad.
+   */
   if (loading) {
     return <ReviewsSkeleton count={3} />;
   }
@@ -147,10 +146,18 @@ export function ReviewSection({ reviews, mediaTitle, loading, error, refreshRevi
   return (
     <div className={STYLES.section.container}>
       <h2 ref={headingRef} tabIndex={-1} className={STYLES.section.title}>Reseñas</h2>
+      {!isAuthenticated && (
+        <p className={STYLES.states.loginPrompt}>
+          <Link href={loginHref(pathname)} prefetch={false} className={STYLES.states.loginLink}>
+            Inicia sesión
+          </Link>{' '}
+          para escribir la tuya.
+        </p>
+      )}
       {visibleReviews.length === 0 ? (
         <div className={STYLES.states.empty}>
           <FiAlertCircle className={STYLES.states.emptyIcon} />
-          <p className={STYLES.states.emptyText}>No hay reseñas para este título.</p>
+          <p className={STYLES.states.emptyText}>Nadie ha reseñado este título todavía.</p>
         </div>
       ) : (
         <div className={STYLES.reviews.container}>

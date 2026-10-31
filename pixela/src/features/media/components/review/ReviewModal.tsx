@@ -304,6 +304,12 @@ export const ReviewModal = ({
             )}
           </div>
 
+          {/* Lo que la interfaz no decía: la reseña la lee cualquiera. */}
+          <p className="text-sm leading-relaxed text-white/60">
+            Tu reseña será pública: se verá en esta ficha con tu nombre y tu foto, también para
+            quien no tenga cuenta.
+          </p>
+
           {apiError && (
             <div role="alert" className={STYLES.content.apiError}>
               {apiError}

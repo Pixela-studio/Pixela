@@ -121,14 +121,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       const current = await prisma.user.findUnique({
         where: { id },
-        select: { isAdmin: true, tokenVersion: true },
+        select: { name: true, email: true, isAdmin: true, tokenVersion: true },
       });
 
       if (!current || current.tokenVersion !== (token.tokenVersion ?? 0)) {
         return null;
       }
 
+      // Ya que se consulta, el nombre y el email también salen de la base de
+      // datos: tras renombrarse, la barra seguía mostrando el nombre del token.
       token.isAdmin = current.isAdmin;
+      token.name = current.name;
+      token.email = current.email;
       return token;
     },
     async session({ session, token }) {

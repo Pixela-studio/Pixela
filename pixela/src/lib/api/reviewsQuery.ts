@@ -24,6 +24,20 @@ export function mediaPathFor(tmdbId: number | bigint, itemType: ItemType): strin
   return `/${segment}/${tmdbId}`;
 }
 
+/**
+ * URL de la foto del autor, nunca la foto en sí.
+ *
+ * Las fotos subidas son data URI de hasta 512 KB y viajaban dentro del HTML de
+ * la ficha. Se sirven aparte desde `/api/users/[id]/avatar`, con la fecha de
+ * actualización como versión para poder cachearlas.
+ */
+function avatarUrlFor(userId: number, photoUrl: string | null, updatedAt: Date): string | undefined {
+  if (!photoUrl) return undefined;
+  if (photoUrl.startsWith("https://")) return photoUrl;
+  if (!photoUrl.startsWith("data:image/")) return undefined;
+  return `/api/users/${userId}/avatar?v=${updatedAt.getTime()}`;
+}
+
 export async function getMediaReviews(
   tmdbId: number,
   itemType: ItemType,
@@ -35,15 +49,16 @@ export async function getMediaReviews(
     },
     orderBy: { createdAt: "desc" },
     include: {
-      user: { select: { name: true, photoUrl: true } },
+      user: { select: { name: true, photoUrl: true, updatedAt: true } },
     },
   });
 
   return reviews.map((review) => ({
     id: review.id,
+    // Hace falta para que el autor vea "editar" y "borrar" en la suya.
     user_id: review.userId,
     user_name: review.user.name,
-    photo_url: review.user.photoUrl ?? undefined,
+    photo_url: avatarUrlFor(review.userId, review.user.photoUrl, review.user.updatedAt),
     tmdb_id: Number(review.tmdbId),
     item_type: review.itemType,
     rating: Number(review.rating),
