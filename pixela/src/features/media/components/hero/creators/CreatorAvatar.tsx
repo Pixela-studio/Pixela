@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, memo } from 'react';
 import { FiUser } from 'react-icons/fi';
 import { CreatorAvatarProps } from '@/features/media/types/creators';
@@ -47,11 +48,19 @@ AvatarPlaceholder.displayName = 'AvatarPlaceholder';
  * @param {string} props.name - Nombre del director/creador
  * @returns {JSX.Element} Componente de avatar de director/creador
  */
-export const CreatorAvatar = ({ photo, name }: CreatorAvatarProps) => {
+export const CreatorAvatar = ({ photo, name, personId }: CreatorAvatarProps) => {
   const [imageError, setImageError] = useState(false);
 
+  // Enlace a la filmografía de la directora o el creador: era lo que Javi
+  // buscaba al leer «Dirección» y no podía pulsar. `nofollow` por la misma
+  // razón que el reparto (ver `ActorCard`).
+  const Wrapper = personId ? Link : 'div';
+  const wrapperProps = personId
+    ? { href: `/actor/${personId}`, prefetch: false, rel: 'nofollow' }
+    : {};
+
   return (
-    <div className={STYLES.container}>
+    <Wrapper {...(wrapperProps as { href: string })} className={`${STYLES.container} ${personId ? 'group' : ''}`}>
       <div className={STYLES.avatarContainer}>
         {!photo || photo.trim() === '' || imageError ? (
           <AvatarPlaceholder name={name} />
@@ -67,7 +76,7 @@ export const CreatorAvatar = ({ photo, name }: CreatorAvatarProps) => {
           />
         )}
       </div>
-      <span className={STYLES.name}>{name}</span>
-    </div>
+      <span className={`${STYLES.name} ${personId ? 'underline-offset-4 group-hover:underline' : ''}`}>{name}</span>
+    </Wrapper>
   );
 }; 

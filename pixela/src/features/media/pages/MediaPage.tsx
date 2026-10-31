@@ -14,6 +14,10 @@ import { CastSection } from "@/features/media/components/cast/CastSection";
 import { TrailersSection } from "@/features/media/components/trailer/TrailersSection";
 import { GallerySection } from "@/features/media/components/gallery/GallerySection";
 import { ReviewSection } from "@/features/media/components/review/ReviewSection";
+import { TechnicalSheet } from "@/features/media/components/details/TechnicalSheet";
+import { SimilarSection } from "@/features/media/components/details/SimilarSection";
+import { EpisodesSection } from "@/features/media/components/episodes/EpisodesSection";
+import type { Serie } from "@/features/media/types/content";
 
 interface MediaPageProps {
   media: Media;
@@ -71,8 +75,11 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
    * `undefined` sin sesión: el modal no se abre sin ella.
    */
   const userId = useAuthStore((state) => state.user?.user_id);
+  // Si no está en la lista, puede ser «solo para mí»: el HTML cacheado de la
+  // ficha no las lleva. Con `undefined` el modal la busca al abrirse en vez de
+  // dar por hecho que no hay ninguna (y sobrescribirla al guardar).
   const userReview = useMemo(
-    () => (userId ? reviews.find((review) => review.user_id === userId) ?? null : undefined),
+    () => (userId ? reviews.find((review) => review.user_id === userId) : undefined),
     [reviews, userId],
   );
 
@@ -116,13 +123,22 @@ export const MediaPage = ({ media, initialReviews }: MediaPageProps) => {
       <div className="relative z-10 pb-40">
         <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 flex flex-col gap-16 md:gap-24">
           {/* Proveedores de Streaming */}
-          <StreamingProviders providers={media.proveedores || []} />
+          <StreamingProviders
+            providers={media.proveedores || []}
+            watchUrl={media.proveedoresUrl}
+          />
+          {/* Temporadas y capítulos vistos */}
+          {media.tipo === "serie" && <EpisodesSection serie={media as Serie} />}
           {/* Reparto */}
           <CastSection actors={media.actores} />
           {/* Trailers */}
           <TrailersSection trailers={media.trailers} />
           {/* Galería */}
           <GallerySection media={media} />
+          {/* Ficha técnica */}
+          <TechnicalSheet media={media} />
+          {/* Similares */}
+          <SimilarSection items={media.similares ?? []} />
           {/* Reseñas */}
           <ReviewSection
             tmdbId={tmdbId}

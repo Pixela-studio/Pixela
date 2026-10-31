@@ -27,6 +27,15 @@ const eslintConfig = [
       ],
     },
   },
+  {
+    // `next.config.js` es CommonJS (lo carga Node tal cual, sin transpilar):
+    // `require` es la forma correcta ahí. Esta regla hacía que `bun run lint`
+    // saliera con error aunque el resto estuviera limpio.
+    files: ["next.config.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

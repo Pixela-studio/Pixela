@@ -11,6 +11,10 @@ import { buildTmdbImageUrl, DEFAULT_IMAGE_SIZES } from '@/lib/constants/tmdb';
 const formatImageUrl = (path: string): string =>
   path?.startsWith('/') ? buildTmdbImageUrl(path, DEFAULT_IMAGE_SIZES.BACKDROP) : path || '';
 
+/** Caras a w185, no al tamaño de fondo. Ver `formatProfileUrl` en `mapPelicula`. */
+const formatProfileUrl = (path: string): string =>
+  path?.startsWith('/') ? buildTmdbImageUrl(path, DEFAULT_IMAGE_SIZES.PROFILE) : path || '';
+
 /**
  * Mapea un actor
  * @param actor
@@ -19,7 +23,7 @@ const formatImageUrl = (path: string): string =>
 const mapActor = (actor: ApiActor) => ({
   id: actor.id?.toString() || '',
   nombre: actor.nombre || actor.name || '',
-  foto: formatImageUrl(actor.foto || actor.profile_path || ''),
+  foto: formatProfileUrl(actor.foto || actor.profile_path || ''),
   personaje: actor.personaje || actor.character || '',
 });
 
@@ -56,7 +60,7 @@ const mapProvider = (provider: ApiProvider, tipo?: 'flatrate' | 'rent' | 'buy'):
 const mapCreator = (creator: ApiCreator) => ({
   id: creator.id?.toString() || '',
   nombre: creator.name || creator.nombre || '',
-  foto: formatImageUrl(creator.profile_path || ''),
+  foto: formatProfileUrl(creator.profile_path || ''),
 });
 
 /**
@@ -116,8 +120,12 @@ export function mapSerieFromApi(apiData: ApiSerie): Serie {
     creadores.push(...apiData.created_by.map(mapCreator));
   }
 
-  const generos = Array.isArray(apiData.generos)
-    ? apiData.generos.map((g) => typeof g === 'string' ? g : g.nombre || g.name || '')
+  // TMDB manda `genres`; ver el mismo arreglo en `mapPelicula`.
+  const rawGenres = apiData.generos ?? apiData.genres;
+  const generos = Array.isArray(rawGenres)
+    ? rawGenres
+        .map((g: string | { nombre?: string; name?: string }) => typeof g === 'string' ? g : g.nombre || g.name || '')
+        .filter(Boolean)
     : [];
 
   return {

@@ -6,9 +6,7 @@ import { usersAPI } from '@/api/users/users';
 import type { User } from '@/api/users/types';
 import { CreateUserData, ApiError, UserCreateModalProps, UserForm } from '@/features/profile/types/form';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-
-const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-const STRONG_PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+import { validateEmail, validateName, validatePassword } from '@/lib/validation/account';
 
 /**
  * Valores iniciales del formulario
@@ -223,10 +221,8 @@ export const UserCreateModal = ({
               <div className={STYLES.fieldGroup}>
                 <label htmlFor={ids.name} className={STYLES.label}>Nombre</label>
                 <input
-                  {...register('name', { 
-                    required: 'El nombre es requerido',
-                    minLength: { value: 3, message: 'El nombre debe tener al menos 3 caracteres' },
-                    maxLength: { value: 50, message: 'El nombre no puede exceder los 50 caracteres' }
+                  {...register('name', {
+                    validate: (value) => validateName(value) ?? true,
                   })}
                   id={ids.name}
                     aria-invalid={errors.name ? true : undefined}
@@ -245,11 +241,7 @@ export const UserCreateModal = ({
                 <input
                   type="email"
                   {...register('email', {
-                    required: 'El email es requerido',
-                    pattern: {
-                      value: EMAIL_REGEX,
-                      message: 'Formato de email inválido'
-                    }
+                    validate: (value) => validateEmail(value) ?? true,
                   })}
                   id={ids.email}
                     aria-invalid={errors.email ? true : undefined}
@@ -272,15 +264,7 @@ export const UserCreateModal = ({
                   <input
                     type={showPassword ? 'text' : 'password'}
                     {...register('password', {
-                      required: 'La contraseña es requerida',
-                      minLength: {
-                        value: 8,
-                        message: 'La contraseña debe tener al menos 8 caracteres'
-                      },
-                      pattern: {
-                        value: STRONG_PASSWORD_REGEX,
-                        message: 'Debe incluir mayúscula, minúscula, número y símbolo.'
-                      }
+                      validate: (value) => validatePassword(value) ?? true,
                     })}
                     id={ids.password}
                     aria-invalid={errors.password ? true : undefined}

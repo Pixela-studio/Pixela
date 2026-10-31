@@ -11,7 +11,7 @@ import {
 } from "@/lib/api/responses";
 import { createReviewSchema } from "@/lib/api/schemas";
 import { enforceRateLimit } from "@/lib/api/rateLimit";
-import { mediaPathFor } from "@/lib/api/reviewsQuery";
+import { avatarUrlFor, mediaPathFor } from "@/lib/api/reviewsQuery";
 
 interface TmdbMediaDetails {
   title?: string;
@@ -31,7 +31,7 @@ export async function GET() {
       where: { userId: guard.user.id },
       orderBy: { createdAt: "desc" },
       include: {
-        user: { select: { name: true, photoUrl: true } },
+        user: { select: { name: true, photoUrl: true, updatedAt: true } },
       },
     });
 
@@ -57,11 +57,12 @@ export async function GET() {
         id: review.id,
         user_id: review.userId,
         user_name: review.user.name,
-        photo_url: review.user.photoUrl,
+        photo_url: avatarUrlFor(review.userId, review.user.photoUrl, review.user.updatedAt),
         tmdb_id: Number(review.tmdbId),
         item_type: review.itemType,
         rating: Number(review.rating),
         review: review.review,
+        is_public: review.isPublic,
         created_at: review.createdAt.toISOString(),
         updated_at: review.updatedAt.toISOString(),
         title:
@@ -98,7 +99,7 @@ export async function POST(request: Request) {
   const parsed = createReviewSchema.safeParse(body.data);
   if (!parsed.success) return validationError(parsed.error);
 
-  const { tmdb_id, item_type, rating, review } = parsed.data;
+  const { tmdb_id, item_type, rating, review, is_public } = parsed.data;
 
   try {
     const newReview = await prisma.review.upsert({
@@ -109,16 +110,17 @@ export async function POST(request: Request) {
           tmdbId: BigInt(tmdb_id),
         },
       },
-      update: { rating, review: review ?? null },
+      update: { rating, review: review ?? null, ...(is_public !== undefined && { isPublic: is_public }) },
       create: {
         userId: guard.user.id,
         itemType: item_type,
         tmdbId: BigInt(tmdb_id),
         rating,
         review: review ?? null,
+        isPublic: is_public ?? true,
       },
       include: {
-        user: { select: { name: true, photoUrl: true } },
+        user: { select: { name: true, photoUrl: true, updatedAt: true } },
       },
     });
 
@@ -140,11 +142,12 @@ export async function POST(request: Request) {
         id: newReview.id,
         user_id: newReview.userId,
         user_name: newReview.user.name,
-        photo_url: newReview.user.photoUrl,
+        photo_url: avatarUrlFor(newReview.userId, newReview.user.photoUrl, newReview.user.updatedAt),
         tmdb_id: Number(newReview.tmdbId),
         item_type: newReview.itemType,
         rating: Number(newReview.rating),
         review: newReview.review,
+        is_public: newReview.isPublic,
         created_at: newReview.createdAt.toISOString(),
         updated_at: newReview.updatedAt.toISOString(),
       },

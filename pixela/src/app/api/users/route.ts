@@ -9,6 +9,7 @@ import {
   parseJsonBody,
   validationError,
 } from "@/lib/api/responses";
+import { emailSchema, nameSchema, passwordSchema } from "@/lib/validation/account";
 
 /**
  * Coste de bcrypt. 10 era el valor por defecto heredado; 12 es la recomendación
@@ -17,17 +18,9 @@ import {
 const BCRYPT_ROUNDS = 12;
 
 const createUserSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder los 50 caracteres")
-    .regex(
-      /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*$/,
-      "El nombre solo puede contener letras, números y los caracteres . _ -",
-    ),
-  email: z.string().trim().toLowerCase().email("Email inválido"),
-  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres").max(128),
+  name: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
   is_admin: z
     .preprocess((value) => (typeof value === "string" ? value === "true" : value), z.boolean())
     .optional()

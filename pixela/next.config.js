@@ -118,6 +118,17 @@ const nextConfig = {
             ...cacheHeaders,
             {
                 /*
+                 * El service worker tiene que poder actualizarse en cuanto
+                 * cambie: sin esto le tocaría la regla de estáticos de un día.
+                 */
+                source: '/sw.js',
+                headers: [
+                    { key: 'Cache-Control', value: 'no-cache' },
+                    { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+                ],
+            },
+            {
+                /*
                  * La API interna no aporta nada a un buscador y sí atrae
                  * rastreadores: 25 rutas indexables que devuelven JSON.
                  * `noindex` las saca del índice y corta el tráfico recurrente.

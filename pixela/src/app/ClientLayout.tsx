@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "@/shared/components/Navbar";
 import { ToastContainer } from "@/shared/components/ToastContainer";
 import Footer from "@/features/footer/Footer";
+import { useLiteModeClass } from "@/hooks/useLiteMode";
+import { registerServiceWorker } from "@/lib/offline";
 
 /**
  * Componente que maneja el layout del cliente
@@ -17,8 +19,15 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  useLiteModeClass();
+
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
   const isAuthPage =
-    pathname?.startsWith("/login") || pathname?.startsWith("/register");
+    pathname?.startsWith("/login") ||
+    pathname?.startsWith("/register") ||
+    pathname?.startsWith("/recuperar");
 
   // Resetear scroll al tope en cada cambio de ruta.
   // Se hace aquí (layout global) y no en el componente destino porque el layout

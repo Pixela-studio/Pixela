@@ -50,9 +50,27 @@ export const API_ENDPOINTS = {
     CREATE: `${API_BASE_URL}/users`,
     UPDATE: `${API_BASE_URL}/users/:id`,
     DELETE: `${API_BASE_URL}/users/:id`,
+    EXPORT: `${API_BASE_URL}/users/me/export`,
+    SESSIONS: `${API_BASE_URL}/users/me/sessions`,
   },
 
+  /** Diario de visionado. */
+  DIARY: `${API_BASE_URL}/diary`,
+
+  /** Capítulos vistos de una serie. */
+  EPISODES: `${API_BASE_URL}/episodes`,
+
+  /** Listas con nombre. */
+  LISTS: `${API_BASE_URL}/lists`,
+
+  /** Plataformas de streaming de España, para «Mis plataformas». */
+  PROVIDERS: `${API_BASE_URL}/tmdb/providers`,
+
+  /** Búsqueda global: películas, series y personas en una consulta. */
+  SEARCH: `${API_BASE_URL}/search`,
+
   FAVORITES: {
+    LIST: `${API_BASE_URL}/favorites`,
     ADD: `${API_BASE_URL}/favorites`,
     DELETE: `${API_BASE_URL}/favorites/:id`,
     DETAILS: `${API_BASE_URL}/favorites/details`,

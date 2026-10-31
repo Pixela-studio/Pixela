@@ -1,60 +1,46 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { TextInput } from '@/features/auth/components/TextInput';
 import { RoundedButton } from '@/features/auth/components/RoundedButton';
 import { VscAccount, VscMail, VscLock, VscCheck } from 'react-icons/vsc';
+import { loginHref, safeCallbackUrl } from '@/lib/authRedirect';
+import {
+  MIN_AGE,
+  NAME_HINT,
+  NAME_MAX,
+  PASSWORD_HINT,
+  validateEmail,
+  validateName,
+  validatePassword,
+} from '@/lib/validation/account';
 
-/*
- * Reglas copiadas de `registerSchema` en `/api/auth/register`: avisar aquí
- * ahorra el viaje de ida y vuelta con un 400. Si la API cambia (p. ej. para
- * admitir tildes y espacios en el nombre), hay que cambiarlas también aquí; lo
- * ideal es compartir el esquema zod entre los dos lados.
- */
-const NAME_MIN = 2;
-const NAME_MAX = 50;
-const NAME_PATTERN = /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*$/;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_PASSWORD_LENGTH = 8;
-const MAX_PASSWORD_LENGTH = 128;
-
-type Field = 'name' | 'email' | 'password' | 'password_confirmation';
+type Field = 'name' | 'email' | 'password' | 'password_confirmation' | 'accept_terms';
 type FieldErrors = Partial<Record<Field, string>>;
-type Values = Record<Field, string>;
+type Values = Record<Exclude<Field, 'accept_terms'>, string> & { accept_terms: boolean };
 
-const FIELD_ORDER: Field[] = ['name', 'email', 'password', 'password_confirmation'];
+const FIELD_ORDER: Field[] = ['name', 'email', 'password', 'password_confirmation', 'accept_terms'];
 
+/* Las reglas son las de `@/lib/validation/account`, las mismas que aplica la API. */
 const validateField = (field: Field, values: Values): string | undefined => {
   switch (field) {
-    case 'name': {
-      const name = values.name.trim();
-      if (!name) return 'Escribe tu nombre.';
-      if (name.length < NAME_MIN) return `El nombre debe tener al menos ${NAME_MIN} caracteres.`;
-      if (name.length > NAME_MAX) return `El nombre no puede pasar de ${NAME_MAX} caracteres.`;
-      if (!NAME_PATTERN.test(name)) {
-        return 'Por ahora solo se admiten letras sin tilde, números y . _ - entre ellos, sin espacios.';
-      }
-      return undefined;
-    }
-    case 'email': {
-      const email = values.email.trim();
-      if (!email) return 'Escribe tu email.';
-      if (!EMAIL_PATTERN.test(email)) return 'Ese email no parece válido.';
-      return undefined;
-    }
+    case 'name':
+      return validateName(values.name);
+    case 'email':
+      return validateEmail(values.email);
     case 'password':
-      if (values.password.length < MIN_PASSWORD_LENGTH) {
-        return `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`;
-      }
-      if (values.password.length > MAX_PASSWORD_LENGTH) return 'La contraseña es demasiado larga.';
-      return undefined;
+      return validatePassword(values.password);
     case 'password_confirmation':
       if (!values.password_confirmation) return 'Repite la contraseña.';
       if (values.password_confirmation !== values.password) return 'Las contraseñas no coinciden.';
       return undefined;
+    case 'accept_terms':
+      return values.accept_terms
+        ? undefined
+        : `Marca la casilla para continuar: confirma que tienes ${MIN_AGE} años o más y que aceptas las condiciones.`;
   }
 };
 
@@ -65,11 +51,15 @@ const readValues = (form: HTMLFormElement): Values => {
     email: String(data.get('email') ?? ''),
     password: String(data.get('password') ?? ''),
     password_confirmation: String(data.get('password_confirmation') ?? ''),
+    accept_terms: data.get('accept_terms') === 'on',
   };
 };
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Viene del login, que a su vez lo recibió del botón que pidió la cuenta.
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
@@ -82,7 +72,7 @@ export default function RegisterPage() {
     setFieldErrors((prev) => ({ ...prev, [field]: validateField(field, values) }));
   };
 
-  const fieldProps = (field: Field) => ({
+  const fieldProps = (field: Exclude<Field, 'accept_terms'>) => ({
     error: fieldErrors[field],
     onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
       // Un campo vacío al tabular por encima no es un error todavía.
@@ -112,7 +102,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const name = values.name.trim();
+    const name = values.name.trim().replace(/\s+/g, ' ');
     const email = values.email.trim();
     const { password } = values;
 
@@ -122,7 +112,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, accept_terms: values.accept_terms }),
       });
 
       const data = await res.json();
@@ -139,10 +129,12 @@ export default function RegisterPage() {
       });
 
       if (loginRes?.error) {
-        // Si falla el login automático pero se creó, redirigir a login
-        router.push('/login?registered=true');
+        // La cuenta existe pero el login automático falló: al login, sin
+        // perder el destino.
+        const login = loginHref(callbackUrl);
+        router.push(`${login}${login.includes('?') ? '&' : '?'}registered=true`);
       } else {
-        router.push('/');
+        router.push(callbackUrl);
         router.refresh();
       }
 
@@ -170,12 +162,12 @@ export default function RegisterPage() {
         id="name"
         name="name"
         type="text"
-        label="Nombre"
-        hint="Letras sin tilde, números y . _ - (sin espacios)."
+        label="Nombre público"
+        hint={NAME_HINT}
         icon={<VscAccount />}
         required
         autoFocus
-        autoComplete="name"
+        autoComplete="nickname"
         maxLength={NAME_MAX}
         {...fieldProps('name')}
       />
@@ -197,7 +189,7 @@ export default function RegisterPage() {
         name="password"
         type="password"
         label="Contraseña"
-        hint={`Al menos ${MIN_PASSWORD_LENGTH} caracteres.`}
+        hint={PASSWORD_HINT}
         icon={<VscLock />}
         required
         autoComplete="new-password"
@@ -215,6 +207,37 @@ export default function RegisterPage() {
         {...fieldProps('password_confirmation')}
       />
 
+      <div>
+        <label htmlFor="accept_terms" className="flex items-start gap-3 text-sm leading-relaxed text-white/80">
+          <input
+            id="accept_terms"
+            name="accept_terms"
+            type="checkbox"
+            required
+            aria-invalid={fieldErrors.accept_terms ? true : undefined}
+            aria-describedby={fieldErrors.accept_terms ? 'accept_terms-error' : undefined}
+            onChange={(e) => revalidate('accept_terms', e.currentTarget.form, true)}
+            className="mt-1 h-5 w-5 shrink-0 rounded-sm border border-white/30 bg-pixela-surface accent-pixela-accent focus-visible:ring-2 focus-visible:ring-pixela-accent/40"
+          />
+          <span>
+            Tengo {MIN_AGE} años o más y acepto las{' '}
+            <Link href="/aviso-legal" target="_blank" className="text-white underline underline-offset-4">
+              condiciones de uso
+            </Link>{' '}
+            y la{' '}
+            <Link href="/privacidad" target="_blank" className="text-white underline underline-offset-4">
+              política de privacidad
+            </Link>
+            . Mis reseñas serán públicas con mi nombre.
+          </span>
+        </label>
+        {fieldErrors.accept_terms && (
+          <p id="accept_terms-error" role="alert" className="mt-1.5 text-sm text-red-400">
+            {fieldErrors.accept_terms}
+          </p>
+        )}
+      </div>
+
       {/* Errores del servidor (email ya registrado, límite de altas…). */}
       {error && (
         <div role="alert" className="text-sm text-red-400">
@@ -231,12 +254,21 @@ export default function RegisterPage() {
       <p className="pt-2 text-center text-sm text-white/70">
         ¿Ya tienes cuenta?
         <Link
-          href="/login"
+          href={loginHref(callbackUrl)}
           className="ml-1.5 font-semibold text-pixela-accent underline-offset-4 transition-colors duration-200 hover:underline"
         >
           Inicia sesión
         </Link>
       </p>
     </form>
+  );
+}
+
+export default function RegisterPage() {
+  // `useSearchParams` obliga a un límite de Suspense en el App Router.
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }

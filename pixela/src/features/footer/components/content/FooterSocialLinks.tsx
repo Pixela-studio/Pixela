@@ -1,5 +1,6 @@
 import { FaGithub } from 'react-icons/fa';
 import { FiArrowUpRight } from 'react-icons/fi';
+import { LiteModeToggle } from '../ui/LiteModeToggle';
 
 /*
  * Antes enlazaba a instagram.com/pixela, linkedin.com/company/pixela y
@@ -32,6 +33,7 @@ export const FooterSocialLinks = () => (
       <FiArrowUpRight className={STYLES.arrow} aria-hidden="true" />
       <span className="sr-only">(se abre en una pestaña nueva)</span>
     </a>
+    <LiteModeToggle />
   </div>
 );
 

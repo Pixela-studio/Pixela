@@ -8,8 +8,7 @@ import {
   FiStar,
   FiEdit,
   FiCheck,
-  FiX,
-} from "react-icons/fi";
+  FiX, FiImage } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
@@ -241,8 +240,9 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                 </Link>
                 <p className="text-xs text-gray-400">
                   {review.created_at
-                    ? new Date(review.created_at).toLocaleDateString()
+                    ? new Date(review.created_at).toLocaleDateString("es-ES")
                     : ""}
+                  {review.is_public === false && " · Solo tú la ves"}
                 </p>
               </div>
 
@@ -259,6 +259,19 @@ export const ProfileReviews = ({ onStatsUpdate }: ProfileReviewsProps) => {
                   >
                     <FiEdit className="w-4 h-4" aria-hidden="true" />
                   </button>
+                  {/* Imagen cuadrada para Instagram o WhatsApp; solo de las
+                      públicas, que son las que se pueden enseñar. */}
+                  {review.is_public !== false && (
+                    <a
+                      href={`/api/reviews/${review.id}/image?v=${encodeURIComponent(review.updated_at ?? "")}`}
+                      download={`pixela-resena-${review.id}.png`}
+                      className="rounded-full p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-200"
+                      aria-label={`Descargar tu reseña${review.title ? ` de «${review.title}»` : ""} como imagen`}
+                      title="Descargar como imagen"
+                    >
+                      <FiImage className="w-4 h-4" aria-hidden="true" />
+                    </a>
+                  )}
                   <button
                     type="button"
                     className="rounded-full p-2 text-white/70 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-200"

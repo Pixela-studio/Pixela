@@ -7,6 +7,10 @@ import { WatchProvider } from './supplements';
  */
 export interface PlatformCardProps {
   provider: WatchProvider;
+  /** Página «Dónde ver» del título en TMDB, para plataformas sin URL conocida. */
+  fallbackUrl?: string;
+  /** Está entre «Mis plataformas». */
+  isMine?: boolean;
 } 
 
 
@@ -18,4 +22,6 @@ export interface PlatformCardProps {
  */
 export interface StreamingProvidersProps {
   providers: WatchProvider[];
+  /** Página «Dónde ver» del título en TMDB para España. */
+  watchUrl?: string;
 }

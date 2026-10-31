@@ -16,12 +16,23 @@ model User {
   coverImage    String?   @map("cover_image") @db.Text
   emailVerified DateTime? @map("email_verified_at")
   isAdmin       Boolean   @default(false) @map("is_admin")
+  /// Cuándo aceptó las condiciones y declaró tener la edad mínima. Nulo en
+  /// cuentas anteriores a la casilla.
+  termsAcceptedAt DateTime? @map("terms_accepted_at")
+  /// Se incrementa para invalidar todas las sesiones abiertas: cambio de
+  /// contraseña o "cerrar sesión en todos los dispositivos". Cada JWT lleva la
+  /// versión con la que se emitió y `auth.ts` lo rechaza si ya no coincide.
+  tokenVersion  Int       @default(0) @map("token_version")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   favorites     Favorite[]
   reviews       Review[]
   libraryItems  LibraryItem[]
+  lists         List[]
+  diaryEntries  DiaryEntry[]
+  episodeWatches EpisodeWatch[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -46,6 +57,8 @@ model Review {
   tmdbId    BigInt   @map("tmdb_id")
   rating    Decimal  @db.Decimal(3, 1)
   review    String?  @db.Text
+  /// `false` = «solo para mí»: no sale en la ficha ni para nadie más.
+  isPublic  Boolean  @default(true) @map("is_public")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -80,4 +93,108 @@ model LibraryItem {
 
   @@unique([userId, itemType, tmdbId])
   @@map("library_items")
+}
+
+enum ListVisibility {
+  /// Solo la ve quien la creó.
+  PRIVATE
+  /// La ve quien tenga el enlace; no se indexa ni sale en ningún listado.
+  LINK
+  /// Pública: se puede enlazar y compartir abiertamente.
+  PUBLIC
+}
+
+/// Listas con nombre: «Viernes en familia», «Ciclo coming of age». La feature
+/// más votada de la ronda 2 del beta test.
+model List {
+  id          Int            @id @default(autoincrement()) @map("list_id")
+  userId      Int            @map("user_id")
+  name        String         @db.VarChar(80)
+  description String?        @db.VarChar(500)
+  visibility  ListVisibility @default(PRIVATE)
+  /// Identificador de la URL pública (`/listas/<shareId>`). Aleatorio para que
+  /// una lista «con enlace» no se pueda adivinar recorriendo ids.
+  shareId     String         @unique @map("share_id") @db.VarChar(24)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items ListItem[]
+
+  @@index([userId])
+  @@map("lists")
+}
+
+model ListItem {
+  id       Int      @id @default(autoincrement()) @map("list_item_id")
+  listId   Int      @map("list_id")
+  itemType ItemType @map("item_type")
+  tmdbId   BigInt   @map("tmdb_id")
+  /// Orden manual dentro de la lista (0, 1, 2…).
+  position Int
+  /// Por qué está en la lista: «para la sesión del jueves».
+  note     String?  @db.VarChar(280)
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, itemType, tmdbId])
+  @@index([listId, position])
+  @@map("list_items")
+}
+
+/// Diario de visionado: cada vez que alguien ve algo, con fecha. A diferencia
+/// de la reseña (una por título) aquí puede haber varias entradas del mismo
+/// título: los revisionados que pedía Javi.
+model DiaryEntry {
+  id        Int      @id @default(autoincrement()) @map("diary_entry_id")
+  userId    Int      @map("user_id")
+  itemType  ItemType @map("item_type")
+  tmdbId    BigInt   @map("tmdb_id")
+  watchedOn DateTime @map("watched_on") @db.Date
+  /// Nota de 0 a 10, como las reseñas. Opcional: apuntar que se vio basta.
+  rating    Decimal? @db.Decimal(3, 1)
+  note      String?  @db.VarChar(500)
+  rewatch   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, watchedOn])
+  @@index([userId, itemType, tmdbId])
+  @@map("diary_entries")
+}
+
+/// Capítulos vistos de una serie: el seguimiento por episodio que pedían
+/// Tomás y, en la ronda 1, Marcos y Diego.
+model EpisodeWatch {
+  id        Int      @id @default(autoincrement()) @map("episode_watch_id")
+  userId    Int      @map("user_id")
+  /// Id de TMDB de la serie.
+  tmdbId    BigInt   @map("tmdb_id")
+  season    Int
+  episode   Int
+  watchedAt DateTime @default(now()) @map("watched_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tmdbId, season, episode])
+  @@index([userId, tmdbId])
+  @@map("episode_watches")
+}
+
+/// Enlaces de «He olvidado mi contraseña». Se guarda el hash SHA-256 del
+/// token, nunca el token: quien lea la base de datos no puede usarlos.
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement()) @map("password_reset_token_id")
+  userId    Int       @map("user_id")
+  tokenHash String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }

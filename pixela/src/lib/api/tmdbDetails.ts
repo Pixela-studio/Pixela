@@ -26,8 +26,15 @@ export const toTmdbType = (type: string): TmdbMediaType =>
  *    Next deduplica `generateMetadata` y el render en una sola llamada a TMDB.
  */
 
-/** Todo lo que la ficha necesita en una sola petición. */
-const DETAIL_APPEND = "credits,videos,images,similar,watch/providers";
+/**
+ * Todo lo que la ficha necesita en una sola petición. La calificación por
+ * edades tiene nombre distinto en películas (`release_dates`) y series
+ * (`content_ratings`); antes no se pedía ninguna de las dos.
+ */
+const DETAIL_APPEND: Record<TmdbMediaType, string> = {
+  movie: "credits,videos,images,similar,watch/providers,release_dates",
+  tv: "credits,videos,images,similar,watch/providers,content_ratings",
+};
 
 /**
  * Valida un id de TMDB antes de interpolarlo en la ruta.
@@ -46,7 +53,10 @@ export async function fetchTmdbDetail<T>(
   id: number,
 ): Promise<T> {
   return fetchFromTmdb<T>(`/${tmdbType}/${id}`, {
-    append_to_response: DETAIL_APPEND,
+    append_to_response: DETAIL_APPEND[tmdbType],
     include_image_language: "en,null,es",
+    // Sin esto solo llegaban vídeos en castellano: casi nunca el tráiler en
+    // VO, y en cine no anglosajón ni siquiera en español.
+    include_video_language: "es,en,null",
   });
 }

@@ -7,8 +7,13 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { ReviewModal } from "@/features/media/components/review/ReviewModal";
 import { ActionButtonsProps } from "@/features/media/types/actions";
 import { toast } from "@/lib/toast";
+import { loginHrefForHere } from "@/lib/authRedirect";
 import { LibraryButton } from "@/features/media/components/actions/LibraryButton";
 import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
+import { ShareButton } from "@/shared/components/ShareButton";
+import { AddToListDialog } from "@/features/lists/components/AddToListDialog";
+import { FiCalendar, FiList } from "react-icons/fi";
+import { LogViewingDialog } from "@/features/diary/components/LogViewingDialog";
 
 /*
  * Jerarquía de la fila de acciones.
@@ -33,7 +38,9 @@ const STYLES = {
       isFavorited ? "border-white/45 [&>svg]:text-pixela-accent" : ""
     }`,
   bookmarkIcon: "h-5 w-5 shrink-0",
-  buttonLabel: "sr-only sm:not-sr-only",
+  // Visible también en el móvil: solo con el icono, el marcador de favoritos
+  // y «Añadir a mi lista» parecían el mismo botón.
+  buttonLabel: "",
   reviewButton: SECONDARY_BUTTON,
   penIcon: "h-5 w-5 shrink-0",
 };
@@ -60,13 +67,29 @@ export const ActionButtons = ({
     itemType,
   });
 
+  const [showListsDialog, setShowListsDialog] = useState(false);
+  const [showDiaryDialog, setShowDiaryDialog] = useState(false);
+
+  /** Abre un diálogo que necesita cuenta o manda al login con vuelta aquí. */
+  const requireAccount = (message: string, open: () => void) => {
+    if (!isAuthenticated) {
+      toast.info(message, { title: "Autenticación requerida", duration: 3000 });
+      router.push(loginHrefForHere());
+      return;
+    }
+    open();
+  };
+
+  const handleLists = () =>
+    requireAccount("Inicia sesión para guardar títulos en tus listas", () => setShowListsDialog(true));
+
   const handleReview = () => {
     if (!isAuthenticated) {
       toast.info("Inicia sesión para escribir una reseña", {
         title: "Autenticación requerida",
         duration: 3000,
       });
-      router.push("/login");
+      router.push(loginHrefForHere());
       return;
     }
     setShowReviewModal(true);
@@ -111,7 +134,49 @@ export const ActionButtons = ({
             Reseñar
           </span>
         </button>
+
+        <button
+          onClick={() => requireAccount("Inicia sesión para llevar tu diario", () => setShowDiaryDialog(true))}
+          className={STYLES.reviewButton}
+          type="button"
+          aria-label={`Apuntar «${title}» en tu diario`}
+        >
+          <FiCalendar aria-hidden="true" className={STYLES.penIcon} />
+          <span aria-hidden="true" className={STYLES.buttonLabel}>
+            Lo he visto
+          </span>
+        </button>
+
+        <button
+          onClick={handleLists}
+          className={STYLES.reviewButton}
+          type="button"
+          aria-label={`Añadir «${title}» a una lista`}
+        >
+          <FiList aria-hidden="true" className={STYLES.penIcon} />
+          <span aria-hidden="true" className={STYLES.buttonLabel}>
+            Listas
+          </span>
+        </button>
+
+        <ShareButton title={title} className={STYLES.reviewButton} />
       </div>
+
+      <LogViewingDialog
+        isOpen={showDiaryDialog}
+        onClose={() => setShowDiaryDialog(false)}
+        tmdbId={tmdbId}
+        itemType={itemType}
+        title={title}
+      />
+
+      <AddToListDialog
+        isOpen={showListsDialog}
+        onClose={() => setShowListsDialog(false)}
+        tmdbId={tmdbId}
+        itemType={itemType}
+        title={title}
+      />
 
       <ReviewModal
         isOpen={showReviewModal}

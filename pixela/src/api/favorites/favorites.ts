@@ -3,24 +3,56 @@ import { API_ENDPOINTS } from "../shared/apiEndpoints";
 import { fetchFromAPI } from "../shared/apiHelpers";
 
 /**
- * Caché en memoria para evitar peticiones duplicadas de favoritos.
- * Múltiples instancias de ActionButtons en la misma página comparten este resultado.
- * TTL: 30 segundos. Se invalida automáticamente al añadir o eliminar favoritos.
+ * Caché en memoria compartida por todos los marcadores de la página.
+ *
+ * Guarda también la **promesa en vuelo**: antes solo se guardaba el resultado,
+ * así que las veinte tarjetas de una fila preguntaban a la vez, todas veían la
+ * caché vacía y salían veinte peticiones iguales. Ahora la primera sale y las
+ * demás esperan a esa. TTL de 30 s; se invalida al añadir o quitar.
  */
-let favoritesCache: {
-  data: FavoriteWithDetails[] | null;
-  timestamp: number;
-} = { data: null, timestamp: 0 };
-
 const CACHE_TTL_MS = 30_000;
 
-const isCacheValid = () =>
-  favoritesCache.data !== null &&
-  Date.now() - favoritesCache.timestamp < CACHE_TTL_MS;
+interface CacheEntry<T> {
+  data: T | null;
+  timestamp: number;
+  inFlight: Promise<T> | null;
+}
+
+const emptyEntry = <T,>(): CacheEntry<T> => ({ data: null, timestamp: 0, inFlight: null });
+
+let idsCache: CacheEntry<Favorite[]> = emptyEntry();
+let detailsCache: CacheEntry<FavoriteWithDetails[]> = emptyEntry();
 
 const invalidateCache = () => {
-  favoritesCache = { data: null, timestamp: 0 };
+  idsCache = emptyEntry();
+  detailsCache = emptyEntry();
 };
+
+function cached<T>(
+  getEntry: () => CacheEntry<T>,
+  load: () => Promise<T>,
+): Promise<T> {
+  const entry = getEntry();
+  if (entry.data !== null && Date.now() - entry.timestamp < CACHE_TTL_MS) {
+    return Promise.resolve(entry.data);
+  }
+  if (entry.inFlight) return entry.inFlight;
+
+  const promise = load()
+    .then((data) => {
+      // Si se invalidó mientras tanto, no se escribe en la entrada nueva.
+      if (getEntry() === entry) {
+        entry.data = data;
+        entry.timestamp = Date.now();
+      }
+      return data;
+    })
+    .finally(() => {
+      entry.inFlight = null;
+    });
+  entry.inFlight = promise;
+  return promise;
+}
 
 interface ApiEnvelope<T> {
   success: boolean;
@@ -32,17 +64,22 @@ interface ApiEnvelope<T> {
  * @namespace favoritesAPI
  */
 export const favoritesAPI = {
-  async listWithDetails(): Promise<FavoriteWithDetails[]> {
-    if (isCacheValid()) {
-      return favoritesCache.data!;
-    }
-
-    const response = await fetchFromAPI<ApiEnvelope<FavoriteWithDetails[]>>(
-      API_ENDPOINTS.FAVORITES.DETAILS,
+  /** Favoritos con los datos de TMDB, para la pestaña del perfil. */
+  listWithDetails(): Promise<FavoriteWithDetails[]> {
+    return cached(
+      () => detailsCache,
+      async () =>
+        (await fetchFromAPI<ApiEnvelope<FavoriteWithDetails[]>>(API_ENDPOINTS.FAVORITES.DETAILS))
+          .data,
     );
+  },
 
-    favoritesCache = { data: response.data, timestamp: Date.now() };
-    return response.data;
+  /** Solo ids: lo que necesita un marcador para saber si está activo. */
+  listIds(): Promise<Favorite[]> {
+    return cached(
+      () => idsCache,
+      async () => (await fetchFromAPI<ApiEnvelope<Favorite[]>>(API_ENDPOINTS.FAVORITES.LIST)).data,
+    );
   },
 
   /**

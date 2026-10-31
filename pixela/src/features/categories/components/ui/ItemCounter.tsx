@@ -72,7 +72,8 @@ export const ItemCounter = memo(({
      */
     const getSecondaryText = () => {
         if (isSearching && searchQuery) {
-            return `encontrados`;
+            // «Películas» y «series» son femeninas.
+            return `encontradas`;
         }
         
         if (totalPages > 1) {

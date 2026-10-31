@@ -50,6 +50,11 @@ export const metadata: Metadata = {
     locale: "es_ES",
     type: "website",
   },
+  // Ahora sí existe: lo usan iOS al añadir a la pantalla de inicio y algunos
+  // lectores de enlaces.
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
   other: {
     "X-UA-Compatible": "IE=edge",
   },
@@ -65,7 +70,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   // El fondo llega bajo la muesca; la navbar se aparta con safe-area-inset.
   viewportFit: "cover",
-  themeColor: "#181818",
+  themeColor: "#0D0A08",
 };
 
 const STYLES = {

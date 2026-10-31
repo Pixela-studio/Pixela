@@ -1,6 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { clearOfflineData } from '@/lib/offline';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import { UserResponse } from '@/api/auth/types';
@@ -70,6 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       // plano", dejando la cookie viva si la petición fallaba.
       await signOut({ redirect: false });
     } finally {
+      clearOfflineData();
       set({ user: null, isAuthenticated: false, isLoading: false, error: null });
     }
   },

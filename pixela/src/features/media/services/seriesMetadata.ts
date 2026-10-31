@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getSeriesData } from './seriesService';
 import { isAllowedSeries } from '@/lib/api/tmdbAllowlist';
+import { buildMediaMetadata } from './mediaSocialMetadata';
 
 /**
  * `noindex` para lo que no está en la allowlist del catálogo.
@@ -30,13 +31,7 @@ export async function generateMetadata(
     ]);
 
     return {
-      title: `${serie.titulo} | Pixela`,
-      description: serie.sinopsis,
-      openGraph: {
-        title: `${serie.titulo} | Pixela`,
-        description: serie.sinopsis,
-        images: [serie.poster],
-      },
+      ...buildMediaMetadata(serie, `/series/${id}`),
       ...(isAllowed ? {} : { robots: NOINDEX }),
     };
   } catch (error) {

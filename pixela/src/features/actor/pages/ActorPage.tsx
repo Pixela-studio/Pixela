@@ -2,19 +2,19 @@
 
 import { ActorDetails } from "@/features/actor/services/actorService";
 import { tmdbImageHelpers, DEFAULT_IMAGE_SIZES } from "@/lib/constants/tmdb";
-import { MediaCarousel } from "@/shared/components/MediaCarousel";
 import { BackdropImage } from "@/features/media/components/hero/backdrop/BackdropImage";
 import { MediaPoster } from "@/features/media/components/hero/poster/MediaPoster";
-import Link from "next/link";
-import Image from "next/image";
+import { Filmography } from "@/features/actor/components/Filmography";
+import { departmentName } from "@/lib/departments";
 
 interface ActorPageProps {
   actor: ActorDetails;
   /**
-   * Claves `"movies/<id>"` / `"series/<id>"` de la filmografía que pueden
-   * emitir `<Link>`, resueltas en el Server Component de la ruta.
+   * Claves `"movies/<id>"` / `"series/<id>"` de la filmografía que están en la
+   * allowlist, resueltas en el Server Component de la ruta. Desde la ronda 2
+   * del beta test todos los títulos enlazan; estos van sin `rel="nofollow"`.
    *
-   * Este carrusel era el segundo de los dos `<Link>` que cerraban el ciclo
+   * La filmografía era el segundo de los dos `<Link>` que cerraban el ciclo
    * rastreable: ficha → reparto → persona → **veinte fichas nuevas** → sus
    * repartos → más personas. Sin salida, y con una entrada de caché ISR y una
    * invocación por paso, un rastreador recorría TMDB entero. Cortando aquí, el
@@ -62,20 +62,16 @@ const formatLongDate = (value: string) => {
 };
 
 export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
-  const enlazables = new Set(linkableCredits);
-
   const actorImage = actor.profile_path
     ? tmdbImageHelpers.profile(actor.profile_path, DEFAULT_IMAGE_SIZES.PROFILE)
     : "";
 
-  const credits = actor.combined_credits?.cast
-    ?.filter((c) => c.poster_path)
-    .sort((a, b) => b.vote_average - a.vote_average)
-    .slice(0, 20) || [];
-
-  // Usamos la mejor película/serie del actor como Backdrop!
-  const bestWorkBackdrop = credits[0]?.backdrop_path
-    ? tmdbImageHelpers.backdrop(credits[0].backdrop_path, DEFAULT_IMAGE_SIZES.BACKDROP)
+  // De fondo, el trabajo mejor valorado que tenga imagen.
+  const bestWork = [...(actor.combined_credits?.cast ?? []), ...(actor.combined_credits?.crew ?? [])]
+    .filter((credit) => credit.backdrop_path && (credit.vote_count ?? 0) >= 50)
+    .sort((a, b) => b.vote_average - a.vote_average)[0];
+  const bestWorkBackdrop = bestWork?.backdrop_path
+    ? tmdbImageHelpers.backdrop(bestWork.backdrop_path, DEFAULT_IMAGE_SIZES.BACKDROP)
     : "";
 
   return (
@@ -102,7 +98,7 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
             <div className={STYLES.content}>
               <h1 className={STYLES.title}>{actor.name}</h1>
               <h2 className={STYLES.subtitle}>
-                {actor.known_for_department || "Actuación"}
+                {departmentName(actor.known_for_department) || "Interpretación"}
               </h2>
 
               <div className={STYLES.metadata}>
@@ -126,68 +122,14 @@ export const ActorPage = ({ actor, linkableCredits = [] }: ActorPageProps) => {
         </div>
       </div>
 
-      {/* FILMOGRAFIA */}
-      {credits.length > 0 && (
-        <div className="relative z-10 pb-40 w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 mt-8 mb-20">
-            <h2 className="title-card text-5xl md:text-6xl mb-8">Filmografía</h2>
-            <div className="relative -mx-4 sm:mx-0">
-              <MediaCarousel 
-                autoplay={false} 
-                className="pb-4"
-              >
-                {credits.map((item, index) => {
-                  const imageSrc = tmdbImageHelpers.poster(item.poster_path || '', DEFAULT_IMAGE_SIZES.POSTER);
-                  const linkType = item.media_type === 'movie' ? 'movies' : 'series';
-                  const enlazable = enlazables.has(`${linkType}/${item.id}`);
-
-                  /*
-                   * Mismo contenido con y sin enlace. La variante no enlazable
-                   * se queda sin la clase `group`, así que tampoco hereda el
-                   * `group-hover:scale-105` del póster ni el acento en el
-                   * título: una tarjeta que reacciona al ratón y no lleva a
-                   * ningún sitio es peor que una tarjeta quieta.
-                   */
-                  const contenido = (
-                    <>
-                      <div className="relative aspect-[2/3] rounded-sm overflow-hidden bg-pixela-surface mb-3">
-                        <Image
-                          src={imageSrc}
-                          alt={item.title || item.name || ""}
-                          fill
-                          sizes="(max-width: 768px) 140px, 160px"
-                          className="object-cover transition-transform duration-700 ease-out-expo [@media(hover:hover)]:group-hover:scale-[1.04]"
-                        />
-                      </div>
-                      <h3 className="text-[15px] font-semibold text-white truncate">
-                        {item.title || item.name}
-                      </h3>
-                      <p className="text-sm text-gray-400 truncate mt-0.5">
-                        {item.character}
-                      </p>
-                    </>
-                  );
-
-                  return (
-                    // `py-1`: hueco para el anillo de foco, que el overflow-hidden del carrusel recortaba.
-                    <div key={`${item.id}-${index}`} className="flex-[0_0_140px] md:flex-[0_0_160px] min-w-0 pl-4 py-1 h-full">
-                      {enlazable ? (
-                        <Link
-                          href={`/${linkType}/${item.id}`}
-                          className="group h-full flex flex-col"
-                          prefetch={false}
-                        >
-                          {contenido}
-                        </Link>
-                      ) : (
-                        <div className="h-full flex flex-col">{contenido}</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </MediaCarousel>
-            </div>
-        </div>
-      )}
+      <div className="relative z-10 pb-40 w-full px-4 sm:px-6 md:px-10 lg:px-16 2k:px-24 mt-8 mb-20">
+        <Filmography
+          cast={actor.combined_credits?.cast ?? []}
+          crew={actor.combined_credits?.crew ?? []}
+          knownFor={actor.known_for_department}
+          linkableKeys={linkableCredits}
+        />
+      </div>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 "use client";
 
-import { useMediaStore } from '@/features/media/store/mediaStore';
+import { useState } from 'react';
 import { TrailersSectionProps } from '@/features/media/types/trailer';
 import { TrailerPlayer } from './TrailerPlayer';
-import { TrailerList } from './TrailerList';  
+import { TrailerList } from './TrailerList';
 
 const STYLES = {
   container: {
@@ -18,42 +18,46 @@ const STYLES = {
   }
 } as const;
 
-
 /**
- * Componente que muestra la sección de trailers
- * @param {TrailersSectionProps} props - Propiedades del componente
- * @returns {JSX.Element} Componente de sección de trailers
+ * Sección de tráilers de la ficha.
+ *
+ * El vídeo elegido es estado local. Vivía en el store global de la ficha, así
+ * que al pasar de una película a otra seguía seleccionado el de la anterior.
  */
 export function TrailersSection({ trailers }: TrailersSectionProps) {
-  // Filtrar solo trailers de YouTube válidos
-  const youtubeTrailers = trailers.filter(trailer => 
-    trailer.site?.toLowerCase() === 'youtube' && 
-    trailer.key
+  const youtubeTrailers = trailers.filter(
+    (trailer) => trailer.site?.toLowerCase() === 'youtube' && trailer.key,
   );
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-  const { selectedTrailerId, setSelectedTrailerId } = useMediaStore();
-  
   if (youtubeTrailers.length === 0) return null;
-  
+
+  const selected =
+    youtubeTrailers.find((trailer) => trailer.key === selectedKey) ?? youtubeTrailers[0];
+
   return (
     <div className={STYLES.container.base}>
       <h2 className={STYLES.container.title}>Tráilers</h2>
-      
+
       <div className={STYLES.container.content}>
-        <TrailerPlayer trailerId={selectedTrailerId || youtubeTrailers[0]?.key || ''} />
+        {/* `key`: al cambiar de vídeo se vuelve a la miniatura en vez de
+            arrancar otro reproductor sin que se haya pedido. */}
+        <TrailerPlayer key={selected.key} trailer={selected} />
         {youtubeTrailers.length > 1 ? (
           <TrailerList
             trailers={youtubeTrailers}
-            selectedTrailerId={selectedTrailerId || youtubeTrailers[0]?.key || ''}
-            onSelectTrailer={setSelectedTrailerId}
+            selectedTrailerId={selected.key}
+            onSelectTrailer={setSelectedKey}
           />
         ) : (
           <div className={STYLES.container.caption}>
-            <p className={STYLES.container.captionTitle}>{youtubeTrailers[0].nombre}</p>
-            <p className={STYLES.container.captionMeta}>{youtubeTrailers[0].tipo || 'Tráiler'} · YouTube</p>
+            <p className={STYLES.container.captionTitle}>{selected.nombre}</p>
+            <p className={STYLES.container.captionMeta}>
+              {[selected.tipo || 'Tráiler', selected.idioma].filter(Boolean).join(' · ')} · YouTube
+            </p>
           </div>
         )}
       </div>
     </div>
   );
-} 
+}

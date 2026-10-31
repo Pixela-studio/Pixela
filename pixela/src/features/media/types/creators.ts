@@ -9,6 +9,8 @@ import { Media } from './mediaBase';
 export interface CreatorAvatarProps {
   photo?: string;
   name: string;
+  /** Id de TMDB: si llega, el avatar enlaza a la ficha de la persona. */
+  personId?: string;
 } 
 
 /**

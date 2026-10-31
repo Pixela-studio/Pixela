@@ -81,20 +81,20 @@ export const ActorCard = memo(function ActorCard({ actor, className = '' }: Acto
    * El zoom de la foto al pasar el ratón solo existe dentro de un `<Link>`
    * (`group` sin enlace no se activa con el foco ni lleva a ningún sitio).
    */
-  const estiloBase = clsx(
-    "block rounded-sm",
-    enlazable && "group",
-    className
-  );
+  const estiloBase = clsx("group block rounded-sm", className);
 
-  if (!enlazable) {
-    return <div className={estiloBase}>{contenido}</div>;
-  }
-
+  /*
+   * Desde la ronda 2 del beta test todas las tarjetas enlazan (decisión 6.3 del
+   * informe): quien monta un ciclo necesita poder seguir a cualquier persona.
+   * Las que quedan fuera del reparto principal de la allowlist llevan
+   * `rel="nofollow"`, y el recorrido masivo lo frena el límite por IP de las
+   * fichas en `src/proxy.ts`.
+   */
   return (
     <Link
       href={`/actor/${actor.id}`}
       prefetch={false}
+      rel={enlazable ? undefined : "nofollow"}
       className={estiloBase}
     >
       {contenido}

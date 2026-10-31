@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { favoritesAPI } from "@/api/favorites/favorites";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { toast } from "@/lib/toast";
+import { loginHrefForHere } from "@/lib/authRedirect";
 import { logger } from "@/lib/logger";
 
 interface UseFavoriteToggleOptions {
@@ -46,7 +47,7 @@ export function useFavoriteToggle({ tmdbId, itemType }: UseFavoriteToggleOptions
     let active = true;
 
     favoritesAPI
-      .listWithDetails()
+      .listIds()
       .then((favorites) => {
         if (!active) return;
         const match = favorites.find(
@@ -73,7 +74,7 @@ export function useFavoriteToggle({ tmdbId, itemType }: UseFavoriteToggleOptions
         title: "Autenticación requerida",
         duration: 3000,
       });
-      router.push("/login");
+      router.push(loginHrefForHere());
       return;
     }
 
@@ -98,7 +99,7 @@ export function useFavoriteToggle({ tmdbId, itemType }: UseFavoriteToggleOptions
       logger.error("Error toggling favorite", error);
 
       if (error instanceof Error && error.message.includes("401")) {
-        router.push("/login");
+        router.push(loginHrefForHere());
         return;
       }
 

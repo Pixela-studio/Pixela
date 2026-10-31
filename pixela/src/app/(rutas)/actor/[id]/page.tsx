@@ -89,9 +89,10 @@ export default async function ActorRoute({ params }: { params: Promise<{ id: str
      * duplicar ese criterio aquí se le pasa la intersección de todos sus
      * créditos con la allowlist —cero o un puñado de claves— y allí se consulta.
      */
-    const linkableCredits = await filterLinkableCredits(
-      actor.combined_credits?.cast ?? [],
-    );
+    const linkableCredits = await filterLinkableCredits([
+      ...(actor.combined_credits?.cast ?? []),
+      ...(actor.combined_credits?.crew ?? []),
+    ]);
 
     return (
       <ActorPage actor={actor} linkableCredits={linkableCredits} />

@@ -10,23 +10,21 @@ import { PlatformCardProps } from '@/features/media/types/platforms';
  * @param {PlatformCardProps} props - Propiedades del componente
  * @returns {JSX.Element} Enlace a la plataforma de streaming
  */
-export function PlatformCard({ provider }: PlatformCardProps) {
+export function PlatformCard({ provider, fallbackUrl, isMine = false }: PlatformCardProps) {
   const name = provider.nombre || String(provider.id || 'Plataforma');
-  const href = getPlatformUrl(provider);
+  const href = getPlatformUrl(provider, fallbackUrl);
 
   // Verificar y formatear URL del logo
   const logoUrl = provider.logo?.startsWith('http')
     ? provider.logo
     : formatImageUrl(provider.logo);
 
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Ver en ${name} (se abre en una pestaña nueva)`}
-      className="p-3 rounded-2xl flex items-center gap-3 bg-pixela-surface border border-white/10 hover:border-white/20 hover:-translate-y-0.5 transition-[transform,border-color] duration-300 ease-out-expo select-none"
-    >
+  const className = `p-3 rounded-2xl flex items-center gap-3 bg-pixela-surface border select-none ${
+    isMine ? 'border-white/60' : 'border-white/10'
+  }`;
+
+  const content = (
+    <>
       <div className="relative flex-shrink-0 w-8 h-8 overflow-hidden rounded-md">
         {logoUrl ? (
           <Image
@@ -46,6 +44,23 @@ export function PlatformCard({ provider }: PlatformCardProps) {
         )}
       </div>
       <span className="font-medium text-white truncate">{name}</span>
+      {isMine && <span className="text-xs font-semibold text-pixela-accent">La tienes</span>}
+    </>
+  );
+
+  // Sin URL conocida ni página de TMDB, mejor una tarjeta sin enlace que un
+  // enlace inventado.
+  if (!href) return <div className={className}>{content}</div>;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Ver en ${name} (se abre en una pestaña nueva)`}
+      className={`${className} hover:border-white/20 hover:-translate-y-0.5 transition-[transform,border-color] duration-300 ease-out-expo`}
+    >
+      {content}
     </a>
   );
 }

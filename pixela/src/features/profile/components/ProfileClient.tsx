@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { clearOfflineData } from "@/lib/offline";
 import { UserResponse } from "@/api/auth/types";
 import { User } from "@/api/users/types";
 import { ProfileFormData } from "@/features/profile/types/profileTypes";
@@ -24,6 +25,8 @@ import {
   FiActivity,
   FiGrid,
   FiStar,
+  FiList,
+  FiCalendar,
 } from "react-icons/fi";
 import type { IconType } from "react-icons";
 import { FaRegBookmark, FaRegComments } from "react-icons/fa";
@@ -34,6 +37,9 @@ import { ProfileClientProps } from "@/features/profile/types/profileTypes";
 import { useProfileStats } from "@/features/profile/hooks/useProfileStats";
 import { ProfileHero } from "./layout/ProfileHero";
 import { ProfileStatsBar } from "./layout/ProfileStatsBar";
+import { AccountDataPanel } from "./layout/AccountDataPanel";
+import { ProfileLists } from "@/features/lists/components/ProfileLists";
+import { ProfileDiary } from "@/features/diary/components/ProfileDiary";
 
 const STYLES = {
   // Contenedores principales
@@ -80,6 +86,8 @@ type ProfileTab = { id: TabType; label: string; icon: IconType };
 const BASE_TABS: ProfileTab[] = [
   { id: "profile", label: "General", icon: FiSettings },
   { id: "library", label: "Biblioteca", icon: FiGrid },
+  { id: "lists", label: "Listas", icon: FiList },
+  { id: "diary", label: "Diario", icon: FiCalendar },
   { id: "reviews", label: "Reseñas", icon: FaRegComments },
   { id: "favorites", label: "Favoritos", icon: FaRegBookmark },
 ];
@@ -173,6 +181,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
     if (!redirecting) return;
 
     const timer = setTimeout(() => {
+      clearOfflineData();
       void signOut({ callbackUrl: "/login" });
     }, 1500);
 
@@ -181,6 +190,8 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
 
   const handleSubmitProfile = async (data: ProfileFormData) => {
     const isChangingPassword = Boolean(data.password?.trim());
+    const isChangingEmail =
+      data.email.trim().toLowerCase() !== user.email.trim().toLowerCase();
 
     try {
       const payload: Partial<UserResponse> & { current_password?: string } = {
@@ -193,9 +204,9 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           data.cover_url !== undefined ? data.cover_url : user.cover_url,
       };
 
-      if (isChangingPassword) {
-        payload.password = data.password;
-        // La API exige la contraseña actual para cambiar la propia.
+      if (isChangingPassword) payload.password = data.password;
+      // La API exige la contraseña actual para cambiar el email o la contraseña.
+      if (isChangingPassword || isChangingEmail) {
         payload.current_password = data.current_password;
       }
 
@@ -325,6 +336,7 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
                 user={{ ...user, user_id: user.user_id }}
                 onEdit={() => setIsEditing(true)}
               />
+              <AccountDataPanel userId={user.user_id} />
             </div>
           )}
 
@@ -348,6 +360,18 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           {activeTab === "library" && (
             <ContentPanel title="Tu Biblioteca">
               <ProfileLibrary />
+            </ContentPanel>
+          )}
+
+          {activeTab === "lists" && (
+            <ContentPanel title="Tus listas">
+              <ProfileLists onOpenFavorites={() => changeTab("favorites")} />
+            </ContentPanel>
+          )}
+
+          {activeTab === "diary" && (
+            <ContentPanel title="Tu diario">
+              <ProfileDiary />
             </ContentPanel>
           )}
 

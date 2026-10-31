@@ -105,7 +105,8 @@ const { reviews, loadingReviews, errorReviews, setReviews, setLoadingReviews, se
 const { activeGalleryTab, setActiveGalleryTab, selectedGalleryImage, setSelectedGalleryImage } = useMediaStore();
 
 // Control de trailers
-const { selectedTrailerId, setSelectedTrailerId } = useMediaStore();
+// El tráiler seleccionado es estado local de `TrailersSection`: en el store
+// global se arrastraba de una ficha a la siguiente.
 ```
 
 ### HeroSection

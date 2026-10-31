@@ -14,6 +14,8 @@ export interface Trailer {
     key: string;
     site: string;
     tipo: string;
+    /** «Castellano», «VO» u otro idioma. */
+    idioma?: string;
   }
 
 /**
@@ -35,7 +37,7 @@ export interface TrailerListProps {
  * @property {string} trailerId - ID del trailer
  */
 export interface TrailerPlayerProps {
-  trailerId: string;
+  trailer: Trailer;
 }
 
 /**

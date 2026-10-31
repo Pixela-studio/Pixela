@@ -1,3 +1,4 @@
+import type { OrderedItem } from "@/features/categories/hooks/useContentLoader";
 import { Category } from "@/api/categories/categories";
 import { Pelicula, Serie } from "@/features/media/types/content";
 
@@ -26,6 +27,10 @@ export interface CategoriesContentProps {
   mediaType: "all" | "movies" | "series" | "random";
   currentPage: number;
   totalPages: number;
+  /** Resultados de búsqueda en orden de relevancia; `null` al explorar. */
+  ordered?: OrderedItem[] | null;
+  /** Repite la última carga o búsqueda tras un error. */
+  onRetry?: () => void;
 }
 
 /**

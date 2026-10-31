@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { FiLogIn, FiArrowLeft } from 'react-icons/fi';
 import { STYLES } from './_styles';
+import { loginHrefForHere } from '@/lib/authRedirect';
 
 export default function Error403() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Error403() {
   };
 
   const handleLogin = () => {
-    router.push('/login');
+    router.push(loginHrefForHere());
   };
 
   return (

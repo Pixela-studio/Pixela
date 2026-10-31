@@ -13,6 +13,13 @@ export const formatImageUrl = (path: string): string =>
   path?.startsWith('/') ? buildTmdbImageUrl(path, DEFAULT_IMAGE_SIZES.BACKDROP) : path || '';
 
 /**
+ * Caras del reparto y del equipo a w185. Se pedían con el tamaño de fondo
+ * (w1280, que el loader bajaba a w780) para pintarlas a 40-180 px.
+ */
+const formatProfileUrl = (path: string): string =>
+  path?.startsWith('/') ? buildTmdbImageUrl(path, DEFAULT_IMAGE_SIZES.PROFILE) : path || '';
+
+/**
  * Mapea un actor
  * @param actor
  * @returns 
@@ -20,7 +27,7 @@ export const formatImageUrl = (path: string): string =>
 const mapActor = (actor: ApiActor): Actor => ({
   id: actor.id?.toString() || '',
   nombre: actor.nombre || actor.name || '',
-  foto: formatImageUrl(actor.foto || actor.profile_path || ''),
+  foto: formatProfileUrl(actor.foto || actor.profile_path || ''),
   personaje: actor.personaje || actor.character || '',
 });
 
@@ -69,19 +76,24 @@ export function mapPeliculaFromApi(movieData: ApiPelicula): Pelicula {
     throw new Error('Los datos recibidos de la API están incompletos o en un formato inesperado');
   }
 
-  const duracion = parseInt(String(movieData.duracion || movieData.runtime));
-  if (isNaN(duracion)) {
-    throw new Error('La duración de la película es requerida y debe ser un número válido');
-  }
+  // Sin duración la ficha se pinta igual; antes esto lanzaba y la página daba
+  // 404, justo en el cine antiguo o poco conocido que TMDB tiene incompleto.
+  const parsedRuntime = parseInt(String(movieData.duracion || movieData.runtime));
+  const duracion = Number.isFinite(parsedRuntime) && parsedRuntime > 0 ? parsedRuntime : undefined;
 
   const titulo = movieData.nombre || movieData.titulo || movieData.title || '';
   const sinopsis = movieData.descripcion || movieData.sinopsis || movieData.overview || '';
   const fecha = movieData.fecha_estreno || movieData.fecha || movieData.release_date || '';
-  const generos = movieData.generos 
-    ? (Array.isArray(movieData.generos) 
-        ? movieData.generos.map((g: string | { nombre?: string; name?: string }) => 
-            typeof g === 'string' ? g : g.nombre || g.name || '')
-        : [String(movieData.generos)])
+  // TMDB manda `genres`; `generos` solo llega si alguien ya lo mapeó. Leyendo
+  // solo `generos`, la ficha se quedaba siempre sin géneros.
+  const rawGenres = movieData.generos ?? movieData.genres;
+  const generos = rawGenres
+    ? (Array.isArray(rawGenres)
+        ? rawGenres
+            .map((g: string | { nombre?: string; name?: string }) =>
+              typeof g === 'string' ? g : g.nombre || g.name || '')
+            .filter(Boolean)
+        : [String(rawGenres)])
     : [];
   const poster = formatImageUrl(movieData.poster_path || movieData.poster || '');
   const backdrop = formatImageUrl(movieData.backdrop_path || movieData.backdrop || '');
@@ -108,7 +120,7 @@ export function mapPeliculaFromApi(movieData: ApiPelicula): Pelicula {
     creador: movieData.creador ? {
       id: Number(movieData.creador.id),
       nombre: movieData.creador.nombre || movieData.creador.name || '',
-      foto: formatImageUrl(movieData.creador.foto || movieData.creador.profile_path || '')
+      foto: formatProfileUrl(movieData.creador.foto || movieData.creador.profile_path || '')
     } : undefined
   };
 } 

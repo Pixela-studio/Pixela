@@ -57,7 +57,11 @@ bun run dev           # dev server (proxies to next dev)
 bun run build         # prisma generate && next build
 bun run start
 bun run lint
+bun run test          # Vitest: pure logic, no network or database
+bun run typecheck
 ```
+
+CI (`.github/workflows/ci.yml`) runs typecheck, lint and tests on every push to `main` and every pull request. It does not run `next build`: that needs `TMDB_API_KEY`, which lives in Coolify.
 
 Do NOT reintroduce `package-lock.json` or `.npmrc legacy-peer-deps`. Bun handles peer resolution.
 
@@ -79,8 +83,19 @@ Every route handler goes through these. Don't hand-roll auth or validation in a 
 - **`tmdbDetails.ts`** — `fetchTmdbDetail` plus `parseTmdbId` / `toTmdbType`. The route handler and the Server Components of the media pages both go through it so they request the identical URL and Next's Data Cache serves both from one TMDB call. `parseTmdbId` must gate any id before it reaches a TMDB path: Next decodes route params, so an encoded `..` would otherwise walk to arbitrary TMDB endpoints with our API key.
 - **`rateLimit.ts`** — fixed-window limiter in memory. Per-process, so a multi-instance deploy multiplies the effective limit; swap the `Map` for Redis if that stops being acceptable, keeping the signature.
 - **`mediaEnrichment.ts`** — `enrichWithTmdb` resolves TMDB metadata for a list of own rows, deduplicating by `(itemType, tmdbId)`.
+- **`reviewsQuery.ts`** — reviews of a title (public, plus the viewer's private ones when a `viewerId` is passed) and `avatarUrlFor`: author photos travel as `/api/users/[id]/avatar?v=` URLs, never as base64 inside the HTML.
+- **`lists.ts`** — named lists: queries, `toListDto`, `newShareId`. Public pages live at `/listas/[shareId]`; mutations call `revalidatePath` on it.
 
-`src/proxy.ts` adds the CSP and security headers, rejects a denylist of user-agents with 403, and redirects to `/login` when the session cookie is missing. That redirect is UX only — real authorization lives in the handlers. (Next 16 renamed the `middleware.ts` convention to `proxy.ts`; the exported function is the default export.)
+Other shared modules:
+
+- **`src/lib/validation/account.ts`** — name, email and password rules shared by every form and API (register, profile, admin). One password rule: length only.
+- **`src/lib/authRedirect.ts`** — `safeCallbackUrl`, `loginHref`, `loginHrefForHere`. Every "you need an account" button sends the user back where they were.
+- **`src/api/shared/tmdbDetailExtras.ts`** — what the detail mappers used to drop: age rating, providers by type, crew, video language, similar titles, series status.
+- **`src/hooks/useMyPlatforms.ts`**, **`useLiteMode.ts`** — per-browser preferences in `localStorage`, read with `useSyncExternalStore` (server snapshot = empty/off).
+
+`src/proxy.ts` adds the CSP and security headers, rejects a denylist of user-agents with 403, rate-limits detail pages per IP (150 per 10 min across `/movies/`, `/series/`, `/actor/`) and redirects to `/login` when the session cookie is missing. That redirect is UX only — real authorization lives in the handlers. (Next 16 renamed the `middleware.ts` convention to `proxy.ts`; the exported function is the default export.)
+
+**Sessions are revocable.** `auth.ts` checks `users.token_version` (and refreshes role, name and email) on every authenticated session read. Bump it to log a user out everywhere: password change, password reset and "Cerrar todas" already do.
 
 ## Gotchas
 
@@ -93,8 +108,9 @@ Every route handler goes through these. Don't hand-roll auth or validation in a 
 ## Known tech debt
 
 **Storage / data**
-- Profile photos stored as base64 in `users.photo_url` (TEXT), capped at 512 KB by the Zod schema. Should move to object storage (S3/Cloudinary).
-- No password recovery. The login page shows no "forgot password" link at all (a disabled one used to sit there); add it back together with the email flow.
+- Profile photos stored as base64 in `users.photo_url` (TEXT), capped at 512 KB by the Zod schema. They are no longer embedded in pages (served by `/api/users/[id]/avatar`), but storage should still move to S3/Cloudinary.
+- Password recovery needs `RESEND_API_KEY` and `RESEND_FROM`. Without them `/recuperar` says it is unavailable and points to the contact email.
+- Offline mode (`public/sw.js`) is read-only: marking episodes or editing lists without network fails with an error instead of queuing.
 
 **Pending major upgrades** (skipped in the Bun migration to keep the diff safe)
 - **Prisma 5 → 7**: two majors. Follow https://pris.ly/d/major-version-upgrade. Regenerate client, review query call sites, run migrations against a snapshot first.
@@ -104,10 +120,10 @@ Every route handler goes through these. Don't hand-roll auth or validation in a 
 
 **Code smells** (non-blocking, worth a focused refactor pass)
 - `src/features/categories/components/core/CategoriesContent.tsx` (~1000 lines): God component. Split by concern (filters, grid, pagination, search state).
-- `src/features/categories/hooks/useContentLoader.ts` (~485 lines): same shape, split by responsibility. It also drops user interactions — `if (isLoadingRef.current) return` silently discards a page change requested while another load is in flight. Replace the boolean with a request-id counter (see `useAsyncResource`) so newer requests supersede older ones instead of being ignored.
+- `src/features/categories/components/core/CategoriesContainer.tsx` now owns URL state (type, genre, query, page, filters) on top of the loader; if it grows further, move the URL sync into its own hook.
 - `src/features/hero/services/heroBackdropService.ts` pins a hardcoded TMDB id as the first hero slide and keeps a manual title blacklist. Both will rot; move them to configuration.
 - The remaining lint warnings (22, all `warn`) are mostly `react-hooks/set-state-in-effect` coming from fetch-in-effect, which is inherent to `useAsyncResource`. The two `react-hooks/purity` hits are `Math.random()` inside Server Components in `app/page.tsx`; the page is now ISR (`revalidate = 3600`), so those values are drawn once per regeneration instead of per request. Worth moving to `src/lib/deterministicRandom.ts` seeded by the revalidation bucket.
-- `next.config.js` line 1 uses `require()`, which trips `@typescript-eslint/no-require-imports` as an **error**, so `bun run lint` exits 1 even when nothing else is wrong. Pre-existing.
+- `next.config.js` is CommonJS; `eslint.config.mjs` turns `no-require-imports` off for that file only, so `bun run lint` exits 0.
 
 **Shared building blocks** — reach for these before writing a new one:
 - `src/hooks/useAsyncResource.ts` — load a resource with loading/error state, cancel on unmount and discard out-of-order responses.
@@ -123,7 +139,7 @@ Self-hosted: the production image is `Dockerfile.prod`, deployed with Coolify be
 
 **URLs that are not ours.** `pixela.io` is parked and for sale on Spaceship.com, and `pixela.vercel.app` belongs to an unrelated user. The canonical URL lives in **`src/lib/site.ts`** — `layout.tsx`, `robots.ts` and `sitemap.ts` all import `SITE_URL` from there. Its fallback is `http://localhost:3000`, so production must pass `NEXT_PUBLIC_SITE_URL` as a **build arg** (it is inlined at build time).
 
-The footer no longer advertises `pixel@pixela.io` nor the Instagram/LinkedIn/GitHub accounts that were not ours; it links to the repository only.
+The footer no longer advertises `pixel@pixela.io` nor the Instagram/LinkedIn/GitHub accounts that were not ours. Owners, contact email and the legal pages' review date live in `src/lib/site.ts`; the legal pages are `/aviso-legal`, `/privacidad` and `/cookies`. Keep `/cookies` in sync with any new cookie or storage key.
 
 ### Environment variables the deploy needs
 
@@ -139,6 +155,8 @@ Derived from every `process.env` reference in `src/` plus `prisma/schema.prisma`
 | `NEXT_PUBLIC_API_URL` | no | Only a localhost fallback now. Every `API_ENDPOINTS` consumer left is client-side, and in the browser off localhost `getBaseUrl()` returns the relative `/api`. The server no longer calls its own API. |
 | `DIRECT_URL` | no | Present in `.env.local` for migrations but **not referenced** by `schema.prisma`; add `directUrl` to the datasource block if you want it honored. |
 | `AUTH_TRUST_HOST` | **yes** | `true` in production (or set `AUTH_URL`). Off Vercel, Auth.js rejects every request with `UntrustedHost` otherwise — see Gotchas. |
+| `RESEND_API_KEY` | no | Enables password recovery emails (`src/lib/email.ts`). Read at runtime. |
+| `RESEND_FROM` | no | Verified sender in Resend, e.g. `Pixela <no-reply@yourdomain>`. Both Resend vars are needed. |
 
 `NEXT_PUBLIC_BACKEND_URL` and `NEXT_PUBLIC_FRONTEND_URL` appear in `.env.local` but no code reads them; leftovers from the Laravel backend.
 

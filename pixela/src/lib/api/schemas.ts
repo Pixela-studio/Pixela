@@ -57,13 +57,15 @@ export const createReviewSchema = z.object({
     .max(REVIEW_MAX_LENGTH, `La reseña no puede exceder los ${REVIEW_MAX_LENGTH} caracteres`)
     .optional()
     .nullable(),
+  /** «Solo para mí». Por defecto, pública. */
+  is_public: z.boolean().optional(),
 });
 
 export const updateReviewSchema = createReviewSchema
-  .pick({ rating: true, review: true })
+  .pick({ rating: true, review: true, is_public: true })
   .partial()
   .refine(
-    (data) => data.rating !== undefined || data.review !== undefined,
+    (data) => data.rating !== undefined || data.review !== undefined || data.is_public !== undefined,
     { message: "No hay nada que actualizar" },
   );
 
@@ -96,7 +98,11 @@ export const ALLOWED_DISCOVER_PARAMS = new Set([
   "without_genres",
   "with_original_language",
   "with_watch_providers",
+  "with_watch_monetization_types",
   "watch_region",
+  // Edad recomendada (solo películas en TMDB): filtro «Para ver en familia».
+  "certification_country",
+  "certification.lte",
   "primary_release_year",
   "primary_release_date.gte",
   "primary_release_date.lte",
@@ -135,3 +141,65 @@ export const searchQuerySchema = z
   .trim()
   .min(1, "La búsqueda no puede estar vacía")
   .max(200, "La búsqueda es demasiado larga");
+
+/* ── Listas ──────────────────────────────────────────────────────────────── */
+
+export const listVisibilitySchema = z.enum(["PRIVATE", "LINK", "PUBLIC"]);
+
+export const createListSchema = z.object({
+  name: z.string().trim().min(1, "Ponle un nombre a la lista").max(80, "El nombre es demasiado largo"),
+  description: z.string().trim().max(500, "La descripción es demasiado larga").optional(),
+  visibility: listVisibilitySchema.optional(),
+});
+
+export const updateListSchema = createListSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, { message: "No hay nada que actualizar" });
+
+export const addListItemSchema = z.object({
+  tmdb_id: tmdbIdSchema,
+  item_type: itemTypeSchema,
+  note: z.string().trim().max(280, "La nota es demasiado larga").optional(),
+});
+
+/** El orden completo de la lista: ids de sus elementos de arriba abajo. */
+export const reorderListSchema = z.object({
+  item_ids: z.array(resourceIdSchema).min(1).max(500),
+});
+
+/* ── Diario y capítulos ──────────────────────────────────────────────────── */
+
+/** Fecha `AAAA-MM-DD`, no futura y no anterior a 1900. */
+const watchedOnSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha no válida")
+  .refine((value) => {
+    const date = new Date(`${value}T12:00:00Z`);
+    return !Number.isNaN(date.getTime()) && date.getUTCFullYear() >= 1900 && date.getTime() <= Date.now() + 86_400_000;
+  }, "La fecha no puede ser futura");
+
+export const createDiaryEntrySchema = z.object({
+  tmdb_id: tmdbIdSchema,
+  item_type: itemTypeSchema,
+  watched_on: watchedOnSchema,
+  rating: z.coerce
+    .number()
+    .min(0)
+    .max(10)
+    .transform((value) => Math.round(value * 10) / 10)
+    .nullable()
+    .optional(),
+  note: z.string().trim().max(500, "La nota es demasiado larga").optional(),
+  /** Si no se indica, se deduce: revisionado si ya hay otra entrada del título. */
+  rewatch: z.boolean().optional(),
+  /** Marcar además el título como «Completado» en la biblioteca. */
+  mark_completed: z.boolean().optional(),
+});
+
+export const episodeToggleSchema = z.object({
+  tmdb_id: tmdbIdSchema,
+  season: z.coerce.number().int().min(0).max(200),
+  /** Uno o varios capítulos de la misma temporada (marcar la temporada entera). */
+  episodes: z.array(z.coerce.number().int().min(1).max(5000)).min(1).max(500),
+  watched: z.boolean(),
+});

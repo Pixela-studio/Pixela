@@ -10,6 +10,8 @@ import {
   validationError,
 } from "@/lib/api/responses";
 import { resourceIdSchema } from "@/lib/api/schemas";
+import { reviewPathsOf, revalidatePaths } from "@/lib/api/reviewsQuery";
+import { emailSchema, nameSchema, passwordSchema } from "@/lib/validation/account";
 
 const BCRYPT_ROUNDS = 12;
 
@@ -38,27 +40,14 @@ const imageSourceSchema = z
   );
 
 const userUpdateSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder los 50 caracteres")
-    .regex(
-      /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*$/,
-      "El nombre solo puede contener letras, números y los caracteres . _ - (sin espacios ni caracteres especiales)",
-    )
-    .optional(),
-  email: z.string().trim().toLowerCase().email("Email inválido").optional(),
+  name: nameSchema.optional(),
+  email: emailSchema.optional(),
   photo_url: imageSourceSchema.optional(),
   cover_url: imageSourceSchema.optional(),
   is_admin: z
     .preprocess((value) => (typeof value === "string" ? value === "true" : value), z.boolean())
     .optional(),
-  password: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .max(128, "La contraseña es demasiado larga")
-    .optional(),
+  password: passwordSchema.optional(),
   current_password: z.string().max(128).optional(),
 });
 
@@ -70,6 +59,10 @@ interface UpdateUserData {
   isAdmin?: boolean;
   password?: string;
 }
+
+const deleteUserSchema = z.object({
+  current_password: z.string().max(128).optional(),
+});
 
 export async function PUT(
   request: Request,
@@ -116,7 +109,43 @@ export async function PUT(
       updateData.isAdmin = is_admin;
     }
 
-    if (email) {
+    /*
+     * Cambiar el correo o la contraseña de la propia cuenta exige la contraseña
+     * actual. Antes solo la pedía la contraseña: con una sesión robada bastaba
+     * cambiar el correo para quedarse la cuenta, y con recuperación por correo
+     * eso sería definitivo.
+     */
+    const current = await prisma.user.findUnique({
+      where: { id },
+      select: { email: true, password: true },
+    });
+    if (!current) {
+      return apiError("Usuario no encontrado", 404);
+    }
+
+    const emailChanges = Boolean(email) && email !== current.email;
+
+    if ((emailChanges || password) && currentUserId === id) {
+      if (!current.password) {
+        return apiError("Esta cuenta no tiene contraseña configurada", 400);
+      }
+
+      if (!current_password) {
+        return apiError(
+          emailChanges
+            ? "Escribe tu contraseña actual para cambiar el email"
+            : "Debes indicar tu contraseña actual",
+          400,
+        );
+      }
+
+      const matches = await bcrypt.compare(current_password, current.password);
+      if (!matches) {
+        return apiError("La contraseña actual no es correcta", 403);
+      }
+    }
+
+    if (email && emailChanges) {
       const emailOwner = await prisma.user.findUnique({
         where: { email },
         select: { id: true },
@@ -132,30 +161,12 @@ export async function PUT(
     }
 
     if (password) {
-      // Cambiar la contraseña propia exige demostrar que se conoce la actual.
-      // Sin esto, una sesión secuestrada bastaba para expulsar al dueño de su cuenta.
-      if (currentUserId === id) {
-        const account = await prisma.user.findUnique({
-          where: { id },
-          select: { password: true },
-        });
-
-        if (!account?.password) {
-          return apiError("Esta cuenta no tiene contraseña configurada", 400);
-        }
-
-        if (!current_password) {
-          return apiError("Debes indicar tu contraseña actual", 400);
-        }
-
-        const matches = await bcrypt.compare(current_password, account.password);
-        if (!matches) {
-          return apiError("La contraseña actual no es correcta", 403);
-        }
-      }
-
       updateData.password = await bcrypt.hash(password, BCRYPT_ROUNDS);
     }
+
+    // Cambiar la contraseña cierra todas las sesiones abiertas, también las de
+    // otros dispositivos: `auth.ts` rechaza los tokens con la versión anterior.
+    const revokeSessions = Boolean(password);
 
     if (Object.keys(updateData).length === 0) {
       return apiError("No hay cambios que aplicar", 400);
@@ -163,7 +174,7 @@ export async function PUT(
 
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: updateData,
+      data: revokeSessions ? { ...updateData, tokenVersion: { increment: 1 } } : updateData,
       select: {
         id: true,
         name: true,
@@ -175,6 +186,11 @@ export async function PUT(
         updatedAt: true,
       },
     });
+
+    // El nombre y la foto salen en las reseñas de las fichas cacheadas.
+    if (updateData.name !== undefined || updateData.photoUrl !== undefined) {
+      revalidatePaths(await reviewPathsOf(id));
+    }
 
     return NextResponse.json({
       success: true,
@@ -215,14 +231,35 @@ export async function DELETE(
     return apiError("No tienes permiso para eliminar este perfil", 403);
   }
 
+  // El cuerpo es opcional: un admin que borra a otro usuario no manda nada.
+  let currentPassword: string | undefined;
+  if (request.headers.get("content-type")?.includes("application/json")) {
+    const body = await parseJsonBody(request);
+    if (!body.ok) return body.response;
+    const parsed = deleteUserSchema.safeParse(body.data);
+    if (!parsed.success) return validationError(parsed.error);
+    currentPassword = parsed.data.current_password;
+  }
+
   try {
     const target = await prisma.user.findUnique({
       where: { id },
-      select: { isAdmin: true },
+      select: { isAdmin: true, password: true },
     });
 
     if (!target) {
       return apiError("Usuario no encontrado", 404);
+    }
+
+    // Borrar la propia cuenta es irreversible: se pide la contraseña, como al
+    // cambiar el email o la contraseña.
+    if (currentUserId === id && target.password) {
+      if (!currentPassword) {
+        return apiError("Escribe tu contraseña para eliminar la cuenta", 400);
+      }
+      if (!(await bcrypt.compare(currentPassword, target.password))) {
+        return apiError("La contraseña no es correcta", 403);
+      }
     }
 
     // No dejar la plataforma sin ningún administrador.
@@ -233,7 +270,13 @@ export async function DELETE(
       }
     }
 
+    // Las rutas se leen antes de borrar: el borrado en cascada se lleva las
+    // reseñas y con ellas la lista de fichas que hay que invalidar.
+    const reviewPaths = await reviewPathsOf(id);
+
     await prisma.user.delete({ where: { id } });
+
+    revalidatePaths(reviewPaths);
 
     return NextResponse.json({ success: true });
   } catch (error) {

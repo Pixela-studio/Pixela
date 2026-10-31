@@ -88,6 +88,49 @@ export function checkRateLimit(
 }
 
 /**
+ * Mira si queda cupo **sin gastarlo**.
+ *
+ * Para límites que deben contar solo los intentos que salen bien —las altas de
+ * cuenta— y no los rechazados por validación: se consulta con esto al entrar y
+ * se gasta con `checkRateLimit` cuando la operación ha tenido éxito.
+ */
+export function peekRateLimit(
+  identifier: string,
+  { name, limit }: RateLimitOptions,
+): RateLimitResult {
+  const now = Date.now();
+  const existing = buckets.get(`${name}:${identifier}`);
+
+  if (!existing || existing.resetAt <= now || existing.count < limit) {
+    return {
+      allowed: true,
+      remaining: existing && existing.resetAt > now ? limit - existing.count : limit,
+      retryAfterSeconds: 0,
+    };
+  }
+
+  return {
+    allowed: false,
+    remaining: 0,
+    retryAfterSeconds: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)),
+  };
+}
+
+/** Respuesta 429 con `Retry-After` y un mensaje que dice cuánto esperar. */
+export function rateLimitedResponse(result: RateLimitResult): NextResponse {
+  const minutes = Math.ceil(result.retryAfterSeconds / 60);
+  const wait = minutes <= 1 ? "un minuto" : `${minutes} minutos`;
+
+  return NextResponse.json(
+    { success: false, error: `Demasiados intentos seguidos. Vuelve a probar dentro de ${wait}.` },
+    {
+      status: 429,
+      headers: { "Retry-After": String(result.retryAfterSeconds) },
+    },
+  );
+}
+
+/**
  * Aplica un límite y, si se supera, devuelve la respuesta 429 lista para usar.
  */
 export function enforceRateLimit(
@@ -99,11 +142,5 @@ export function enforceRateLimit(
 
   if (result.allowed) return null;
 
-  return NextResponse.json(
-    { success: false, error: "Demasiadas peticiones. Inténtalo más tarde." },
-    {
-      status: 429,
-      headers: { "Retry-After": String(result.retryAfterSeconds) },
-    },
-  );
+  return rateLimitedResponse(result);
 }

@@ -1,9 +1,20 @@
 import { Serie } from '@/features/media/types/content';
 import { fetchTmdbDetail, parseTmdbId } from '@/lib/api/tmdbDetails';
 import { mapSerieFromApi } from './mapper/mapSerie';
-import type {
-  Video, Provider, ApiSerie, ApiActor
-} from './types';
+import type { ApiSerie, ApiActor } from './types';
+import {
+  countryNames,
+  crewOf,
+  languageName,
+  mapRegionProviders,
+  mapSimilar,
+  mapVideos,
+  seriesStatus,
+  tvCertification,
+  type RawCrewMember,
+  type RawRegionProviders,
+  type RawVideo,
+} from '@/api/shared/tmdbDetailExtras';
 
 interface SerieImage {
   file_path: string;
@@ -16,37 +27,36 @@ interface SerieImage {
 }
 
 interface ExtendedSerieResponse extends ApiSerie {
+  original_name?: string;
+  original_language?: string;
+  origin_country?: string[];
+  vote_count?: number;
+  status?: string;
+  seasons?: Array<{ season_number: number; name?: string; episode_count?: number; air_date?: string | null }>;
+  episode_run_time?: number[];
+  last_episode_to_air?: { runtime?: number | null } | null;
+  next_episode_to_air?: {
+    air_date?: string;
+    season_number?: number;
+    episode_number?: number;
+  } | null;
   credits?: {
     cast: ApiActor[];
+    crew?: RawCrewMember[];
   };
   videos?: {
-    results: Video[];
+    results: RawVideo[];
   };
   'watch/providers'?: {
-    results: {
-      ES?: {
-        flatrate?: Provider[];
-        rent?: Provider[];
-        buy?: Provider[];
-      };
-    };
+    results: { ES?: RawRegionProviders };
   };
+  content_ratings?: Parameters<typeof tvCertification>[0];
+  similar?: { results?: Parameters<typeof mapSimilar>[0] };
   images?: {
     backdrops: SerieImage[];
     posters: SerieImage[];
   };
 }
-
-const deduplicateProviders = (providers: Provider[]): Provider[] => {
-  const seen = new Set<number>();
-  return providers.filter(provider => {
-    if (seen.has(provider.provider_id)) {
-      return false;
-    }
-    seen.add(provider.provider_id);
-    return true;
-  });
-};
 
 /**
  * Obtiene los datos de una serie
@@ -77,22 +87,49 @@ export async function getSerieById(id: string): Promise<Serie> {
     throw new Error('Series not found or invalid data');
   }
   const actores = rawSerie.credits?.cast || [];
-  const trailers = rawSerie.videos?.results || [];
+  const { proveedores, proveedoresUrl } = mapRegionProviders(
+    rawSerie['watch/providers']?.results?.ES,
+  );
+  const tituloOriginal = rawSerie.original_name?.trim();
+  const titulo = rawSerie.name?.trim();
+  const next = rawSerie.next_episode_to_air;
 
-  const providersData = rawSerie['watch/providers']?.results?.ES;
-  const allProviders: Provider[] = providersData ? [
-    ...(providersData.flatrate || []),
-    ...(providersData.rent || []),
-    ...(providersData.buy || [])
-  ] : [];
-
-  const proveedores = deduplicateProviders(allProviders);
-
-  return mapSerieFromApi({
+  const serie = mapSerieFromApi({
     ...rawSerie,
     actores,
-    trailers,
-    proveedores,
     imagenes: rawSerie.images || { backdrops: [], posters: [] }
   });
+
+  return {
+    ...serie,
+    trailers: mapVideos(rawSerie.videos?.results, rawSerie.original_language),
+    proveedores,
+    proveedoresUrl,
+    clasificacion: tvCertification(rawSerie.content_ratings),
+    tituloOriginal: tituloOriginal && tituloOriginal !== titulo ? tituloOriginal : undefined,
+    idiomaOriginal: languageName(rawSerie.original_language),
+    paises: countryNames(rawSerie.origin_country ?? []),
+    votos: rawSerie.vote_count,
+    equipo: crewOf(rawSerie.credits?.crew),
+    similares: mapSimilar(rawSerie.similar?.results, 'serie'),
+    // `episode_run_time` llega vacío en muchas series recientes: se cae a la
+    // duración del último episodio emitido.
+    duracionEpisodio:
+      rawSerie.episode_run_time?.find((minutes) => minutes > 0) ??
+      rawSerie.last_episode_to_air?.runtime ??
+      undefined,
+    estado: seriesStatus(rawSerie.status),
+    listaTemporadas: (rawSerie.seasons ?? [])
+      .filter((season) => season.season_number > 0 && (season.episode_count ?? 0) > 0)
+      .map((season) => ({
+        numero: season.season_number,
+        nombre: season.name ?? `Temporada ${season.season_number}`,
+        episodios: season.episode_count ?? 0,
+        fecha: season.air_date ?? '',
+      })),
+    proximoEpisodio:
+      next?.air_date && next.season_number && next.episode_number
+        ? { fecha: next.air_date, temporada: next.season_number, episodio: next.episode_number }
+        : undefined,
+  };
 }

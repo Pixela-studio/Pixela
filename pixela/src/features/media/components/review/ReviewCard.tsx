@@ -95,6 +95,9 @@ export const ReviewCard = ({
                     alt={review.user_name || 'Avatar'}
                     width={32}
                     height={32}
+                    // Sale de nuestra API o de una URL https del usuario: no
+                    // hay nada que ganar pasándola por el optimizador de Next.
+                    unoptimized
                     className={STYLES.user.avatar.image}
                   />
                 ) : (
@@ -104,6 +107,11 @@ export const ReviewCard = ({
                 )}
               </span>
               <span className={STYLES.user.name}>{review.user_name || 'Usuario'}</span>
+              {review.is_public === false && (
+                <span className="rounded-sm border border-white/30 px-1.5 py-0.5 text-xs text-white/80">
+                  Solo tú la ves
+                </span>
+              )}
             </div>
             {!isEditing && (
               <span className="flex items-center">

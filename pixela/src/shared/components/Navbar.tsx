@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { MdLogout } from 'react-icons/md';
-import { FiUser, FiX } from 'react-icons/fi';
+import { FiSearch, FiUser, FiX } from 'react-icons/fi';
 import { RxHamburgerMenu } from 'react-icons/rx';
 import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { mainNavLinks } from '@/links/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useSectionNavigation } from '@/hooks/useSectionNavigation';
+import { loginHrefForHere } from '@/lib/authRedirect';
 
 /**
  * Returns whether the current pathname matches this nav link.
@@ -43,16 +44,17 @@ const STYLES = {
   navLinksContainer: 'flex gap-7 xl:gap-9',
   // Inactivo atenuado a 65% para que el activo (magenta) destaque; hover
   // devuelve al 100% mientras el underline crece.
-  navLink: 'text-[15px] font-medium [font-stretch:112%] text-white/70 relative group py-1 transition-colors duration-200 hover:text-white',
+  navLink: 'whitespace-nowrap text-[15px] font-medium [font-stretch:112%] text-white/70 relative group py-1 transition-colors duration-200 hover:text-white',
   navLinkActive: 'text-white',
   // Se escala en vez de animar `width`: así no fuerza layout en cada frame.
   navLinkUnderline: 'absolute -bottom-0.5 left-0 w-full h-0.5 bg-pixela-accent origin-left scale-x-0 transition-transform duration-300 ease-out-expo group-hover:scale-x-100',
   navLinkUnderlineActive: 'scale-x-100',
   userSection: 'hidden lg:flex ml-auto items-center',
   userContainer: 'flex items-center gap-2',
-  userName: 'text-pixela-light text-sm',
+  userName: 'whitespace-nowrap text-pixela-light text-sm',
   button: 'text-pixela-light/80 hover:text-pixela-accent transition-colors duration-300 p-2 rounded-full hover:bg-pixela-dark/30',
   divider: 'mx-2 h-6 w-0.5 bg-pixela-light/20',
+  searchLink: 'flex items-center gap-2 rounded-full p-2 text-[15px] font-medium [font-stretch:112%] text-pixela-light/80 transition-colors duration-300 hover:text-white lg:mr-4',
 
   // Estilos para el menú hamburguesa
   mobileMenuButton: 'lg:hidden text-pixela-light hover:text-pixela-accent p-2 transition-colors duration-300 mr-1 ml-auto',
@@ -198,7 +200,7 @@ export const Navbar = () => {
       router.push('/profile');
       setMobileMenuOpen(false);
     } else {
-      router.push('/login');
+      router.push(loginHrefForHere());
     }
   };
 
@@ -291,6 +293,18 @@ export const Navbar = () => {
             </div>
           </div>
           
+          {/* Buscador global, en todas las pantallas: los cinco testers de la
+              ronda 2 lo buscaron arriba y solo existía dentro de Categorías. */}
+          <Link
+            href="/buscar"
+            prefetch={false}
+            className={STYLES.searchLink}
+            aria-label="Buscar películas, series y personas"
+          >
+            <FiSearch className="w-5 h-5" aria-hidden="true" />
+            <span className="hidden xl:inline">Buscar</span>
+          </Link>
+
           <div className={STYLES.userSection}>
             {isAuthenticated && user ? (
               <div className={STYLES.userContainer}>

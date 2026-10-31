@@ -47,12 +47,4 @@ export interface MediaState {
   setActiveGalleryTab: (tab: 'backdrops' | 'posters') => void;
   selectedGalleryImage: string | null;
   setSelectedGalleryImage: (image: string | null) => void;
-
-  /**
-   * Estado que maneja el reproductor de trailers
-   * @property {string | null} selectedTrailerId - ID del trailer seleccionado
-   * @property {function} setSelectedTrailerId - Función para actualizar el trailer seleccionado
-   */
-  selectedTrailerId: string | null;
-  setSelectedTrailerId: (trailerId: string | null) => void;
 } 

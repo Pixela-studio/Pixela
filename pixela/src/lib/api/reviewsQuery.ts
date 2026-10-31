@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import type { Review } from "@/api/reviews/types";
@@ -23,30 +24,53 @@ export function mediaPathFor(tmdbId: number | bigint, itemType: ItemType): strin
   return `/${segment}/${tmdbId}`;
 }
 
+/**
+ * URL de la foto del autor, nunca la foto en sí.
+ *
+ * Las fotos subidas son data URI de hasta 512 KB y viajaban dentro del HTML de
+ * la ficha. Se sirven aparte desde `/api/users/[id]/avatar`, con la fecha de
+ * actualización como versión para poder cachearlas.
+ */
+export function avatarUrlFor(userId: number, photoUrl: string | null, updatedAt: Date): string | undefined {
+  if (!photoUrl) return undefined;
+  if (photoUrl.startsWith("https://")) return photoUrl;
+  if (!photoUrl.startsWith("data:image/")) return undefined;
+  return `/api/users/${userId}/avatar?v=${updatedAt.getTime()}`;
+}
+
+/**
+ * Reseñas de un título: las públicas y, si se pasa `viewerId`, también las
+ * «solo para mí» de esa persona. La ficha ISR llama sin `viewerId`: su HTML es
+ * el mismo para todos y no puede llevar nada privado.
+ */
 export async function getMediaReviews(
   tmdbId: number,
   itemType: ItemType,
+  viewerId?: number,
 ): Promise<Review[]> {
   const reviews = await prisma.review.findMany({
     where: {
       tmdbId: BigInt(tmdbId),
       itemType,
+      OR: [{ isPublic: true }, ...(viewerId ? [{ userId: viewerId }] : [])],
     },
     orderBy: { createdAt: "desc" },
     include: {
-      user: { select: { name: true, photoUrl: true } },
+      user: { select: { name: true, photoUrl: true, updatedAt: true } },
     },
   });
 
   return reviews.map((review) => ({
     id: review.id,
+    // Hace falta para que el autor vea "editar" y "borrar" en la suya.
     user_id: review.userId,
     user_name: review.user.name,
-    photo_url: review.user.photoUrl ?? undefined,
+    photo_url: avatarUrlFor(review.userId, review.user.photoUrl, review.user.updatedAt),
     tmdb_id: Number(review.tmdbId),
     item_type: review.itemType,
     rating: Number(review.rating),
     review: review.review ?? "",
+    is_public: review.isPublic,
     created_at: review.createdAt.toISOString(),
     updated_at: review.updatedAt.toISOString(),
   }));
@@ -89,4 +113,23 @@ export async function getMediaReviewsSafe(
     });
     return [];
   }
+}
+
+/**
+ * Fichas donde un usuario tiene reseñas.
+ *
+ * Las fichas son ISR y llevan dentro el nombre y la foto del autor de cada
+ * reseña. Si el autor cambia de nombre o de foto, o borra la cuenta, hay que
+ * invalidarlas; si no, siguen mostrando lo de antes hasta una hora.
+ */
+export async function reviewPathsOf(userId: number): Promise<string[]> {
+  const rows = await prisma.review.findMany({
+    where: { userId },
+    select: { tmdbId: true, itemType: true },
+  });
+  return rows.map((row) => mediaPathFor(row.tmdbId, row.itemType));
+}
+
+export function revalidatePaths(paths: string[]): void {
+  for (const path of new Set(paths)) revalidatePath(path);
 }

@@ -26,3 +26,10 @@ export const ACCOUNT_LINKS: FooterLink[] = [
   { name: 'Iniciar sesión', href: '/login' },
   { name: 'Crear cuenta', href: '/register' }
 ];
+
+/** Textos legales, en la franja inferior del pie. */
+export const LEGAL_LINKS: FooterLink[] = [
+  { name: 'Aviso legal', href: '/aviso-legal' },
+  { name: 'Privacidad', href: '/privacidad' },
+  { name: 'Cookies', href: '/cookies' }
+];

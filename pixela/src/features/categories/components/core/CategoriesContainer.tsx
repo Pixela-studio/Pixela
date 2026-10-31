@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CategoriesList } from "@/features/categories/components/navigation/CategoriesList";
 import { CategoriesContent } from "@/features/categories/components/core/CategoriesContent";
 import { CategoriesHeader } from "@/features/categories/components/navigation/CategoriesHeader";
@@ -9,6 +10,13 @@ import { Category } from "@/api/categories/categories";
 import { useCategoriesStore } from "@/features/categories/store/categoriesStore";
 import { useContentLoader } from "@/features/categories/hooks/useContentLoader";
 import { MediaType } from "@/features/categories/types/media";
+import { FiltersPanel } from "@/features/categories/components/filters/FiltersPanel";
+import {
+  readFilters,
+  writeFilters,
+  type CatalogFilters,
+} from "@/features/categories/filters";
+import { useMyPlatforms } from "@/hooks/useMyPlatforms";
 
 const STYLES = {
   // Layout Principal
@@ -37,12 +45,67 @@ const STYLES = {
  * @component
  * @returns {JSX.Element} El componente CategoriesContainer renderizado
  */
+const MEDIA_TYPES: readonly MediaType[] = ["all", "movies", "series", "random"];
+
+/** Estado de Categorías tal como vive en la URL. */
+interface UrlState {
+  tipo: MediaType;
+  genero: number | null;
+  q: string;
+  pagina: number;
+  filtros: CatalogFilters;
+}
+
+function readUrlState(params: URLSearchParams): UrlState {
+  const tipo = params.get("tipo") as MediaType | null;
+  const genero = Number.parseInt(params.get("genero") ?? "", 10);
+  const pagina = Number.parseInt(params.get("pagina") ?? "", 10);
+  return {
+    tipo: tipo && MEDIA_TYPES.includes(tipo) ? tipo : "all",
+    genero: Number.isInteger(genero) && genero > 0 ? genero : null,
+    q: (params.get("q") ?? "").trim().slice(0, 200),
+    pagina: Number.isInteger(pagina) && pagina > 0 ? Math.min(pagina, 500) : 1,
+    filtros: readFilters(params),
+  };
+}
+
+function toQueryString({ tipo, genero, q, pagina, filtros }: UrlState): string {
+  const params = new URLSearchParams();
+  if (tipo !== "all") params.set("tipo", tipo);
+  if (genero) params.set("genero", String(genero));
+  if (q) params.set("q", q);
+  if (pagina > 1) params.set("pagina", String(pagina));
+  writeFilters(params, filtros);
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+/**
+ * Categorías: explorar por tipo y género, buscar y paginar.
+ *
+ * El tipo, el género, la búsqueda y la página viven en la URL
+ * (`/categories?tipo=movies&genero=27&q=…&pagina=2`). Antes eran estado en
+ * memoria: al entrar en una ficha y volver atrás se perdía la búsqueda, y no se
+ * podía mandar a nadie un enlace a «terror, página 3». Se usa `replace` para no
+ * llenar el historial con cada pulsación del buscador.
+ */
 export const CategoriesContainer = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [initialUrlState] = useState(() =>
+    readUrlState(new URLSearchParams(searchParams.toString())),
+  );
+
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
+    initialUrlState.genero ? ({ id: initialUrlState.genero, name: "" } as Category) : null,
   );
   const [isInitialized, setIsInitialized] = useState(false);
-  const { selectedMediaType, setSelectedMediaType } = useCategoriesStore();
+  const [restored, setRestored] = useState(false);
+  const [filters, setFilters] = useState<CatalogFilters>(initialUrlState.filtros);
+  const { ids: platformIds } = useMyPlatforms();
+  const discover = { filters, platformIds };
+  const { selectedMediaType, setSelectedMediaType, categories } = useCategoriesStore();
 
   // Para el hook useContentLoader, convertimos 'random' a 'all' ya que cargamos todo
   const loaderMediaType =
@@ -51,6 +114,7 @@ export const CategoriesContainer = () => {
   const {
     movies,
     series,
+    ordered,
     loading,
     error,
     currentPage,
@@ -61,104 +125,146 @@ export const CategoriesContainer = () => {
     searchQuery,
   } = useContentLoader(loaderMediaType);
 
-  /**
-   * Maneja la selección de una categoría y carga su contenido.
-   *
-   * @param {Category} category - La categoría seleccionada
-   */
+  // El género restaurado desde la URL llega solo con el id; el nombre se
+  // completa cuando la lista de géneros está en memoria.
+  const resolvedCategory =
+    selectedCategory && !selectedCategory.name
+      ? categories.find((category) => category.id === selectedCategory.id) ?? selectedCategory
+      : selectedCategory;
+
+  const syncUrl = useCallback(
+    (state: UrlState) => {
+      router.replace(`${pathname}${toQueryString(state)}`, { scroll: false });
+    },
+    [router, pathname],
+  );
+
   const handleCategorySelect = useCallback(
     async (category: Category) => {
       setSelectedCategory(category);
       resetContent();
-      await loadContent(category, 1);
+      syncUrl({ tipo: selectedMediaType, genero: category.id, q: "", pagina: 1, filtros: filters });
+      await loadContent(category, 1, discover);
     },
-    [loadContent, resetContent],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loadContent, resetContent, syncUrl, selectedMediaType, filters, platformIds],
   );
 
-  /**
-   * Maneja el cambio de página en la paginación.
-   * Preserva el término de búsqueda si existe una búsqueda activa.
-   *
-   * @param {number} page - El número de página a cargar
-   */
+  /** Cambio de página; conserva la búsqueda si la hay. */
   const handlePageChange = useCallback(
     async (page: number) => {
-      if (searchQuery.trim()) {
-        // Si hay una búsqueda activa, usar searchContent para preservar el término de búsqueda
-        await searchContent(searchQuery, page);
+      const q = searchQuery.trim();
+      syncUrl({
+        tipo: selectedMediaType,
+        genero: q ? null : selectedCategory?.id ?? null,
+        q,
+        pagina: page,
+        filtros: filters,
+      });
+      if (q) {
+        await searchContent(q, page);
       } else {
-        // Si no hay búsqueda, usar loadContent normal
-        await loadContent(selectedCategory, page);
+        await loadContent(selectedCategory, page, discover);
       }
     },
-    [selectedCategory, loadContent, searchContent, searchQuery],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedCategory, loadContent, searchContent, searchQuery, syncUrl, selectedMediaType, filters, platformIds],
   );
 
-  /**
-   * Maneja el cambio de tipo de medio.
-   *
-   * @param {MediaType} type - El nuevo tipo de medio
-   */
   const handleMediaTypeChange = useCallback(
-    async (type: MediaType) => {
+    (type: MediaType) => {
       setSelectedMediaType(type);
       setSelectedCategory(null);
       resetContent();
+      syncUrl({ tipo: type, genero: null, q: "", pagina: 1, filtros: filters });
     },
-    [setSelectedMediaType, resetContent],
+    [setSelectedMediaType, resetContent, syncUrl, filters],
   );
 
-  /**
-   * Maneja la búsqueda de contenido
-   * @param {string} query - Término de búsqueda
-   */
   const handleSearch = useCallback(
     async (query: string) => {
-      if (query.trim()) {
-        setSelectedCategory(null);
-        resetContent();
-        await searchContent(query, 1);
+      const q = query.trim();
+      setSelectedCategory(null);
+      resetContent();
+      syncUrl({ tipo: selectedMediaType, genero: null, q, pagina: 1, filtros: filters });
+      if (q) {
+        await searchContent(q, 1);
       } else {
-        resetContent();
-        await loadContent(null, 1);
+        await loadContent(null, 1, discover);
       }
     },
-    [searchContent, loadContent, resetContent],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchContent, loadContent, resetContent, syncUrl, selectedMediaType, filters, platformIds],
   );
 
-  // Carga inicial del contenido
+  // Arranque: el tipo sale de la URL.
   useEffect(() => {
-    const initializeContent = async () => {
-      if (!isInitialized) {
-        await handleMediaTypeChange("all");
-        setIsInitialized(true);
-      }
-    };
+    if (isInitialized) return;
+    setSelectedMediaType(initialUrlState.tipo);
+    setIsInitialized(true);
+  }, [isInitialized, initialUrlState, setSelectedMediaType]);
 
-    initializeContent();
-  }, [isInitialized, handleMediaTypeChange]);
-
-  // Manejar cambios en el tipo de medio después de la inicialización
+  // Carga al cambiar de tipo. La primera vez restaura género, búsqueda y
+  // página de la URL; las siguientes empieza de cero.
   useEffect(() => {
-    if (isInitialized) {
-      loadContent(null, 1);
+    if (!isInitialized) return;
+    if (!restored) {
+      setRestored(true);
+      const { q, pagina } = initialUrlState;
+      if (q) void searchContent(q, pagina);
+      else void loadContent(selectedCategory, pagina, discover);
+      return;
     }
-  }, [selectedMediaType, isInitialized, loadContent]);
+    void loadContent(null, 1, discover);
+    // `selectedCategory` y `restored` solo cuentan en el arranque.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedMediaType, isInitialized, loadContent, searchContent]);
 
   // Scroll automático al top cuando cambia la página (excepto la inicial)
   useEffect(() => {
     if (currentPage > 1 && typeof window !== "undefined") {
-      // Pequeño delay para asegurar que el contenido se ha actualizado
       const timeoutId = setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }, 100);
 
       return () => clearTimeout(timeoutId);
     }
   }, [currentPage]);
+
+  /** Reintenta lo último que se pidió: la búsqueda o la página del género. */
+  const handleRetry = useCallback(() => {
+    if (searchQuery.trim()) void searchContent(searchQuery, currentPage);
+    else void loadContent(selectedCategory, currentPage, discover);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, searchContent, loadContent, selectedCategory, currentPage, filters, platformIds]);
+
+  /** Cambiar un filtro vuelve a la página 1 del mismo género. */
+  const handleFiltersChange = useCallback(
+    (next: CatalogFilters) => {
+      setFilters(next);
+      syncUrl({
+        tipo: selectedMediaType,
+        genero: selectedCategory?.id ?? null,
+        q: searchQuery.trim(),
+        pagina: 1,
+        filtros: next,
+      });
+      if (!searchQuery.trim()) void loadContent(selectedCategory, 1, { filters: next, platformIds });
+    },
+    [syncUrl, selectedMediaType, selectedCategory, searchQuery, loadContent, platformIds],
+  );
+
+  // Si cambian las plataformas elegidas con el filtro puesto, se recarga.
+  const platformKey = platformIds.join(",");
+  const [lastPlatformKey, setLastPlatformKey] = useState(platformKey);
+  useEffect(() => {
+    if (platformKey === lastPlatformKey) return;
+    setLastPlatformKey(platformKey);
+    if (filters.misPlataformas && !searchQuery.trim() && restored) {
+      void loadContent(selectedCategory, 1, { filters, platformIds });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [platformKey]);
 
   return (
     <div className={STYLES.container}>
@@ -175,7 +281,7 @@ export const CategoriesContainer = () => {
               <div className={STYLES.categoriesContainer}>
                 <CategoriesList
                   onCategorySelect={handleCategorySelect}
-                  selectedCategory={selectedCategory}
+                  selectedCategory={resolvedCategory}
                   mediaType={selectedMediaType}
                 />
               </div>
@@ -189,15 +295,30 @@ export const CategoriesContainer = () => {
                 <div className="mb-6 lg:hidden">
                   <CategoriesList
                     onCategorySelect={handleCategorySelect}
-                    selectedCategory={selectedCategory}
+                    selectedCategory={resolvedCategory}
                     mediaType={selectedMediaType}
                   />
                 </div>
               )}
 
+            <FiltersPanel
+              filters={filters}
+              onChange={handleFiltersChange}
+              mediaType={selectedMediaType}
+              searching={Boolean(searchQuery.trim())}
+            />
+
+            {filters.misPlataformas && platformIds.length === 0 && (
+              <p className="mb-6 text-sm text-gray-400">
+                Elige tus plataformas en «Filtros» para ver solo lo que tienes incluido.
+              </p>
+            )}
+
             <div className="transform-gpu">
               <CategoriesContent
-                selectedCategory={selectedCategory}
+                selectedCategory={resolvedCategory}
+                ordered={ordered}
+                onRetry={handleRetry}
                 movies={
                   selectedMediaType === "random"
                     ? movies

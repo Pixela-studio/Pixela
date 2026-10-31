@@ -69,15 +69,41 @@ export async function getAllCategories(): Promise<Category[]> {
  * @param mediaType Tipo de medio ('movies', 'series', 'all')
  * @returns Array de categorías filtradas
  */
+/**
+ * Géneros que TMDB solo usa en series, con su nombre en castellano: la API los
+ * devuelve en inglés aunque se pidan en `es-ES` («Kids», «Soap», «Talk»…).
+ * En Películas no deben salir: filtrar por «News» no devuelve ninguna película.
+ */
+const SERIES_ONLY_CATEGORIES: Record<number, string> = {
+    10759: 'Acción y aventura',
+    10762: 'Infantil',
+    10763: 'Noticias',
+    10764: 'Reality',
+    10765: 'Ciencia ficción y fantasía',
+    10766: 'Telenovela',
+    10767: 'Entrevistas',
+    10768: 'Bélica y política',
+};
+
 export function filterCategoriesForMediaType(
     allCategories: Category[],
     mediaType: 'movies' | 'series' | 'all',
 ): Category[] {
-    if (mediaType !== 'series') {
-        return allCategories;
+    const translated = allCategories.map((category) =>
+        SERIES_ONLY_CATEGORIES[category.id]
+            ? { ...category, name: SERIES_ONLY_CATEGORIES[category.id] }
+            : category,
+    );
+
+    if (mediaType === 'movies') {
+        return translated.filter((category) => !SERIES_ONLY_CATEGORIES[category.id]);
     }
 
-    return allCategories.filter(category => {
+    if (mediaType !== 'series') {
+        return translated;
+    }
+
+    return translated.filter(category => {
         const isMovieOnlyByName = MOVIE_ONLY_CATEGORIES.includes(category.name);
         const isMovieOnlyById = MOVIE_ONLY_CATEGORY_IDS.includes(category.id);
 

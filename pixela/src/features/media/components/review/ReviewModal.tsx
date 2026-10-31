@@ -54,9 +54,11 @@ interface ReviewFormData {
   /** `null` hasta que se elige una nota: el modal no propone ninguna. */
   rating: number | null;
   review: string;
+  /** «Solo para mí»: la reseña no sale en la ficha. */
+  private: boolean;
 }
 
-const EMPTY_FORM: ReviewFormData = { rating: null, review: '' };
+const EMPTY_FORM: ReviewFormData = { rating: null, review: '', private: false };
 
 interface ReviewModalWithExistingProps extends ReviewModalProps {
   /**
@@ -108,6 +110,7 @@ export const ReviewModal = ({
   const isEditing = existingReview !== null;
   const rating = watch('rating');
   const reviewText = watch('review') ?? '';
+  const isPrivate = watch('private');
 
   useFocusTrap(dialogRef, isOpen, { onEscape: onClose });
 
@@ -139,7 +142,11 @@ export const ReviewModal = ({
     if (!isOpen) return;
     reset(
       existingReview
-        ? { rating: Number(existingReview.rating), review: existingReview.review ?? '' }
+        ? {
+            rating: Number(existingReview.rating),
+            review: existingReview.review ?? '',
+            private: existingReview.is_public === false,
+          }
         : EMPTY_FORM,
     );
   }, [isOpen, existingReview, reset]);
@@ -182,7 +189,8 @@ export const ReviewModal = ({
         tmdb_id: tmdbId,
         item_type: itemType,
         rating: data.rating,
-        review: data.review
+        review: data.review,
+        is_public: !data.private,
       };
       await reviewsAPI.add(reviewData);
 
@@ -303,6 +311,24 @@ export const ReviewModal = ({
               </p>
             )}
           </div>
+
+          {/* Lo que la interfaz no decía: la reseña la lee cualquiera. Y la
+              opción que pedía Pedro para no publicarla. */}
+          <label className="flex items-start gap-3 text-sm leading-relaxed text-white/80">
+            <input
+              type="checkbox"
+              {...register('private')}
+              className="mt-0.5 h-5 w-5 shrink-0 rounded-sm accent-pixela-accent"
+            />
+            <span>
+              Solo para mí
+              <span className="block text-white/55">
+                {isPrivate
+                  ? 'Nadie más la verá: no sale en la ficha ni en ningún listado.'
+                  : 'Si no la marcas, tu reseña será pública: se verá en esta ficha con tu nombre y tu foto, también para quien no tenga cuenta.'}
+              </span>
+            </span>
+          </label>
 
           {apiError && (
             <div role="alert" className={STYLES.content.apiError}>

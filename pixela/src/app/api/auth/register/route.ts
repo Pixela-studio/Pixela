@@ -8,33 +8,42 @@ import {
   parseJsonBody,
   validationError,
 } from "@/lib/api/responses";
-import { enforceRateLimit } from "@/lib/api/rateLimit";
+import {
+  checkRateLimit,
+  getClientIp,
+  peekRateLimit,
+  rateLimitedResponse,
+} from "@/lib/api/rateLimit";
+import { emailSchema, nameSchema, passwordSchema } from "@/lib/validation/account";
 
 const BCRYPT_ROUNDS = 12;
 
-/** Altas permitidas por IP y hora: frena la creación masiva de cuentas. */
+/** Altas creadas por IP y hora: frena la creación masiva de cuentas. */
 const REGISTER_LIMIT = { name: "register", limit: 5, windowMs: 60 * 60 * 1000 };
 
 const registerSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder los 50 caracteres")
-    .regex(
-      /^[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*$/,
-      "El nombre solo puede contener letras, números y los caracteres . _ - (sin espacios ni caracteres especiales)",
-    ),
-  email: z.string().trim().toLowerCase().email("Email inválido"),
-  password: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .max(128, "La contraseña es demasiado larga"),
+  name: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+  /*
+   * Aceptar las condiciones y declarar la edad mínima no es opcional: sin eso
+   * no hay base para tratar los datos (art. 6.1.b RGPD y art. 7 LOPDGDD). Se
+   * comprueba aquí y no solo con la casilla, porque la API se puede llamar sin
+   * pasar por el formulario.
+   */
+  accept_terms: z.literal(true, "Tienes que aceptar las condiciones y la política de privacidad."),
 });
 
 export async function POST(request: Request) {
-  const limited = enforceRateLimit(request, REGISTER_LIMIT);
-  if (limited) return limited;
+  /*
+   * El cupo se consulta al entrar y se gasta solo cuando la cuenta se crea.
+   * Antes se gastaba en cada intento, también en los que fallaban por un nombre
+   * con tilde o un email repetido: cinco errores de tecleo en un aula y nadie
+   * más podía registrarse en una hora desde esa red.
+   */
+  const ip = getClientIp(request);
+  const quota = peekRateLimit(ip, REGISTER_LIMIT);
+  if (!quota.allowed) return rateLimitedResponse(quota);
 
   const body = await parseJsonBody(request);
   if (!body.ok) return body.response;
@@ -59,9 +68,12 @@ export async function POST(request: Request) {
         name,
         email,
         password: await bcrypt.hash(password, BCRYPT_ROUNDS),
+        termsAcceptedAt: new Date(),
       },
       select: { id: true },
     });
+
+    checkRateLimit(ip, REGISTER_LIMIT);
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {

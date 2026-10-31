@@ -1,6 +1,6 @@
 import { CreatorAvatar } from './CreatorAvatar';
 import { CreatorInfoProps } from '@/features/media/types/creators';
-import { Serie } from '@/features/media/types/content';
+import { Pelicula, Serie } from '@/features/media/types/content';
 
 
 const STYLES = {
@@ -17,38 +17,23 @@ const STYLES = {
  */
 export const CreatorInfo = ({ media }: CreatorInfoProps) => {
   const isSerie = media.tipo === 'serie';
-  const serie = media as Serie;
-  
-  // Si no hay creadores, no renderizamos nada
-  if (!(isSerie ? (serie.creadores?.length ?? 0) > 0 : media.creador)) {
-    return null;
-  }
-  
+
+  // Todos los directores, no solo el primero que aparecía en los créditos:
+  // las codirecciones (los Coen, los Daniels) perdían a una de las dos personas.
+  const people = isSerie
+    ? (media as Serie).creadores ?? []
+    : (media as Pelicula).directores ??
+      (media.creador ? [{ ...media.creador, id: String(media.creador.id) }] : []);
+
+  if (people.length === 0) return null;
+
   return (
     <div className={STYLES.container}>
-      <h3 className={STYLES.title}>
-        {isSerie 
-          ? 'Creada por'
-          : 'Dirección'
-        }
-      </h3>
+      <h3 className={STYLES.title}>{isSerie ? 'Creada por' : 'Dirección'}</h3>
       <div className={STYLES.creatorsWrapper}>
-        {isSerie ? (
-          (serie.creadores ?? []).map((creador) => (
-            <CreatorAvatar 
-              key={creador.id} 
-              photo={creador.foto} 
-              name={creador.nombre} 
-            />
-          ))
-        ) : (
-          media.creador && (
-            <CreatorAvatar 
-              photo={media.creador.foto} 
-              name={media.creador.nombre} 
-            />
-          )
-        )}
+        {people.map((person) => (
+          <CreatorAvatar key={person.id} photo={person.foto} name={person.nombre} personId={person.id} />
+        ))}
       </div>
     </div>
   );

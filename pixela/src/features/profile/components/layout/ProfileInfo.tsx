@@ -68,7 +68,7 @@ export const ProfileInfo = ({ user: initialUser, onEdit, refreshTrigger }: Profi
 
       <div className={STYLES.content}>
         <div className={STYLES.field}>
-          <p className={STYLES.label}>Username</p>
+          <p className={STYLES.label}>Nombre público</p>
           <div className={STYLES.value}>
             <FiUser className={STYLES.icon} />
             <span>{user.name}</span>
