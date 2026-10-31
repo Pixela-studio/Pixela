@@ -141,3 +141,28 @@ export const searchQuerySchema = z
   .trim()
   .min(1, "La búsqueda no puede estar vacía")
   .max(200, "La búsqueda es demasiado larga");
+
+/* ── Listas ──────────────────────────────────────────────────────────────── */
+
+export const listVisibilitySchema = z.enum(["PRIVATE", "LINK", "PUBLIC"]);
+
+export const createListSchema = z.object({
+  name: z.string().trim().min(1, "Ponle un nombre a la lista").max(80, "El nombre es demasiado largo"),
+  description: z.string().trim().max(500, "La descripción es demasiado larga").optional(),
+  visibility: listVisibilitySchema.optional(),
+});
+
+export const updateListSchema = createListSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, { message: "No hay nada que actualizar" });
+
+export const addListItemSchema = z.object({
+  tmdb_id: tmdbIdSchema,
+  item_type: itemTypeSchema,
+  note: z.string().trim().max(280, "La nota es demasiado larga").optional(),
+});
+
+/** El orden completo de la lista: ids de sus elementos de arriba abajo. */
+export const reorderListSchema = z.object({
+  item_ids: z.array(resourceIdSchema).min(1).max(500),
+});

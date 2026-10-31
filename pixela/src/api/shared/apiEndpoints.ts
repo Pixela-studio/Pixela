@@ -54,6 +54,9 @@ export const API_ENDPOINTS = {
     SESSIONS: `${API_BASE_URL}/users/me/sessions`,
   },
 
+  /** Listas con nombre. */
+  LISTS: `${API_BASE_URL}/lists`,
+
   /** Plataformas de streaming de España, para «Mis plataformas». */
   PROVIDERS: `${API_BASE_URL}/tmdb/providers`,
 

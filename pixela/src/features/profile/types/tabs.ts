@@ -4,7 +4,7 @@ import { ReactNode } from "react";
  * Tipos de pestañas
  * @type {TabType}
  */
-export type TabType = "profile" | "reviews" | "favorites" | "users" | "library";
+export type TabType = "profile" | "reviews" | "favorites" | "users" | "library" | "lists";
 
 /**
  * Props para el componente ProfileTabs

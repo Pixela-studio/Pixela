@@ -24,6 +24,7 @@ import {
   FiActivity,
   FiGrid,
   FiStar,
+  FiList,
 } from "react-icons/fi";
 import type { IconType } from "react-icons";
 import { FaRegBookmark, FaRegComments } from "react-icons/fa";
@@ -35,6 +36,7 @@ import { useProfileStats } from "@/features/profile/hooks/useProfileStats";
 import { ProfileHero } from "./layout/ProfileHero";
 import { ProfileStatsBar } from "./layout/ProfileStatsBar";
 import { AccountDataPanel } from "./layout/AccountDataPanel";
+import { ProfileLists } from "@/features/lists/components/ProfileLists";
 
 const STYLES = {
   // Contenedores principales
@@ -81,6 +83,7 @@ type ProfileTab = { id: TabType; label: string; icon: IconType };
 const BASE_TABS: ProfileTab[] = [
   { id: "profile", label: "General", icon: FiSettings },
   { id: "library", label: "Biblioteca", icon: FiGrid },
+  { id: "lists", label: "Listas", icon: FiList },
   { id: "reviews", label: "Reseñas", icon: FaRegComments },
   { id: "favorites", label: "Favoritos", icon: FaRegBookmark },
 ];
@@ -352,6 +355,12 @@ export const ProfileClient = ({ user: initialUser }: ProfileClientProps) => {
           {activeTab === "library" && (
             <ContentPanel title="Tu Biblioteca">
               <ProfileLibrary />
+            </ContentPanel>
+          )}
+
+          {activeTab === "lists" && (
+            <ContentPanel title="Tus listas">
+              <ProfileLists onOpenFavorites={() => changeTab("favorites")} />
             </ContentPanel>
           )}
 

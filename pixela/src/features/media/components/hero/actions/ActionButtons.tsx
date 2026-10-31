@@ -11,6 +11,8 @@ import { loginHrefForHere } from "@/lib/authRedirect";
 import { LibraryButton } from "@/features/media/components/actions/LibraryButton";
 import { useFavoriteToggle } from "@/hooks/useFavoriteToggle";
 import { ShareButton } from "@/shared/components/ShareButton";
+import { AddToListDialog } from "@/features/lists/components/AddToListDialog";
+import { FiList } from "react-icons/fi";
 
 /*
  * Jerarquía de la fila de acciones.
@@ -64,6 +66,20 @@ export const ActionButtons = ({
     itemType,
   });
 
+  const [showListsDialog, setShowListsDialog] = useState(false);
+
+  const handleLists = () => {
+    if (!isAuthenticated) {
+      toast.info("Inicia sesión para guardar títulos en tus listas", {
+        title: "Autenticación requerida",
+        duration: 3000,
+      });
+      router.push(loginHrefForHere());
+      return;
+    }
+    setShowListsDialog(true);
+  };
+
   const handleReview = () => {
     if (!isAuthenticated) {
       toast.info("Inicia sesión para escribir una reseña", {
@@ -116,8 +132,28 @@ export const ActionButtons = ({
           </span>
         </button>
 
+        <button
+          onClick={handleLists}
+          className={STYLES.reviewButton}
+          type="button"
+          aria-label={`Añadir «${title}» a una lista`}
+        >
+          <FiList aria-hidden="true" className={STYLES.penIcon} />
+          <span aria-hidden="true" className={STYLES.buttonLabel}>
+            Listas
+          </span>
+        </button>
+
         <ShareButton title={title} className={STYLES.reviewButton} />
       </div>
+
+      <AddToListDialog
+        isOpen={showListsDialog}
+        onClose={() => setShowListsDialog(false)}
+        tmdbId={tmdbId}
+        itemType={itemType}
+        title={title}
+      />
 
       <ReviewModal
         isOpen={showReviewModal}

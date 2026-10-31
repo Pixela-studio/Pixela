@@ -29,6 +29,7 @@ model User {
   favorites     Favorite[]
   reviews       Review[]
   libraryItems  LibraryItem[]
+  lists         List[]
 
   @@map("users")
 }
@@ -89,4 +90,52 @@ model LibraryItem {
 
   @@unique([userId, itemType, tmdbId])
   @@map("library_items")
+}
+
+enum ListVisibility {
+  /// Solo la ve quien la creó.
+  PRIVATE
+  /// La ve quien tenga el enlace; no se indexa ni sale en ningún listado.
+  LINK
+  /// Pública: se puede enlazar y compartir abiertamente.
+  PUBLIC
+}
+
+/// Listas con nombre: «Viernes en familia», «Ciclo coming of age». La feature
+/// más votada de la ronda 2 del beta test.
+model List {
+  id          Int            @id @default(autoincrement()) @map("list_id")
+  userId      Int            @map("user_id")
+  name        String         @db.VarChar(80)
+  description String?        @db.VarChar(500)
+  visibility  ListVisibility @default(PRIVATE)
+  /// Identificador de la URL pública (`/listas/<shareId>`). Aleatorio para que
+  /// una lista «con enlace» no se pueda adivinar recorriendo ids.
+  shareId     String         @unique @map("share_id") @db.VarChar(24)
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items ListItem[]
+
+  @@index([userId])
+  @@map("lists")
+}
+
+model ListItem {
+  id       Int      @id @default(autoincrement()) @map("list_item_id")
+  listId   Int      @map("list_id")
+  itemType ItemType @map("item_type")
+  tmdbId   BigInt   @map("tmdb_id")
+  /// Orden manual dentro de la lista (0, 1, 2…).
+  position Int
+  /// Por qué está en la lista: «para la sesión del jueves».
+  note     String?  @db.VarChar(280)
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, itemType, tmdbId])
+  @@index([listId, position])
+  @@map("list_items")
 }

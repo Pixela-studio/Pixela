@@ -13,8 +13,8 @@ const DATA_URI = /^data:(image\/(?:png|jpe?g|webp|gif));base64,(.+)$/i;
  * también con 3G. Ahora la ficha lleva solo esta URL, con `?v=` para que el
  * navegador y la CDN la guarden hasta que el usuario cambie de foto.
  *
- * Solo se sirve la foto de quien tiene alguna reseña, que es la que ya es
- * pública. Recorrer ids no descubre la foto de nadie más.
+ * Solo se sirve la foto de quien tiene alguna reseña o lista pública, que es
+ * donde ya aparece. Recorrer ids no descubre la foto de nadie más.
  */
 export async function GET(
   _request: Request,
@@ -26,7 +26,13 @@ export async function GET(
 
   try {
     const user = await prisma.user.findFirst({
-      where: { id: parsedId.data, reviews: { some: { isPublic: true } } },
+      where: {
+        id: parsedId.data,
+        OR: [
+          { reviews: { some: { isPublic: true } } },
+          { lists: { some: { visibility: { not: "PRIVATE" } } } },
+        ],
+      },
       select: { photoUrl: true },
     });
 
