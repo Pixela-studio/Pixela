@@ -64,24 +64,24 @@ El catálogo (películas, series, actores, tráilers y plataformas) llega en tie
     <td width="50%"><img src=".github/assets/screen-series.webp" alt="Ficha de serie" width="100%" /></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Ficha de película</b> · nota, director, plataformas y acciones rápidas</sub></td>
-    <td align="center"><sub><b>Ficha de serie</b> · temporadas, episodios y creador</sub></td>
+    <td align="center"><sub><b>Película</b> · nota, director y plataformas</sub></td>
+    <td align="center"><sub><b>Serie</b> · temporadas, episodios y creador</sub></td>
   </tr>
   <tr>
     <td width="50%"><img src=".github/assets/screen-categories.webp" alt="Categorías" width="100%" /></td>
     <td width="50%"><img src=".github/assets/screen-trending.webp" alt="Tendencias" width="100%" /></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Categorías</b> · búsqueda, filtros por tipo y "Sorpréndeme"</sub></td>
-    <td align="center"><sub><b>Tendencias</b> · lo más visto hoy, en series y en películas</sub></td>
+    <td align="center"><sub><b>Categorías</b> · búsqueda y filtros por tipo</sub></td>
+    <td align="center"><sub><b>Tendencias</b> · lo más visto hoy</sub></td>
   </tr>
   <tr>
     <td width="50%"><img src=".github/assets/screen-actor.webp" alt="Ficha de actor" width="100%" /></td>
     <td width="50%"><img src=".github/assets/screen-mobile.webp" alt="Pixela en móvil" width="100%" /></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Actores</b> · biografía y filmografía destacada</sub></td>
-    <td align="center"><sub><b>Móvil</b> · cada pantalla adaptada a cualquier tamaño</sub></td>
+    <td align="center"><sub><b>Actores</b> · biografía y filmografía</sub></td>
+    <td align="center"><sub><b>Móvil</b> · adaptado a cualquier pantalla</sub></td>
   </tr>
 </table>
 
